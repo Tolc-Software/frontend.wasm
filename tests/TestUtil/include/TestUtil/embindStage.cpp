@@ -1,11 +1,11 @@
 #include "TestUtil/embindStage.hpp"
 #include "Stage/cmakeStage.hpp"
-#include "TestStage/stageFunctions.hpp"
 #include "TestUtil/parse.hpp"
 #include <IR/ir.hpp>
 #include <Parser/Parse.hpp>
 #include <filesystem>
 #include <fmt/format.h>
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -15,7 +15,11 @@ namespace TestUtil {
 EmbindStage::EmbindStage(std::filesystem::path const& baseStage,
                          std::string const& moduleName)
     : m_stage(baseStage / "EmscriptenStage",
-              {"cmake", "CMakeLists.txt", "configureAndBuild.bat"}),
+              {"cmake",
+               "CMakeLists.txt",
+               "configureAndBuild.bat",
+               "package.json",
+               "node_modules"}),
       m_moduleName(moduleName) {
 	m_stage.setTargetName(m_moduleName);
 	m_stage.setWindowsCMakeBuildAndConfigureScript("configureAndBuild.bat");
@@ -54,27 +58,26 @@ int EmbindStage::runEmbindUnittest(std::string const& testBody) {
 		}
 	}
 
-	return 1;
+	addJestUnitTest(testBody);
 
-	std::vector<std::string> includes = {m_moduleName};
-	std::string testName = "default";
+	return m_stage.runCommand("./node_modules/jest/bin/jest.js");
+}
 
-	// Store all the lines in the test
-	std::vector<std::string> body;
-	std::string::size_type pos = 0;
-	std::string::size_type prev = 0;
-	while ((pos = testBody.find('\n', prev)) != std::string::npos) {
-		body.push_back(testBody.substr(prev, pos - prev));
-		prev = pos + 1;
-	}
+void EmbindStage::addJestUnitTest(std::string const& body) {
+	std::string test = std::string(R"(
+var m = require('./build/defaultModule');
 
-	// To get the last substring (or only, if delimiter is not found)
-	body.push_back(testBody.substr(prev));
+test('Default test', () => {
+	m.onRuntimeInitialized = function() {
+)") + body + std::string(R"(
+	};
+});
+	)");
 
-	TestStage::addPythonUnittest(
-	    m_stage.m_stage, m_moduleName, testName, body, includes);
-
-	return TestStage::runEmbindUnittest(m_stage.m_stage, m_moduleName);
+	std::string filename = m_moduleName + ".test.js";
+	std::ofstream testFile(m_stage.m_stage / filename);
+	testFile << test;
+	testFile.close();
 }
 
 void EmbindStage::keepAliveAfterTest() {

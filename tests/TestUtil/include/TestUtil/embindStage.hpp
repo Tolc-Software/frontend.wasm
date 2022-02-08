@@ -21,16 +21,17 @@ struct EmbindStage {
 	void addModuleFile(std::filesystem::path const& file,
 	                   std::string const& content);
 
-	/**
-	* Injects input python code testBody into a python unittest file.
-	* The content of testBody will be copied into a function and the unittest module can be used freely.
-	*/
 	int runEmbindUnittest(std::string const& testBody);
 
 	/**
 	* Run this to keep the stage on the filesystem after the test has completed
 	*/
 	void keepAliveAfterTest();
+
+	/**
+	 * Adds a jest unittest to build directory in the stage
+	 */
+	void addJestUnitTest(std::string const& body);
 
 	Stage::CMakeStage m_stage;
 	std::string m_moduleName;

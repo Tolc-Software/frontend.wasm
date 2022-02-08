@@ -17,10 +17,9 @@ int sayTen() {
 }
 )";
 
-	auto jsTestCode = fmt::format(R"(
-{moduleName}.sayTen()
-)",
-	                              fmt::arg("moduleName", moduleName));
+	auto jsTestCode = R"(
+expect(m.sayTen()).toBe(10);
+)";
 
 	auto errorCode =
 	    TestUtil::runEmbindTest(stage, cppCode, jsTestCode, moduleName);
