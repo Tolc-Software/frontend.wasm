@@ -12,7 +12,7 @@ std::string Module::getEmbind() const {
 	}
 
 	for (auto const& cls : m_classes) {
-		out += fmt::format("\t{};\n", cls.getEmbind(m_prefix));
+		out += fmt::format("\t{};\n", cls.getEmbind());
 	}
 
 	for (auto const& e : m_enums) {

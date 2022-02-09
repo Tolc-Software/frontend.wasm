@@ -98,12 +98,12 @@ foreach(
   Helpers/combine.cpp
   Helpers/string.cpp
   # EmbindProxy/attribute.cpp
-  # EmbindProxy/class.cpp
+  EmbindProxy/class.cpp
   # EmbindProxy/enum.cpp
   EmbindProxy/function.cpp
   EmbindProxy/module.cpp
   EmbindProxy/moduleFile.cpp
-  # arrays.cpp
+  arrays.cpp
   # classes.cpp
   # complex.cpp
   # deques.cpp

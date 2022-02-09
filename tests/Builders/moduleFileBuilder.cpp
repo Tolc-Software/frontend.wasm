@@ -23,19 +23,19 @@ TEST_CASE(
 
 	auto file = Builders::buildModuleFile(ns, moduleName).value();
 	auto path = file.getFilepath();
-	auto pybind = file.getEmbind();
+	auto embind = file.getEmbind();
 	CAPTURE(path);
-	CAPTURE(pybind);
+	CAPTURE(embind);
 
 	REQUIRE(path == "MyModule.cpp");
 
 	for (auto const& expectedContains :
-	     {"#include <pybind11/pybind11.h>",
-	      "#include <pybind11/stl.h>",
-	      "namespace py = pybind11;",
+	     {"#include <embind11/embind11.h>",
+	      "#include <embind11/stl.h>",
+	      "namespace em = pybind11;",
 	      "PYBIND11_MODULE(MyModule, MyModule)"}) {
 		CAPTURE(expectedContains);
-		REQUIRE(TestUtil::contains(pybind, expectedContains));
+		REQUIRE(TestUtil::contains(embind, expectedContains));
 	}
 }
 
@@ -45,18 +45,18 @@ TEST_CASE("One level namespace", "[moduleFileBuilder]") {
 
 	auto file = Builders::buildModuleFile(ns, moduleName).value();
 	auto path = file.getFilepath();
-	auto pybind = file.getEmbind();
+	auto embind = file.getEmbind();
 	CAPTURE(path);
-	CAPTURE(pybind);
+	CAPTURE(embind);
 
 	REQUIRE(path == "MyModule.cpp");
 
 	for (auto const& expectedContains :
-	     {"#include <pybind11/pybind11.h>",
-	      "namespace py = pybind11;",
+	     {"#include <embind11/embind11.h>",
+	      "namespace em = pybind11;",
 	      "PYBIND11_MODULE(MyModule, MyModule)"}) {
 		CAPTURE(expectedContains);
-		REQUIRE(TestUtil::contains(pybind, expectedContains));
+		REQUIRE(TestUtil::contains(embind, expectedContains));
 	}
 }
 
@@ -74,9 +74,9 @@ TEST_CASE("Two level namespace", "[moduleFileBuilder]") {
 	std::string moduleName = "MyModule";
 	auto file = Builders::buildModuleFile(ns, moduleName).value();
 	auto path = file.getFilepath();
-	auto pybind = file.getEmbind();
+	auto embind = file.getEmbind();
 	CAPTURE(path);
-	CAPTURE(pybind);
+	CAPTURE(embind);
 
 	REQUIRE(path == "MyModule.cpp");
 
@@ -88,7 +88,7 @@ TEST_CASE("Two level namespace", "[moduleFileBuilder]") {
 		CAPTURE(subNamespace);
 		CAPTURE(expectedContains);
 
-		REQUIRE(TestUtil::contains(pybind, expectedContains));
+		REQUIRE(TestUtil::contains(embind, expectedContains));
 	}
 }
 
@@ -109,14 +109,14 @@ TEST_CASE("Three level namespace", "[moduleFileBuilder]") {
 
 	std::string moduleName = "MyModule";
 	auto file = Builders::buildModuleFile(ns, moduleName).value();
-	auto pybind = file.getEmbind();
-	CAPTURE(pybind);
+	auto embind = file.getEmbind();
+	CAPTURE(embind);
 
 	auto firstSub = R"(auto MyModule_sub = MyModule.def_submodule("sub");)";
 
-	REQUIRE(TestUtil::contains(pybind, firstSub));
+	REQUIRE(TestUtil::contains(embind, firstSub));
 
 	auto secondSub =
 	    R"(auto MyModule_sub_subsub = MyModule_sub.def_submodule("subsub");)";
-	REQUIRE(TestUtil::contains(pybind, secondSub));
+	REQUIRE(TestUtil::contains(embind, secondSub));
 }

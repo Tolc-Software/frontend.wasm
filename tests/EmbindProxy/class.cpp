@@ -4,23 +4,19 @@
 #include <fmt/format.h>
 
 TEST_CASE("Empty class", "[class]") {
-	std::string moduleName = "myModule";
 	std::string className = "myClass";
 	EmbindProxy::Class c(className, className);
-	auto pybindCode = c.getEmbind(moduleName);
-	CAPTURE(pybindCode);
+	auto embindCode = c.getEmbind();
+	CAPTURE(embindCode);
 
 	using TestUtil::contains;
-	auto expectedContains =
-	    fmt::format(R"(py::class_<{className}>({moduleName}, "{className}"))",
-	                fmt::arg("className", className),
-	                fmt::arg("moduleName", moduleName));
+	auto expectedContains = fmt::format(R"(class_<{className}>("{className}"))",
+	                                    fmt::arg("className", className));
 	CAPTURE(expectedContains);
-	REQUIRE(contains(pybindCode, expectedContains));
+	REQUIRE(contains(embindCode, expectedContains));
 }
 
 TEST_CASE("Class with functions", "[class]") {
-	std::string moduleName = "myModule";
 	std::string className = "myOtherClass";
 	EmbindProxy::Class c(className, className);
 
@@ -29,50 +25,27 @@ TEST_CASE("Class with functions", "[class]") {
 		c.addFunction(EmbindProxy::Function(function, function));
 	}
 
-	auto pybindCode = c.getEmbind(moduleName);
-	CAPTURE(pybindCode);
+	auto embindCode = c.getEmbind();
+	CAPTURE(embindCode);
+	std::string classDecl =
+	    fmt::format("class_<{}>(\"{}\")", className, className);
+	CAPTURE(classDecl);
 
 	using TestUtil::contains;
+
+	REQUIRE(contains(embindCode, classDecl));
+
 	for (auto const& function : functions) {
 		auto expectedContains =
-		    fmt::format("\t.def(\"{function}\", &{function}",
+		    fmt::format("\t\t.function(\"{function}\", &{function}",
 		                fmt::arg("function", function));
 		CAPTURE(function);
 		CAPTURE(expectedContains);
-		REQUIRE(contains(pybindCode, expectedContains));
+		REQUIRE(contains(embindCode, expectedContains));
 	}
 }
 
-TEST_CASE("Class with enum", "[class]") {
-	std::string moduleName = "myModule";
-	std::string className = "myFreshClass";
-	EmbindProxy::Class c(className, className);
-
-	std::string enumName = "MyEnum";
-	std::string fullyQualifiedName = moduleName + "::" + enumName;
-	EmbindProxy::Enum e(enumName, fullyQualifiedName);
-	e.setScoped(false);
-	e.addValue("Hi");
-	c.addEnum(e);
-
-	using TestUtil::contains;
-	auto expectedContains = fmt::format(
-	    R"(py::enum_<{fullyQualifiedName}>({className}, "{enumName}")",
-	    fmt::arg("fullyQualifiedName", fullyQualifiedName),
-	    fmt::arg("enumName", enumName),
-	    fmt::arg("className", className));
-	auto pybind = c.getEmbind(moduleName);
-	CAPTURE(pybind);
-	CAPTURE(expectedContains);
-	REQUIRE(TestUtil::contains(pybind, expectedContains));
-	// Require exporting since it is scoped
-	std::string exportValues = "\t.export_values()";
-	CAPTURE(exportValues);
-	REQUIRE(TestUtil::contains(pybind, exportValues));
-}
-
 TEST_CASE("Class with constructor", "[class]") {
-	std::string moduleName = "myModule";
 	std::string className = "myFreshClass";
 	EmbindProxy::Class c(className, className);
 
@@ -84,18 +57,17 @@ TEST_CASE("Class with constructor", "[class]") {
 	constructor.setAsConstructor();
 	c.addConstructor(constructor);
 
-	auto pybindCode = c.getEmbind(moduleName);
-	CAPTURE(pybindCode);
+	auto embindCode = c.getEmbind();
+	CAPTURE(embindCode);
 
 	using TestUtil::contains;
 	auto expectedContains =
-	    fmt::format("\t.def(py::init<{}>()", fmt::join(arguments, ", "));
+	    fmt::format("\t\t.constructor<{}>()", fmt::join(arguments, ", "));
 	CAPTURE(expectedContains);
-	REQUIRE(contains(pybindCode, expectedContains));
+	REQUIRE(contains(embindCode, expectedContains));
 }
 
 TEST_CASE("Class with member variables", "[class]") {
-	std::string moduleName = "NewlyMadeModule";
 	std::string className = "SuperbClass";
 	EmbindProxy::Class c(className, className);
 
@@ -109,27 +81,69 @@ TEST_CASE("Class with member variables", "[class]") {
 		c.addMemberVariable(variable, false, false);
 	}
 
-	auto pybindCode = c.getEmbind(moduleName);
-	CAPTURE(pybindCode);
+	auto embindCode = c.getEmbind();
+	CAPTURE(embindCode);
 
 	using TestUtil::contains;
 	for (auto const& variable : constVariables) {
-		auto expectedContains = fmt::format(
-		    "\t.def_readonly(\"{variable}\", &{className}::{variable})",
-		    fmt::arg("variable", variable),
-		    fmt::arg("className", className));
+		auto expectedProperty = fmt::format("\t\t.property(\"{variable}\", ",
+		                                    fmt::arg("variable", variable));
 
-		CAPTURE(expectedContains);
-		REQUIRE(contains(pybindCode, expectedContains));
+		auto expectedGetter =
+		    fmt::format("[](auto& _tolc_c) {{ return _tolc_c.{variable}; }})",
+		                fmt::arg("variable", variable));
+
+		CAPTURE(expectedProperty);
+		CAPTURE(expectedGetter);
+		REQUIRE(contains(embindCode, expectedProperty));
+		REQUIRE(contains(embindCode, expectedGetter));
 	}
 
 	for (auto const& variable : nonConstVariables) {
-		auto expectedContains = fmt::format(
-		    "\t.def_readwrite(\"{variable}\", &{className}::{variable})",
-		    fmt::arg("variable", variable),
-		    fmt::arg("className", className));
+		auto expectedProperty = fmt::format("\t\t.property(\"{variable}\", ",
+		                                    fmt::arg("variable", variable));
 
-		CAPTURE(expectedContains);
-		REQUIRE(contains(pybindCode, expectedContains));
+		auto expectedGetter =
+		    fmt::format("[](auto& _tolc_c) {{ return _tolc_c.{variable}; }}",
+		                fmt::arg("variable", variable));
+
+		auto expectedSetter = fmt::format(
+		    "[](auto& _tolc_c, auto const& _tolc_v) {{ _tolc_c.{variable} = _tolc_v; }})",
+		    fmt::arg("variable", variable));
+
+		CAPTURE(expectedProperty);
+		CAPTURE(expectedGetter);
+		CAPTURE(expectedSetter);
+		REQUIRE(contains(embindCode, expectedProperty));
+		REQUIRE(contains(embindCode, expectedGetter));
+		REQUIRE(contains(embindCode, expectedSetter));
 	}
 }
+
+// TEST_CASE("Class with enum", "[class]") {
+// 	std::string className = "myFreshClass";
+// 	EmbindProxy::Class c(className, className);
+
+// 	std::string enumName = "MyEnum";
+// 	std::string fullyQualifiedName = moduleName + "::" + enumName;
+// 	EmbindProxy::Enum e(enumName, fullyQualifiedName);
+// 	e.setScoped(false);
+// 	e.addValue("Hi");
+// 	c.addEnum(e);
+
+// 	using TestUtil::contains;
+// 	auto expectedContains = fmt::format(
+// 	    R"(py::enum_<{fullyQualifiedName}>({className}, "{enumName}")",
+// 	    fmt::arg("fullyQualifiedName", fullyQualifiedName),
+// 	    fmt::arg("enumName", enumName),
+// 	    fmt::arg("className", className));
+// 	auto pybind = c.getEmbind();
+// 	CAPTURE(pybind);
+// 	CAPTURE(expectedContains);
+// 	REQUIRE(TestUtil::contains(pybind, expectedContains));
+// 	// Require exporting since it is scoped
+// 	std::string exportValues = "\t.export_values()";
+// 	CAPTURE(exportValues);
+// 	REQUIRE(TestUtil::contains(pybind, exportValues));
+// }
+

@@ -71,7 +71,8 @@ std::optional<std::string> extractRegisterCommands(IR::Type const& type) {
 				                        type.m_representation));
 				     ++i) {
 					// See https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html#value-types
-					registerCmd += fmt::format(".element(index<{}>())", i);
+					registerCmd +=
+					    fmt::format(".element(emscripten::index<{}>())", i);
 				}
 			}
 

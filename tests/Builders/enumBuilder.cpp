@@ -22,11 +22,11 @@ TEST_CASE("Can build simple enums", "[enumBuilder]") {
 	e.m_isScoped = true;
 
 	auto proxyEnum = Builders::buildEnum(e);
-	auto pybind = proxyEnum.getEmbind(moduleName);
-	CAPTURE(pybind);
+	auto embind = proxyEnum.getEmbind(moduleName);
+	CAPTURE(embind);
 
 	// Since it is an enum class we should not export it
-	REQUIRE(!TestUtil::contains(pybind, "export_values()"));
+	REQUIRE(!TestUtil::contains(embind, "export_values()"));
 
 	auto expectedContains = fmt::format(
 	    R"(py::enum_<{fullyQualifiedName}>({moduleName}, "{enumName}")",
@@ -34,12 +34,12 @@ TEST_CASE("Can build simple enums", "[enumBuilder]") {
 	    fmt::arg("moduleName", moduleName),
 	    fmt::arg("enumName", e.m_name));
 	CAPTURE(expectedContains);
-	REQUIRE(TestUtil::contains(pybind, expectedContains));
+	REQUIRE(TestUtil::contains(embind, expectedContains));
 	for (auto const& value : values) {
 		CAPTURE(value);
 		// .value("A", Module::MyEnum::A)
 		REQUIRE(TestUtil::contains(
-		    pybind,
+		    embind,
 		    fmt::format(R"(.value("{value}", {fullyQualifiedName}::{value})",
 		                fmt::arg("value", value),
 		                fmt::arg("fullyQualifiedName", e.m_representation))));

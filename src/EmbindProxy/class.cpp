@@ -4,40 +4,42 @@
 
 namespace EmbindProxy {
 
-std::string Class::getEmbind(std::string const& moduleName) const {
-	// Should this class be managed by a shared_ptr on the python side?
-	std::string managedByShared =
-	    m_isManagedByShared ?
-	        fmt::format(", std::shared_ptr<{}>", m_fullyQualifiedName) :
-            "";
+std::string Class::getEmbind() const {
+	std::string out =
+	    fmt::format("class_<{fullyQualifiedName}>(\"{name}\")\n",
+	                fmt::arg("fullyQualifiedName", m_fullyQualifiedName),
+	                fmt::arg("name", m_name));
 
-	std::string out = fmt::format(
-	    "py::class_<{fullyQualifiedName}{managedByShared}>({moduleName}, \"{name}\")\n",
-	    fmt::arg("fullyQualifiedName", m_fullyQualifiedName),
-	    fmt::arg("managedByShared", managedByShared),
-	    fmt::arg("name", m_name),
-	    fmt::arg("moduleName", moduleName));
+	if (m_isManagedByShared) {
+		out += fmt::format(
+		    "\t\t.smart_ptr_constructor(\"{fullyQualifiedName}\", &std::make_shared<{fullyQualifiedName}>\n",
+		    fmt::arg("fullyQualifiedName", m_fullyQualifiedName));
+	}
 
 	for (auto const& init : m_constructors) {
-		out += fmt::format("\t.{constructorPybind}\n",
-		                   fmt::arg("constructorPybind", init.getEmbind()));
+		out += fmt::format("\t\t.{constructorEmbind}\n",
+		                   fmt::arg("constructorEmbind", init.getEmbind()));
 	}
 
 	for (auto const& function : m_functions) {
-		out += fmt::format("\t.{functionPybind}\n",
-		                   fmt::arg("functionPybind", function.getEmbind()));
+		out += fmt::format("\t\t.{functionEmbind}\n",
+		                   fmt::arg("functionEmbind", function.getEmbind()));
 	}
 	// Remove the last newline
 	out.pop_back();
 
 	for (auto const& variable : m_memberVariables) {
-		std::string accessor = variable.m_isConst ? "readonly" : "readwrite";
-		std::string staticness = variable.m_isStatic ? "_static" : "";
+		// Create a setter for the variable if it isn't const
+		std::string setter =
+		    variable.m_isConst ?
+		        "" :
+                fmt::format(
+		            ", [](auto& _tolc_c, auto const& _tolc_v) {{ _tolc_c.{variableName} = _tolc_v; }}",
+		            fmt::arg("variableName", variable.m_name));
+
 		out += fmt::format(
-		    "\t.def_{accessor}{staticness}(\"{variableName}\", &{fullyQualifiedClassName}::{variableName})\n",
-		    fmt::arg("accessor", accessor),
-		    fmt::arg("staticness", staticness),
-		    fmt::arg("fullyQualifiedClassName", m_fullyQualifiedName),
+		    "\t\t.property(\"{variableName}\", [](auto& _tolc_c) {{ return _tolc_c.{variableName}; }}{setter})\n",
+		    fmt::arg("setter", setter),
 		    fmt::arg("variableName", variable.m_name));
 	}
 

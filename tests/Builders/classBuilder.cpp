@@ -43,8 +43,8 @@ TEST_CASE("Class with static member variables", "[classBuilder]") {
 
 	EmbindProxy::TypeInfo typeInfo;
 	auto myStruct = Builders::buildClass(s, typeInfo).value();
-	auto pybind = myStruct.getEmbind(moduleName);
-	CAPTURE(pybind);
+	auto embind = myStruct.getEmbind(moduleName);
+	CAPTURE(embind);
 
 	for (auto const& var : variables) {
 		auto accessor = var.isConst ? "readonly" : "readwrite";
@@ -54,7 +54,7 @@ TEST_CASE("Class with static member variables", "[classBuilder]") {
 		    fmt::arg("variableName", var.name),
 		    fmt::arg("className", s.m_name));
 		CAPTURE(expectedContains);
-		REQUIRE(TestUtil::contains(pybind, expectedContains));
+		REQUIRE(TestUtil::contains(embind, expectedContains));
 	}
 }
 
@@ -76,14 +76,14 @@ TEST_CASE("Class with static function", "[classBuilder]") {
 
 	EmbindProxy::TypeInfo typeInfo;
 	auto myStruct = Builders::buildClass(s, typeInfo).value();
-	auto pybind = myStruct.getEmbind(moduleName);
-	CAPTURE(pybind);
+	auto embind = myStruct.getEmbind(moduleName);
+	CAPTURE(embind);
 
 	auto expectedContains =
 	    fmt::format("\t.def_static(\"{function}\", &{function}",
 	                fmt::arg("function", f.m_name));
 	CAPTURE(expectedContains);
-	REQUIRE(TestUtil::contains(pybind, expectedContains));
+	REQUIRE(TestUtil::contains(embind, expectedContains));
 }
 
 TEST_CASE("Templated class", "[classBuilder]") {
@@ -102,15 +102,15 @@ TEST_CASE("Templated class", "[classBuilder]") {
 
 	EmbindProxy::TypeInfo typeInfo;
 	auto myStruct = Builders::buildClass(s, typeInfo).value();
-	auto pybind = myStruct.getEmbind(moduleName);
+	auto embind = myStruct.getEmbind(moduleName);
 	auto expectedContains = fmt::format(
 	    R"(py::class_<{fullyQualifiedClassName}>({moduleName}, "{className}"))",
 	    fmt::arg("fullyQualifiedClassName", s.m_representation),
 	    fmt::arg("moduleName", moduleName),
 	    fmt::arg("className", removedTemplatePars));
-	CAPTURE(pybind);
+	CAPTURE(embind);
 	CAPTURE(expectedContains);
-	REQUIRE(TestUtil::contains(pybind, expectedContains));
+	REQUIRE(TestUtil::contains(embind, expectedContains));
 }
 
 TEST_CASE("Class within namespace", "[classBuilder]") {
@@ -123,8 +123,8 @@ TEST_CASE("Class within namespace", "[classBuilder]") {
 
 	EmbindProxy::TypeInfo typeInfo;
 	auto myStruct = Builders::buildClass(s, typeInfo).value();
-	auto pybind = myStruct.getEmbind(moduleName);
-	CAPTURE(pybind);
+	auto embind = myStruct.getEmbind(moduleName);
+	CAPTURE(embind);
 
 	auto expectedContains = fmt::format(
 	    R"(py::class_<{fullyQualifiedClassName}>({moduleName}, "{className}"))",
@@ -132,7 +132,7 @@ TEST_CASE("Class within namespace", "[classBuilder]") {
 	    fmt::arg("moduleName", moduleName),
 	    fmt::arg("className", s.m_name));
 	CAPTURE(expectedContains);
-	REQUIRE(TestUtil::contains(pybind, expectedContains));
+	REQUIRE(TestUtil::contains(embind, expectedContains));
 }
 
 TEST_CASE("Empty class gets default constructor", "[classBuilder]") {
@@ -144,12 +144,12 @@ TEST_CASE("Empty class gets default constructor", "[classBuilder]") {
 
 	EmbindProxy::TypeInfo typeInfo;
 	auto myStruct = Builders::buildClass(s, typeInfo).value();
-	auto pybind = myStruct.getEmbind(moduleName);
-	CAPTURE(pybind);
+	auto embind = myStruct.getEmbind(moduleName);
+	CAPTURE(embind);
 
 	auto expectedContains = "def(py::init<>(), \"\")";
 	CAPTURE(expectedContains);
-	REQUIRE(TestUtil::contains(pybind, expectedContains));
+	REQUIRE(TestUtil::contains(embind, expectedContains));
 }
 
 TEST_CASE("Class with a constructor", "[classBuilder]") {
@@ -173,14 +173,14 @@ TEST_CASE("Class with a constructor", "[classBuilder]") {
 
 	EmbindProxy::TypeInfo typeInfo;
 	auto myStruct = Builders::buildClass(s, typeInfo).value();
-	auto pybind = myStruct.getEmbind(moduleName);
-	CAPTURE(pybind);
+	auto embind = myStruct.getEmbind(moduleName);
+	CAPTURE(embind);
 
 	auto expectedContains =
 	    fmt::format(R"(.def(py::init<{type}>(), "", py::arg("s"))",
 	                fmt::arg("type", t.m_representation));
 	CAPTURE(expectedContains);
-	REQUIRE(TestUtil::contains(pybind, expectedContains));
+	REQUIRE(TestUtil::contains(embind, expectedContains));
 }
 
 TEST_CASE("Class with functions", "[classBuilder]") {
@@ -218,15 +218,15 @@ TEST_CASE("Class with functions", "[classBuilder]") {
 
 	EmbindProxy::TypeInfo typeInfo;
 	auto myStruct = Builders::buildClass(s, typeInfo).value();
-	auto pybind = myStruct.getEmbind(moduleName);
-	CAPTURE(pybind);
+	auto embind = myStruct.getEmbind(moduleName);
+	CAPTURE(embind);
 
 	for (auto const& [function, argument] : functions) {
 		auto expectedContains =
 		    fmt::format("\t.def(\"{function}\", &{function}",
 		                fmt::arg("function", function));
 		CAPTURE(expectedContains);
-		REQUIRE(TestUtil::contains(pybind, expectedContains));
+		REQUIRE(TestUtil::contains(embind, expectedContains));
 	}
 }
 
@@ -254,8 +254,8 @@ TEST_CASE("Class with member variables", "[classBuilder]") {
 
 	EmbindProxy::TypeInfo typeInfo;
 	auto myStruct = Builders::buildClass(s, typeInfo).value();
-	auto pybind = myStruct.getEmbind(moduleName);
-	CAPTURE(pybind);
+	auto embind = myStruct.getEmbind(moduleName);
+	CAPTURE(embind);
 
 	for (auto const& var : variables) {
 		auto accessor = var.isConst ? "readonly" : "readwrite";
@@ -265,7 +265,7 @@ TEST_CASE("Class with member variables", "[classBuilder]") {
 		    fmt::arg("variableName", var.name),
 		    fmt::arg("className", s.m_name));
 		CAPTURE(expectedContains);
-		REQUIRE(TestUtil::contains(pybind, expectedContains));
+		REQUIRE(TestUtil::contains(embind, expectedContains));
 	}
 }
 
@@ -289,7 +289,7 @@ TEST_CASE("Class with vector in constructor gives the correct include",
 	auto myStruct = Builders::buildClass(s, typeInfo).value();
 	REQUIRE(typeInfo.m_includes.size() == 1);
 	for (auto const& include : typeInfo.m_includes) {
-		REQUIRE(include == "<pybind11/stl.h>");
+		REQUIRE(include == "<embind11/stl.h>");
 	}
 }
 
@@ -313,7 +313,7 @@ TEST_CASE("Class with vector in member function gives the correct include",
 	auto myStruct = Builders::buildClass(s, typeInfo).value();
 	REQUIRE(typeInfo.m_includes.size() == 1);
 	for (auto const& include : typeInfo.m_includes) {
-		REQUIRE(include == "<pybind11/stl.h>");
+		REQUIRE(include == "<embind11/stl.h>");
 	}
 }
 
@@ -331,13 +331,13 @@ TEST_CASE("Class with enum", "[classBuilder]") {
 
 	EmbindProxy::TypeInfo typeInfo;
 	auto myStruct = Builders::buildClass(s, typeInfo).value();
-	auto pybind = myStruct.getEmbind(moduleName);
+	auto embind = myStruct.getEmbind(moduleName);
 	auto expectedContains = fmt::format(
 	    R"(py::enum_<{representation}>({structureName}, "{enumName}")",
 	    fmt::arg("representation", e.m_representation),
 	    fmt::arg("enumName", e.m_name),
 	    fmt::arg("structureName", s.m_name));
-	CAPTURE(pybind);
+	CAPTURE(embind);
 	CAPTURE(expectedContains);
-	REQUIRE(TestUtil::contains(pybind, expectedContains));
+	REQUIRE(TestUtil::contains(embind, expectedContains));
 }

@@ -1,4 +1,3 @@
-#include "Frontend/Wasm/frontend.hpp"
 #include "TestStage/paths.hpp"
 #include "TestUtil/embindStage.hpp"
 #include "TestUtil/runEmbindTest.hpp"
@@ -14,58 +13,32 @@ TEST_CASE("Using std::arrays", "[arrays]") {
 #include <array>
 #include <string>
 
-class WithMember {
-public:
-	explicit WithMember(std::array<std::string, 2> s) : m_s(s) {}
+std::array<double, 3> getData3() {
+	return {0.0, 1.0, 2.0};
+}
 
-	std::array<std::string, 2> getS() { return m_s; }
-
-private:
-	std::array<std::string, 2> m_s;
-};
-
-class WithFunction {
-public:
-	int sum(std::array<int, 5> v) {
-		int s = 0;
-		for (auto i : v) {
-			s += i;
-		}
-		return s;
-	}
-};
+// Multiple array types at the same time
+std::array<int, 2> getData2() {
+	return {0, 1};
+}
 
 )";
 
-	auto pythonTestCode = fmt::format(R"(
-myArray = ["hi", "ho"]
-withMember = {moduleName}.WithMember(myArray)
-self.assertEqual(withMember.getS(), myArray)
+	auto jsTestCode = R"(
+var data3 = m.getData3();
 
-withFunction = {moduleName}.WithFunction()
-self.assertEqual(withFunction.sum([1, 2, 3, 4, 5]), 15)
+// It's just a normal JS array
+expect(data3.length).toBe(3);
 
-# Test array with too many/few values
-for incompatibleArray in [["too many", "too many", "too many"], ["too few"]]:
-    with self.assertRaises(TypeError) as error_context:
-        withMember = defaultModule.WithMember(incompatibleArray)
+expect(data3).toStrictEqual([0, 1, 2]);
 
-    self.assertEqual(len(error_context.exception.args), 1)
-    self.assertTrue(
-        "incompatible constructor arguments" in error_context.exception.args[0],
-        "Error msg does not mention incompatible arguments: "
-        + str(error_context.exception.args[0]),
-    )
-    self.assertTrue(
-        "Invoked with: " + str(incompatibleArray)
-        in error_context.exception.args[0],
-        "Error msg does not mention the given arguments: " + str(error_context.exception.args[0]),
-    )
+var data2 = m.getData2();
+expect(data2.length).toBe(2);
 
-)",
-	                                  fmt::arg("moduleName", moduleName));
+expect(data2).toStrictEqual([0, 1]);
+)";
 
 	auto errorCode =
-	    TestUtil::runEmbindTest(stage, cppCode, pythonTestCode, moduleName);
+	    TestUtil::runEmbindTest(stage, cppCode, jsTestCode, moduleName);
 	REQUIRE(errorCode == 0);
 }

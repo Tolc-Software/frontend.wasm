@@ -1,4 +1,3 @@
-#include "Frontend/Wasm/frontend.hpp"
 #include "TestStage/paths.hpp"
 #include "TestUtil/embindStage.hpp"
 #include "TestUtil/runEmbindTest.hpp"

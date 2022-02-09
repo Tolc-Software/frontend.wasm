@@ -12,6 +12,6 @@ TEST_CASE("function returning containers adds the correct include", "[functionBu
 	auto jsFunction = Builders::buildFunction(f, typeInfo).value();
 	REQUIRE(typeInfo.m_includes.size() == 1);
 	for (auto const& include : typeInfo.m_includes) {
-		REQUIRE(include == "<pybind11/stl.h>");
+		REQUIRE(include == "<embind11/stl.h>");
 	}
 }

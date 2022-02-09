@@ -28,7 +28,7 @@ public:
 	// instead of the default std::unique_ptr
 	void setAsManagedByShared();
 
-	std::string getEmbind(std::string const& moduleName) const;
+	std::string getEmbind() const;
 
 private:
 	struct MemberVariable {

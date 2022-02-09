@@ -16,13 +16,13 @@ TEST_CASE("Can build simple attributes", "[attributeBuilder]") {
 
 	EmbindProxy::TypeInfo typeInfo;
 	auto proxyAttribute = Builders::buildAttribute(moduleName, v, typeInfo);
-	auto pybind = proxyAttribute.getEmbind();
-	CAPTURE(pybind);
+	auto embind = proxyAttribute.getEmbind();
+	CAPTURE(embind);
 
 	auto expectedContains =
 	    fmt::format(R"(attr("{name}") = &{fullyQualifiedName})",
 	                fmt::arg("fullyQualifiedName", fullyQualifiedName),
 	                fmt::arg("name", v.m_name));
 	CAPTURE(expectedContains);
-	REQUIRE(TestUtil::contains(pybind, expectedContains));
+	REQUIRE(TestUtil::contains(embind, expectedContains));
 }

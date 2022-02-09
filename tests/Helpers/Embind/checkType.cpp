@@ -36,7 +36,9 @@ TEST_CASE("Construct value_array", "[checkType]") {
 	for (auto const& command : typeInfo.m_registerCommands) {
 		REQUIRE(TestUtil::contains(
 		    command, "value_array<std::array<int, 2>>(\"array_int_2\")"));
-		REQUIRE(TestUtil::contains(command, ".element(index<0>())"));
-		REQUIRE(TestUtil::contains(command, ".element(index<1>())"));
+		REQUIRE(
+		    TestUtil::contains(command, ".element(emscripten::index<0>())"));
+		REQUIRE(
+		    TestUtil::contains(command, ".element(emscripten::index<1>())"));
 	}
 }
