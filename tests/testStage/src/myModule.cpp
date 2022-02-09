@@ -1,5 +1,6 @@
 #include <emscripten/bind.h>
 #include <string>
+#include <vector>
 
 class MyClass {
 public:
@@ -25,6 +26,14 @@ private:
 	std::string y;
 };
 
+std::vector<std::string> f(std::vector<int> v) {
+	std::vector<std::string> out;
+	for (auto const& e : v) {
+		out.push_back(std::to_string(e));
+	}
+	return out;
+}
+
 // Binding code
 EMSCRIPTEN_BINDINGS(my_class_example) {
 	emscripten::class_<MyClass>("MyClass")
@@ -33,4 +42,8 @@ EMSCRIPTEN_BINDINGS(my_class_example) {
 	    .property("x", &MyClass::getX, &MyClass::setX)
 	    .class_function("getStringFromInstance",
 	                    &MyClass::getStringFromInstance);
+
+	emscripten::function("f", &f);
+	emscripten::register_vector<int>("vector<int>");
+	emscripten::register_vector<std::string>("vector<string >");
 }

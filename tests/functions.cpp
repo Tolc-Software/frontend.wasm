@@ -9,16 +9,23 @@ TEST_CASE("Write to file functions", "[functions]") {
 	std::string moduleName = "defaultModule";
 	auto stage =
 	    TestUtil::EmbindStage(TestStage::getRootStagePath(), moduleName);
-	stage.keepAliveAfterTest();
 
 	auto cppCode = R"(
+#include <string>
+
 int sayTen() {
 	return 10;
+}
+
+std::string giveBack(std::string const& s) {
+	return s;
 }
 )";
 
 	auto jsTestCode = R"(
 expect(m.sayTen()).toBe(10);
+
+expect(m.giveBack("hello")).toBe("hello");
 )";
 
 	auto errorCode =

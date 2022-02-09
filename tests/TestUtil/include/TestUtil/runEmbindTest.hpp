@@ -2,7 +2,6 @@
 
 #include "Frontend/Wasm/frontend.hpp"
 #include "TestUtil/embindStage.hpp"
-#include <iostream>
 
 namespace TestUtil {
 

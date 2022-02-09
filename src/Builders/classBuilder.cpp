@@ -15,23 +15,19 @@
 
 namespace Builders {
 
-namespace {
-
-}    // namespace
-
 std::optional<EmbindProxy::Class> buildClass(IR::Struct const& cppClass,
                                              EmbindProxy::TypeInfo& typeInfo) {
-	EmbindProxy::Class pyClass(
+	EmbindProxy::Class jsClass(
 	    Helpers::removeCppTemplate(cppClass.m_name) +
-	        Builders::getTemplateParameterString(cppClass.m_templateArguments),
+	        Builders::getSeparatedTypeString(cppClass.m_templateArguments, "_"),
 	    cppClass.m_representation);
 
 	auto overloadedFunctions =
 	    Helpers::getOverloadedFunctions(cppClass.m_public.m_functions);
 	// Ignore private functions
 	for (auto const& function : cppClass.m_public.m_functions) {
-		if (auto maybePyFunction = buildFunction(function, typeInfo)) {
-			auto jsFunction = maybePyFunction.value();
+		if (auto maybeJsFunction = buildFunction(function, typeInfo)) {
+			auto jsFunction = maybeJsFunction.value();
 
 			if (function.m_isStatic) {
 				jsFunction.setAsStatic();
@@ -42,15 +38,15 @@ std::optional<EmbindProxy::Class> buildClass(IR::Struct const& cppClass,
 				jsFunction.setAsOverloaded();
 			}
 
-			pyClass.addFunction(jsFunction);
+			jsClass.addFunction(jsFunction);
 		} else {
 			return std::nullopt;
 		}
 	}
 
 	for (auto const& constructor : cppClass.m_public.m_constructors) {
-		if (auto maybePyFunction = buildFunction(constructor, typeInfo)) {
-			auto jsFunction = maybePyFunction.value();
+		if (auto maybeJsFunction = buildFunction(constructor, typeInfo)) {
+			auto jsFunction = maybeJsFunction.value();
 
 			if (constructor.m_isStatic) {
 				jsFunction.setAsStatic();
@@ -61,13 +57,13 @@ std::optional<EmbindProxy::Class> buildClass(IR::Struct const& cppClass,
 			}
 
 			jsFunction.setAsConstructor();
-			pyClass.addConstructor(jsFunction);
+			jsClass.addConstructor(jsFunction);
 		}
 	}
 
 	for (auto const& variable : cppClass.m_public.m_memberVariables) {
 		Helpers::Embind::checkType(variable.m_type, typeInfo);
-		pyClass.addMemberVariable(variable.m_name,
+		jsClass.addMemberVariable(variable.m_name,
 		                          variable.m_type.m_isConst,
 		                          variable.m_type.m_isStatic);
 	}
@@ -75,19 +71,19 @@ std::optional<EmbindProxy::Class> buildClass(IR::Struct const& cppClass,
 	// Add default constructor
 	if (cppClass.m_hasImplicitDefaultConstructor) {
 		auto constructor =
-		    EmbindProxy::Function(pyClass.getName(), pyClass.getName());
+		    EmbindProxy::Function(jsClass.getName(), jsClass.getName());
 		constructor.setAsConstructor();
-		pyClass.addConstructor(constructor);
+		jsClass.addConstructor(constructor);
 	}
 
 	for (auto const& e : cppClass.m_public.m_enums) {
-		pyClass.addEnum(buildEnum(e));
+		jsClass.addEnum(buildEnum(e));
 	}
 
 	if (typeInfo.m_classesMarkedShared.contains(cppClass.m_representation)) {
-		pyClass.setAsManagedByShared();
+		jsClass.setAsManagedByShared();
 	}
 
-	return pyClass;
+	return jsClass;
 }
 }    // namespace Builders

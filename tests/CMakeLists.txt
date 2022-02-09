@@ -46,7 +46,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(stage_content)
 
 # Everything put in TestUtil/include is available
-add_library(TestUtil TestUtil/include/TestUtil/embindStage.cpp)
+add_library(TestUtil TestUtil/include/TestUtil/embindStage.cpp TestUtil/include/TestUtil/parse.cpp)
 target_include_directories(TestUtil PUBLIC TestUtil/include)
 target_link_libraries(TestUtil PRIVATE Tolc::Parser Catch2::Catch2 Tolc::Stage)
 target_link_libraries(TestUtil PUBLIC IR::IR)
@@ -93,9 +93,10 @@ foreach(
   # Builders/enumBuilder.cpp
   # Builders/functionBuilder.cpp
   # Builders/moduleFileBuilder.cpp
-  # Builders/typeToStringBuilder.cpp
-  # Helpers/Embind/checkType.cpp
-  # Helpers/combine.cpp
+  Builders/typeToStringBuilder.cpp
+  Helpers/Embind/checkType.cpp
+  Helpers/combine.cpp
+  Helpers/string.cpp
   # EmbindProxy/attribute.cpp
   # EmbindProxy/class.cpp
   # EmbindProxy/enum.cpp
@@ -128,7 +129,7 @@ foreach(
   # userDefined.cpp
   # valarrays.cpp
   # variants.cpp
-  # vectors.cpp)
+  vectors.cpp
   )
 # Ex: EmbindProxy/moduleFile.cpp -> moduleFile
   get_filename_component(testName ${test} NAME_WLE)

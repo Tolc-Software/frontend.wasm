@@ -4,6 +4,17 @@
 
 namespace EmbindProxy {
 
+namespace {
+std::string joinRegisterCommands(std::set<std::string> const& commands) {
+	std::string out;
+
+	for (auto const& cmd : commands) {
+		out += fmt::format("\t{};\n", cmd);
+	}
+	return out;
+}
+}    // namespace
+
 ModuleFile::ModuleFile(Module const& rootModule, std::string const& libraryName)
     : m_rootModuleName(rootModule.getPrefix()), m_libraryName(libraryName),
       m_modules({rootModule}), m_typeInfo() {}
@@ -31,6 +42,10 @@ EMSCRIPTEN_BINDINGS({libraryName}))",
 	    fmt::arg("libraryName", m_libraryName));
 
 	out += " {\n";
+
+	out +=
+	    fmt::format("{}", joinRegisterCommands(m_typeInfo.m_registerCommands));
+
 	for (auto const& m : m_modules) {
 		out += m.getEmbind();
 	}

@@ -1,5 +1,7 @@
+#include "Helpers/string.hpp"
 #include <IR/ir.hpp>
 #include <fmt/format.h>
+#include <iostream>
 #include <numeric>
 #include <stack>
 #include <string>
@@ -106,7 +108,16 @@ void reverseAndAdd(std::vector<IR::Type> const& toReverse,
 	}
 }
 
-std::string toString(IR::Type::Container const& type) {
+std::string extractArraySize(std::string arr) {
+	// std::array<int, 3> => std::array<int, 3
+	arr = Helpers::trimRight(arr, '>');
+
+	// std::array<int, 3 => 3
+	return Helpers::extractRightUntil(arr, ' ');
+}
+
+std::string toString(IR::Type::Container const& type,
+                     std::string const& separator) {
 	// Start with the base container
 	auto start = toString(type.m_container);
 	std::vector<std::string> typeString = start.empty() ?
@@ -115,7 +126,9 @@ std::string toString(IR::Type::Container const& type) {
 
 	// Go depth first down through the types
 	// Ex:
-	//   map<int, vector<char>>
+	//   type      = map<int, vector<char>>
+	//   separator = "_"
+	//
 	//   (Make tree) ->
 	//   map
 	//   |-- int
@@ -139,11 +152,17 @@ std::string toString(IR::Type::Container const& type) {
 		        [&typeString](IR::Type::Value type) {
 			        typeString.push_back(toString(type));
 		        },
-		        [&typeString, &typesToStringify](IR::Type::Container type) {
+		        [&typeString, &typesToStringify, &current, &separator](
+		            IR::Type::Container type) {
 			        // Some container type should not be entered (such as Allocator etc.)
 			        // They are usually hidden from the user
 			        if (auto container = toString(type.m_container);
 			            !container.empty()) {
+				        if (type.m_container == IR::ContainerType::Array) {
+					        container +=
+					            separator +
+					            extractArraySize(current.m_representation);
+				        }
 				        typeString.push_back(container);
 				        reverseAndAdd(type.m_containedTypes, typesToStringify);
 			        }
@@ -161,21 +180,25 @@ std::string toString(IR::Type::Container const& type) {
 		    current.m_type);
 	}
 
-	return fmt::format("{}", fmt::join(typeString, "_"));
+	return fmt::format("{}", fmt::join(typeString, separator));
 }
 
-std::string buildTypeString(IR::Type const& t) {
+std::string buildTypeString(IR::Type const& t, std::string const& separator) {
 	std::vector<std::string> typeString;
 
 	std::visit(
 	    overload {[&typeString](IR::Type::Value type) {
 		              if (auto s = toString(type); !s.empty()) {
-			              typeString.push_back(toString(type));
+			              typeString.push_back(s);
 		              }
 	              },
-	              [&typeString](IR::Type::Container type) {
-		              if (auto s = toString(type); !s.empty()) {
-			              typeString.push_back(toString(type));
+	              [&typeString, &separator, &t](IR::Type::Container type) {
+		              if (auto s = toString(type, separator); !s.empty()) {
+			              if (type.m_container == IR::ContainerType::Array) {
+				              s += separator +
+				                   extractArraySize(t.m_representation);
+			              }
+			              typeString.push_back(s);
 		              }
 	              },
 	              [&typeString](IR::Type::EnumValue type) {
@@ -191,18 +214,24 @@ std::string buildTypeString(IR::Type const& t) {
 	    // , std::variant<Value, Container, EnumValue, UserDefined, Function> m_type;
 	    t.m_type);
 
-	return fmt::format("{}", fmt::join(typeString, "_"));
+	return fmt::format("{}", fmt::join(typeString, separator));
 }
 
-std::string
-getTemplateParameterString(std::vector<IR::Type> const& parameters) {
-	return std::accumulate(parameters.begin(),
-	                       parameters.end(),
-	                       std::string() /* Start with empty string */,
-	                       [](std::string soFar, IR::Type const& current) {
-		                       return std::move(soFar) + "_" +
-		                              buildTypeString(current);
-	                       });
+std::string getSeparatedTypeString(std::vector<IR::Type> const& parameters,
+                                   std::string const& separator) {
+	return std::accumulate(
+	    parameters.begin(),
+	    parameters.end(),
+	    std::string() /* Start with empty string */,
+	    [&separator](std::string soFar, IR::Type const& current) {
+		    return std::move(soFar) + separator +
+		           buildTypeString(current, separator);
+	    });
+}
+
+std::string getTemplateParameters(IR::Type const& type) {
+	return Helpers::trimRight(Helpers::trimLeft(type.m_representation, '<'),
+	                          '>');
 }
 
 }    // namespace Builders

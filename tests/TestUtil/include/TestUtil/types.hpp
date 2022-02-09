@@ -18,6 +18,7 @@ IR::Type getType() {
 
 IR::Type getVector() {
 	auto t = getType();
+	t.m_representation = "std::vector<int>";
 	IR::Type::Container c;
 	c.m_container = IR::ContainerType::Vector;
 	c.m_containedTypes.push_back(getType());
@@ -27,9 +28,20 @@ IR::Type getVector() {
 
 IR::Type getMap() {
 	auto t = getType();
+	t.m_representation = "std::map<int, int>";
 	IR::Type::Container c;
 	c.m_container = IR::ContainerType::Map;
 	c.m_containedTypes.push_back(getType());
+	c.m_containedTypes.push_back(getType());
+	t.m_type = c;
+	return t;
+}
+
+IR::Type getArray() {
+	auto t = getType();
+	t.m_representation = "std::array<int, 2>";
+	IR::Type::Container c;
+	c.m_container = IR::ContainerType::Array;
 	c.m_containedTypes.push_back(getType());
 	t.m_type = c;
 	return t;

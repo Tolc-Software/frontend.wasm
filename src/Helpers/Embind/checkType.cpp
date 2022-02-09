@@ -1,40 +1,46 @@
 #include "Helpers/Embind/checkType.hpp"
+#include "Builders/typeToStringBuilder.hpp"
 #include "EmbindProxy/typeInfo.hpp"
 #include "Helpers/types.hpp"
 #include <IR/ir.hpp>
+#include <fmt/format.h>
 #include <queue>
-#include <set>
 #include <spdlog/spdlog.h>
 #include <string>
-#include <variant>
 
 namespace Helpers::Embind {
 
-std::optional<std::string> getInclude(IR::ContainerType container) {
-	// See https://pybind11.readthedocs.io/en/stable/advanced/cast/overview.html
+std::optional<std::string> getRegisterString(IR::ContainerType container) {
+	// See https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html
 	switch (container) {
 		case IR::ContainerType::Array:
+			return R"(value_array<std::array<{}>>("{}"))";
+			break;
+		case IR::ContainerType::Map: return R"(register_map<{}>("{}"))"; break;
+		case IR::ContainerType::Vector:
+			return R"(register_vector<{}>("{}"))";
+			break;
+
 		case IR::ContainerType::Deque:
+		case IR::ContainerType::ForwardList:
 		case IR::ContainerType::List:
-		case IR::ContainerType::Map:
+		case IR::ContainerType::MultiMap:
+		case IR::ContainerType::MultiSet:
 		case IR::ContainerType::Optional:
+		case IR::ContainerType::Pair:
+		case IR::ContainerType::PriorityQueue:
+		case IR::ContainerType::Queue:
 		case IR::ContainerType::Set:
+		case IR::ContainerType::Stack:
+		case IR::ContainerType::Tuple:
 		case IR::ContainerType::UnorderedMap:
+		case IR::ContainerType::UnorderedMultiMap:
+		case IR::ContainerType::UnorderedMultiSet:
 		case IR::ContainerType::UnorderedSet:
 		case IR::ContainerType::Valarray:
 		case IR::ContainerType::Variant:
-		case IR::ContainerType::Vector: return "<pybind11/stl.h>"; break;
-
-		case IR::ContainerType::ForwardList:
-		case IR::ContainerType::MultiMap:
-		case IR::ContainerType::MultiSet:
-		case IR::ContainerType::PriorityQueue:
-		case IR::ContainerType::Queue:
-		case IR::ContainerType::Stack:
-		case IR::ContainerType::UnorderedMultiMap:
-		case IR::ContainerType::UnorderedMultiSet:
 			spdlog::error(
-			    "Container type {} does not currently have a direct translation via pybind11. The translation might not work.",
+			    "Container type {} does not currently have a direct translation via embind. The translation might not work.",
 			    Helpers::toString(container));
 			break;
 
@@ -43,9 +49,7 @@ std::optional<std::string> getInclude(IR::ContainerType container) {
 		case IR::ContainerType::Greater:
 		case IR::ContainerType::Hash:
 		case IR::ContainerType::Less:
-		case IR::ContainerType::Pair:
 		case IR::ContainerType::SharedPtr:
-		case IR::ContainerType::Tuple:
 		case IR::ContainerType::UniquePtr: break;
 	}
 	return std::nullopt;
@@ -55,18 +59,24 @@ std::optional<std::string> getInclude(IR::ContainerType container) {
 * Go through type and check if it requires any extra pybind11 includes
 * E.g. vector conversion requires inclusion of <pybind11/stl.h>
 */
-std::optional<std::string> extractInclude(IR::Type const& type) {
+std::optional<std::string> extractRegisterCommands(IR::Type const& type) {
 	if (auto container = Helpers::getContainer(type)) {
-		return getInclude(container->m_container);
-	} else if (Helpers::isFunctionType(type)) {
-		// The type is std::function
-		return "<pybind11/functional.h>";
-	} else if (Helpers::isBaseType(type, IR::BaseType::FilesystemPath)) {
-		// The type is std::filesystem::path
-		return "<pybind11/stl/filesystem.h>";
-	} else if (Helpers::isBaseType(type, IR::BaseType::Complex)) {
-		// The type is std::complex
-		return "<pybind11/complex.h>";
+		if (auto s = getRegisterString(container->m_container)) {
+			auto registerCmd =
+			    fmt::format(s.value(),
+			                Builders::getTemplateParameters(type),
+			                Builders::buildTypeString(type, "_"));
+			if (container->m_container == IR::ContainerType::Array) {
+				for (int i = 0; i < std::stoi(Builders::extractArraySize(
+				                        type.m_representation));
+				     ++i) {
+					// See https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html#value-types
+					registerCmd += fmt::format(".element(index<{}>())", i);
+				}
+			}
+
+			return registerCmd;
+		}
 	}
 	return std::nullopt;
 }
@@ -102,8 +112,8 @@ void checkType(IR::Type const& type, EmbindProxy::TypeInfo& info) {
 	while (!typesToCheck.empty()) {
 		auto& current = typesToCheck.front();
 
-		if (auto include = extractInclude(current)) {
-			info.m_includes.insert(include.value());
+		if (auto registerCmd = extractRegisterCommands(current)) {
+			info.m_registerCommands.insert(registerCmd.value());
 		}
 
 		if (auto sharedClass = extractShared(current)) {

@@ -9,45 +9,34 @@ TEST_CASE("Using std::vectors", "[vectors]") {
 	std::string moduleName = "defaultModule";
 	auto stage =
 	    TestUtil::EmbindStage(TestStage::getRootStagePath(), moduleName);
+	stage.keepAliveAfterTest();
 
 	auto cppCode = R"(
-#include <string>
 #include <vector>
 
-class WithMember {
-public:
-	explicit WithMember(std::vector<std::string> s) : m_s(s) {}
-
-	std::vector<std::string> getS() { return m_s; }
-
-private:
-	std::vector<std::string> m_s;
-};
-
-class WithFunction {
-public:
-	int sum(std::vector<int> v) {
-		int s = 0;
-		for (auto i : v) {
-			s += i;
-		}
-		return s;
-	}
-};
+std::vector<int> getData() {
+	return {0, 1, 2};
+}
 
 )";
 
-	auto pythonTestCode = fmt::format(R"(
-myArray = ["hi", "ho"]
-withMember = {moduleName}.WithMember(myArray)
-self.assertEqual(withMember.getS(), myArray)
+	auto jsTestCode = R"(
+var data = m.getData();
 
-withFunction = {moduleName}.WithFunction()
-self.assertEqual(withFunction.sum([1, 2, 3]), 6)
-)",
-	                                  fmt::arg("moduleName", moduleName));
+expect(data.size()).toBe(3);
+
+for (var i = 0; i < data.size(); i++) {
+    expect(data.get(i)).toBe(i);
+}
+
+data.push_back(3);
+
+expect(data.size()).toBe(4);
+
+expect(data.get(3)).toBe(3);
+)";
 
 	auto errorCode =
-	    TestUtil::runEmbindTest(stage, cppCode, pythonTestCode, moduleName);
+	    TestUtil::runEmbindTest(stage, cppCode, jsTestCode, moduleName);
 	REQUIRE(errorCode == 0);
 }

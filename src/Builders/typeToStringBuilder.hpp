@@ -13,11 +13,23 @@ namespace Builders {
 *   std::map<int, std::string> -> map_int_string
 *   std::map<UserDefined, int> -> map_UserDefined_int
 */
-std::string buildTypeString(IR::Type const& t);
+std::string buildTypeString(IR::Type const& t, std::string const& separator);
 
 /**
 * Call buildTypeString on a number of parameters and join them
 */
-std::string getTemplateParameterString(std::vector<IR::Type> const& parameters);
+std::string getSeparatedTypeString(std::vector<IR::Type> const& parameters,
+                                   std::string const& separator);
 
+/**
+* std::vector<int> -> "int"
+* std::map<int, double> -> "int, double"
+*/
+std::string getTemplateParameters(IR::Type const& type);
+
+/**
+* std::array<int, 3> -> "3"
+* std::map<int, double> -> ""
+*/
+std::string extractArraySize(std::string arr);
 }    // namespace Builders

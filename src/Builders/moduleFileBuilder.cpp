@@ -4,7 +4,6 @@
 #include "EmbindProxy/typeInfo.hpp"
 #include "Helpers/combine.hpp"
 #include <IR/ir.hpp>
-#include <iostream>
 #include <optional>
 #include <queue>
 #include <set>
