@@ -9,7 +9,6 @@ TEST_CASE("Using std::vectors", "[vectors]") {
 	std::string moduleName = "defaultModule";
 	auto stage =
 	    TestUtil::EmbindStage(TestStage::getRootStagePath(), moduleName);
-	stage.keepAliveAfterTest();
 
 	auto cppCode = R"(
 #include <vector>
