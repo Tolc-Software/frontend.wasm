@@ -91,8 +91,8 @@ foreach(
   # Builders/attributeBuilder.cpp
   Builders/classBuilder.cpp
   Builders/enumBuilder.cpp
-  # Builders/functionBuilder.cpp
-  # Builders/moduleFileBuilder.cpp
+  Builders/functionBuilder.cpp
+  Builders/moduleFileBuilder.cpp
   Builders/typeToStringBuilder.cpp
   Helpers/Embind/checkType.cpp
   Helpers/combine.cpp

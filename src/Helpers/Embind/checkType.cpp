@@ -14,11 +14,13 @@ std::optional<std::string> getRegisterString(IR::ContainerType container) {
 	// See https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html
 	switch (container) {
 		case IR::ContainerType::Array:
-			return R"(value_array<std::array<{}>>("{}"))";
+			return R"(em::value_array<std::array<{}>>("{}"))";
 			break;
-		case IR::ContainerType::Map: return R"(register_map<{}>("{}"))"; break;
+		case IR::ContainerType::Map:
+			return R"(em::register_map<{}>("{}"))";
+			break;
 		case IR::ContainerType::Vector:
-			return R"(register_vector<{}>("{}"))";
+			return R"(em::register_vector<{}>("{}"))";
 			break;
 
 		case IR::ContainerType::Deque:

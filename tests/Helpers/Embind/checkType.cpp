@@ -14,7 +14,7 @@ TEST_CASE("Construct register_vector", "[checkType]") {
 	Helpers::Embind::checkType(c, typeInfo);
 	REQUIRE(typeInfo.m_registerCommands.size() == 1);
 	for (auto const& command : typeInfo.m_registerCommands) {
-		REQUIRE(command == "register_vector<int>(\"vector_int\")");
+		REQUIRE(command == "em::register_vector<int>(\"vector_int\")");
 	}
 }
 
@@ -24,7 +24,7 @@ TEST_CASE("Construct register_map", "[checkType]") {
 	Helpers::Embind::checkType(c, typeInfo);
 	REQUIRE(typeInfo.m_registerCommands.size() == 1);
 	for (auto const& command : typeInfo.m_registerCommands) {
-		REQUIRE(command == "register_map<int, int>(\"map_int_int\")");
+		REQUIRE(command == "em::register_map<int, int>(\"map_int_int\")");
 	}
 }
 
@@ -35,7 +35,7 @@ TEST_CASE("Construct value_array", "[checkType]") {
 	REQUIRE(typeInfo.m_registerCommands.size() == 1);
 	for (auto const& command : typeInfo.m_registerCommands) {
 		REQUIRE(TestUtil::contains(
-		    command, "value_array<std::array<int, 2>>(\"array_int_2\")"));
+		    command, "em::value_array<std::array<int, 2>>(\"array_int_2\")"));
 		REQUIRE(
 		    TestUtil::contains(command, ".element(emscripten::index<0>())"));
 		REQUIRE(

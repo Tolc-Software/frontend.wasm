@@ -9,7 +9,7 @@ Enum::Enum(std::string const& name, std::string const& fullyQualifiedName)
 
 std::string Enum::getEmbind() const {
 	std::string out =
-	    fmt::format("enum_<{fullyQualifiedName}>(\"{name}\")\n",
+	    fmt::format("em::enum_<{fullyQualifiedName}>(\"{name}\")\n",
 	                fmt::arg("fullyQualifiedName", m_fullyQualifiedName),
 	                fmt::arg("name", m_name));
 

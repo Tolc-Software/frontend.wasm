@@ -1,17 +1,15 @@
 #include "Builders/functionBuilder.hpp"
+#include <TestUtil/types.hpp>
 #include <catch2/catch.hpp>
+#include <optional>
 
-TEST_CASE("function returning containers adds the correct include", "[functionBuilder]") {
-	IR::Function f;
-	IR::Type t;
-	IR::Type::Container c;
-	c.m_container = IR::ContainerType::Vector;
-	t.m_type = c;
+TEST_CASE("Can build simple functions", "[functionBuilder]") {
+	IR::Function f = TestUtil::getFunction("f");
+	IR::Type t = TestUtil::getVector();
 	f.m_returnType = t;
 	EmbindProxy::TypeInfo typeInfo;
-	auto jsFunction = Builders::buildFunction(f, typeInfo).value();
-	REQUIRE(typeInfo.m_includes.size() == 1);
-	for (auto const& include : typeInfo.m_includes) {
-		REQUIRE(include == "<embind11/stl.h>");
-	}
+	auto jsFunction = Builders::buildFunction(f, typeInfo);
+	REQUIRE(jsFunction.has_value());
+	// The vector is registered
+	REQUIRE(typeInfo.m_registerCommands.size() == 1);
 }

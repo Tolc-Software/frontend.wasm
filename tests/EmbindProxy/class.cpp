@@ -22,7 +22,9 @@ TEST_CASE("Class with functions", "[class]") {
 
 	std::vector<std::string> functions = {"f", "calculate", "foo"};
 	for (auto const& function : functions) {
-		c.addFunction(EmbindProxy::Function(function, function));
+		auto f = EmbindProxy::Function(function, function);
+		f.setAsClassFunction();
+		c.addFunction(f);
 	}
 
 	auto embindCode = c.getEmbind();

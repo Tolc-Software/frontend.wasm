@@ -60,7 +60,7 @@ std::string ModuleFile::getEmbind() const {
 	    R"(
 #include <emscripten/bind.h>
 
-using namespace emscripten;
+namespace em = emscripten;
 
 {joinedFunctions}
 

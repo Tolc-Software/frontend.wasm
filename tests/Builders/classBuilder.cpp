@@ -27,8 +27,8 @@ TEST_CASE("Class with vector in member function gives the correct register",
 	Builders::buildClass(s, typeInfo).value();
 	REQUIRE(typeInfo.m_registerCommands.size() == 2);
 	auto& regs = typeInfo.m_registerCommands;
-	for (auto const& r : {R"(register_vector<int>("vector_int"))",
-	                      R"(register_map<int, int>("map_int_int"))"}) {
+	for (auto const& r : {R"(em::register_vector<int>("vector_int"))",
+	                      R"(em::register_map<int, int>("map_int_int"))"}) {
 		CAPTURE(r);
 		REQUIRE(regs.find(r) != regs.end());
 	}
@@ -154,7 +154,8 @@ TEST_CASE("Class with vector in constructor gives the correct register command",
 	Builders::buildClass(s, typeInfo).value();
 	auto& regs = typeInfo.m_registerCommands;
 	REQUIRE(regs.size() == 1);
-	REQUIRE(regs.find(R"(register_vector<int>("vector_int"))") != regs.end());
+	REQUIRE(regs.find(R"(em::register_vector<int>("vector_int"))") !=
+	        regs.end());
 }
 
 TEST_CASE("Class with member variables", "[classBuilder]") {

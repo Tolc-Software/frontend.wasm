@@ -6,7 +6,7 @@ namespace EmbindProxy {
 
 std::string Class::getEmbind() const {
 	std::string out =
-	    fmt::format("class_<{fullyQualifiedName}>(\"{name}\")\n",
+	    fmt::format("em::class_<{fullyQualifiedName}>(\"{name}\")\n",
 	                fmt::arg("fullyQualifiedName", m_fullyQualifiedName),
 	                fmt::arg("name", m_name));
 

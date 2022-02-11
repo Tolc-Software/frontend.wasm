@@ -12,6 +12,16 @@ std::string getEmbindSelect(std::string const& signature,
                             std::string const& functionName) {
 	return fmt::format("select_overload<{}>(&{})", signature, functionName);
 }
+
+std::string getPrefix(bool isClassFunction, bool isStatic) {
+	// Defined inside a class
+	// => No need for namespaces
+	if (isClassFunction) {
+		// Static functions are prefixed "class_"
+		return isStatic ? "class_" : "";
+	}
+	return "em::";
+}
 }    // namespace
 
 std::string Function::getEmbind() const {
@@ -24,7 +34,7 @@ std::string Function::getEmbind() const {
 		// Results in
 		// class_function("myFunction", select_overload<void()>(&MyNS::myFunction))
 		f = fmt::format(R"({}function("{}", {}))",
-		                m_isClassFunction && m_isStatic ? "class_" : "",
+		                getPrefix(m_isClassFunction, m_isStatic),
 		                m_isOverloaded ? createOverloadedName() : m_name,
 		                m_isOverloaded ? getEmbindSelect(getSignature(),
 		                                                 m_fullyQualifiedName) :
