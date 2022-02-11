@@ -9,7 +9,6 @@ TEST_CASE("Testing enums", "[enums]") {
 	auto stage =
 	    TestUtil::EmbindStage(TestStage::getRootStagePath(), moduleName);
 
-	stage.keepAliveAfterTest();
 	auto cppCode = R"(
 enum Unscoped {
 	A,

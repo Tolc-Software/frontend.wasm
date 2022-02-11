@@ -29,13 +29,9 @@ std::string buildExtraFunctions(std::set<std::string> const& functions,
 	// Add the namespace
 
 	out = fmt::format(R"(
-
 namespace {} {{
-
 {}
-
-}}
-)",
+}})",
 	                  ns,
 	                  out);
 

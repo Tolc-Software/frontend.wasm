@@ -8,19 +8,19 @@ namespace EmbindProxy {
 std::string Module::getEmbind() const {
 	std::string out;
 	for (auto const& function : m_functions) {
-		out += fmt::format("\t{};\n", function.getEmbind());
+		out += fmt::format("\t{};\n\n", function.getEmbind());
 	}
 
 	for (auto const& cls : m_classes) {
-		out += fmt::format("\t{};\n", cls.getEmbind());
+		out += fmt::format("\t{};\n\n", cls.getEmbind());
 	}
 
 	for (auto const& e : m_enums) {
-		out += fmt::format("\t{};\n", e.getEmbind());
+		out += fmt::format("\t{};\n\n", e.getEmbind());
 	}
 
 	for (auto const& attribute : m_attributes) {
-		out += fmt::format("\t{}.{};\n", m_prefix, attribute.getEmbind());
+		out += fmt::format("\t{}.{};\n\n", m_prefix, attribute.getEmbind());
 	}
 
 	// Define all the children
