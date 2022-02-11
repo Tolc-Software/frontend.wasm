@@ -4,6 +4,22 @@
 
 namespace TestUtil {
 
+IR::Struct getStruct(std::string const& name) {
+	IR::Struct s;
+	s.m_name = name;
+	s.m_representation = s.m_name;
+	s.m_hasImplicitDefaultConstructor = true;
+	return s;
+}
+
+IR::Function getFunction(std::string const& name) {
+	IR::Function f;
+	f.m_name = name;
+	f.m_representation = name;
+	f.m_isStatic = false;
+	return f;
+}
+
 IR::Type getType() {
 	IR::Type t;
 	IR::Type::Value v;

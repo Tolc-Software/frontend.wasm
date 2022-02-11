@@ -13,6 +13,34 @@ std::string joinRegisterCommands(std::set<std::string> const& commands) {
 	}
 	return out;
 }
+
+std::string buildExtraFunctions(std::set<std::string> const& functions,
+                                std::string const& ns) {
+	if (functions.empty()) {
+		return "";
+	}
+
+	std::string out;
+
+	for (auto const& f : functions) {
+		out += fmt::format("\t{}\n", f);
+	}
+
+	// Add the namespace
+
+	out = fmt::format(R"(
+
+namespace {} {{
+
+{}
+
+}}
+)",
+	                  ns,
+	                  out);
+
+	return out;
+}
 }    // namespace
 
 ModuleFile::ModuleFile(Module const& rootModule, std::string const& libraryName)
@@ -38,13 +66,18 @@ std::string ModuleFile::getEmbind() const {
 
 using namespace emscripten;
 
-EMSCRIPTEN_BINDINGS({libraryName}))",
-	    fmt::arg("libraryName", m_libraryName));
+{joinedFunctions}
 
-	out += " {\n";
+EMSCRIPTEN_BINDINGS({libraryName}) {{
 
-	out +=
-	    fmt::format("{}", joinRegisterCommands(m_typeInfo.m_registerCommands));
+{registerCommands}
+)",
+	    fmt::arg("joinedFunctions",
+	             buildExtraFunctions(m_typeInfo.m_extraFunctions,
+	                                 m_typeInfo.m_functionsNamespace)),
+	    fmt::arg("libraryName", m_libraryName),
+	    fmt::arg("registerCommands",
+	             joinRegisterCommands(m_typeInfo.m_registerCommands)));
 
 	for (auto const& m : m_modules) {
 		out += m.getEmbind();

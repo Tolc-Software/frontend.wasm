@@ -73,12 +73,14 @@ TEST_CASE("Class with member variables", "[class]") {
 
 	std::vector<std::string> constVariables = {"myInt", "var", "yes"};
 	for (auto const& variable : constVariables) {
-		c.addMemberVariable(variable, true, false);
+		c.addMemberVariable(
+		    variable, "MyGetter_" + variable, std::nullopt, false);
 	}
 
 	std::vector<std::string> nonConstVariables = {"myOtherInt", "var2", "no"};
 	for (auto const& variable : nonConstVariables) {
-		c.addMemberVariable(variable, false, false);
+		c.addMemberVariable(
+		    variable, "MyGetter_" + variable, "MySetter_" + variable, false);
 	}
 
 	auto embindCode = c.getEmbind();
@@ -89,27 +91,27 @@ TEST_CASE("Class with member variables", "[class]") {
 		auto expectedProperty = fmt::format("\t\t.property(\"{variable}\", ",
 		                                    fmt::arg("variable", variable));
 
-		auto expectedGetter =
-		    fmt::format("[](auto& _tolc_c) {{ return _tolc_c.{variable}; }})",
-		                fmt::arg("variable", variable));
-
 		CAPTURE(expectedProperty);
-		CAPTURE(expectedGetter);
 		REQUIRE(contains(embindCode, expectedProperty));
-		REQUIRE(contains(embindCode, expectedGetter));
+
+		auto expectedGetter = fmt::format(R"(&MyGetter_{variableName})",
+		                                  fmt::arg("variableName", variable));
+		CAPTURE(expectedGetter);
+		REQUIRE(TestUtil::contains(embindCode, expectedGetter));
 	}
 
 	for (auto const& variable : nonConstVariables) {
 		auto expectedProperty = fmt::format("\t\t.property(\"{variable}\", ",
 		                                    fmt::arg("variable", variable));
 
-		auto expectedGetter =
-		    fmt::format("[](auto& _tolc_c) {{ return _tolc_c.{variable}; }}",
-		                fmt::arg("variable", variable));
 
-		auto expectedSetter = fmt::format(
-		    "[](auto& _tolc_c, auto const& _tolc_v) {{ _tolc_c.{variable} = _tolc_v; }})",
-		    fmt::arg("variable", variable));
+		auto expectedGetter =
+		    fmt::format(R"(&MyGetter_{variableName})",
+		                fmt::arg("variableName", variable));
+
+		auto expectedSetter =
+		    fmt::format(R"(&MySetter_{variableName})",
+		                fmt::arg("variableName", variable));
 
 		CAPTURE(expectedProperty);
 		CAPTURE(expectedGetter);

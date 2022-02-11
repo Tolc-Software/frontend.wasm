@@ -2,6 +2,7 @@
 
 #include "EmbindProxy/enum.hpp"
 #include "EmbindProxy/function.hpp"
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -19,7 +20,8 @@ public:
 	void addConstructor(Function const& constructor);
 
 	void addMemberVariable(std::string const& variableName,
-	                       bool isConst,
+	                       std::string const& getter,
+	                       std::optional<std::string> setter,
 	                       bool isStatic);
 
 	std::string const& getName() const;
@@ -34,7 +36,9 @@ private:
 	struct MemberVariable {
 		// User defined name of the member variable
 		std::string m_name;
-		bool m_isConst;
+		// Function names to get and set the variable
+		std::string m_getter;
+		std::optional<std::string> m_setter;
 		bool m_isStatic;
 	};
 

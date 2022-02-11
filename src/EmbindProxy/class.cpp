@@ -25,20 +25,17 @@ std::string Class::getEmbind() const {
 		out += fmt::format("\t\t.{functionEmbind}\n",
 		                   fmt::arg("functionEmbind", function.getEmbind()));
 	}
-	// Remove the last newline
-	out.pop_back();
 
 	for (auto const& variable : m_memberVariables) {
 		// Create a setter for the variable if it isn't const
 		std::string setter =
-		    variable.m_isConst ?
-		        "" :
-                fmt::format(
-		            ", [](auto& _tolc_c, auto const& _tolc_v) {{ _tolc_c.{variableName} = _tolc_v; }}",
-		            fmt::arg("variableName", variable.m_name));
+		    variable.m_setter ?
+		        fmt::format(", &{}", variable.m_setter.value()) :
+                "";
 
 		out += fmt::format(
-		    "\t\t.property(\"{variableName}\", [](auto& _tolc_c) {{ return _tolc_c.{variableName}; }}{setter})\n",
+		    "\t\t.property(\"{variableName}\", &{getter}{setter})\n",
+		    fmt::arg("getter", variable.m_getter),
 		    fmt::arg("setter", setter),
 		    fmt::arg("variableName", variable.m_name));
 	}
@@ -52,10 +49,13 @@ std::string Class::getEmbind() const {
 		for (auto const& e : m_enums) {
 			out += fmt::format("{};\n", e.getEmbind(m_name));
 		}
-		// The last endline
-		out.pop_back();
-		// The last ';'
-		out.pop_back();
+	}
+
+	// Remove the trailing endlines
+	if (!out.empty()) {
+		while (out.back() == '\n' && !out.empty()) {
+			out.pop_back();
+		}
 	}
 
 	return out;
@@ -79,9 +79,10 @@ void Class::addConstructor(Function const& constructor) {
 }
 
 void Class::addMemberVariable(std::string const& variableName,
-                              bool isConst,
+                              std::string const& getter,
+                              std::optional<std::string> setter,
                               bool isStatic) {
-	m_memberVariables.push_back({variableName, isConst, isStatic});
+	m_memberVariables.push_back({variableName, getter, setter, isStatic});
 }
 
 std::string const& Class::getName() const {

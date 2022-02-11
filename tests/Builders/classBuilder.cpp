@@ -1,18 +1,12 @@
 #include "Builders/classBuilder.hpp"
 #include "EmbindProxy/class.hpp"
 #include "TestUtil/string.hpp"
+#include "TestUtil/types.hpp"
 #include <IR/ir.hpp>
 #include <catch2/catch.hpp>
 #include <fmt/format.h>
 
 namespace {
-IR::Struct getStruct(std::string const& name) {
-	IR::Struct s;
-	s.m_name = name;
-	s.m_representation = s.m_name;
-	s.m_hasImplicitDefaultConstructor = true;
-	return s;
-}
 struct Var {
 	std::string name;
 	std::string type;
@@ -20,47 +14,45 @@ struct Var {
 };
 }    // namespace
 
-TEST_CASE("Class with static member variables", "[classBuilder]") {
-	std::vector<Var> variables = {Var({"v0", "int", true}),
-	                              Var({"myVar", "double", false})};
+TEST_CASE("Class with vector in member function gives the correct register",
+          "[classBuilder]") {
+	auto constructor = TestUtil::getFunction("SomeClass");
+	constructor.m_arguments.push_back({"myVar", TestUtil::getVector()});
+	constructor.m_returnType = TestUtil::getMap();
 
-	std::string moduleName = "MyModule";
-	IR::Struct s;
-	s.m_name = "MyStruct";
-	s.m_representation = s.m_name;
-	s.m_hasImplicitDefaultConstructor = true;
-
-	for (auto const& var : variables) {
-		IR::Variable v;
-		v.m_name = var.name;
-		IR::Type t;
-		t.m_representation = var.type;
-		t.m_isConst = var.isConst;
-		t.m_isStatic = true;
-		v.m_type = t;
-		s.m_public.m_memberVariables.push_back(v);
-	}
+	auto s = TestUtil::getStruct("SomeClass");
+	s.m_public.m_functions.push_back(constructor);
 
 	EmbindProxy::TypeInfo typeInfo;
-	auto myStruct = Builders::buildClass(s, typeInfo).value();
-	auto embind = myStruct.getEmbind(moduleName);
-	CAPTURE(embind);
-
-	for (auto const& var : variables) {
-		auto accessor = var.isConst ? "readonly" : "readwrite";
-		auto expectedContains = fmt::format(
-		    R"(def_{accessor}_static("{variableName}", &{className}::{variableName}))",
-		    fmt::arg("accessor", accessor),
-		    fmt::arg("variableName", var.name),
-		    fmt::arg("className", s.m_name));
-		CAPTURE(expectedContains);
-		REQUIRE(TestUtil::contains(embind, expectedContains));
+	Builders::buildClass(s, typeInfo).value();
+	REQUIRE(typeInfo.m_registerCommands.size() == 2);
+	auto& regs = typeInfo.m_registerCommands;
+	for (auto const& r : {R"(register_vector<int>("vector_int"))",
+	                      R"(register_map<int, int>("map_int_int"))"}) {
+		CAPTURE(r);
+		REQUIRE(regs.find(r) != regs.end());
 	}
 }
 
+TEST_CASE("Class with a constructor", "[classBuilder]") {
+	auto constructor = TestUtil::getFunction("SomeClass");
+	constructor.m_arguments.push_back({"myVar", TestUtil::getVector()});
+
+	auto s = TestUtil::getStruct("SomeClass");
+	s.m_public.m_constructors.push_back(constructor);
+
+	EmbindProxy::TypeInfo typeInfo;
+	auto myStruct = Builders::buildClass(s, typeInfo).value();
+	auto embind = myStruct.getEmbind();
+	CAPTURE(embind);
+
+	auto expectedContains = R"(.constructor<std::vector<int>>())";
+	CAPTURE(expectedContains);
+	REQUIRE(TestUtil::contains(embind, expectedContains));
+}
+
 TEST_CASE("Class with static function", "[classBuilder]") {
-	std::string moduleName = "MyModule";
-	auto s = getStruct("MyStruct");
+	auto s = TestUtil::getStruct("MyStruct");
 
 	IR::Function f;
 
@@ -68,138 +60,61 @@ TEST_CASE("Class with static function", "[classBuilder]") {
 	f.m_representation = f.m_name;
 	f.m_isStatic = true;
 
-	IR::Type returnType;
-	returnType.m_representation = "void";
-	f.m_returnType = returnType;
+	f.m_returnType = TestUtil::getType();
 
 	s.m_public.m_functions.push_back(f);
 
 	EmbindProxy::TypeInfo typeInfo;
 	auto myStruct = Builders::buildClass(s, typeInfo).value();
-	auto embind = myStruct.getEmbind(moduleName);
+	auto embind = myStruct.getEmbind();
 	CAPTURE(embind);
 
 	auto expectedContains =
-	    fmt::format("\t.def_static(\"{function}\", &{function}",
+	    fmt::format("\t.class_function(\"{function}\", &{function})",
 	                fmt::arg("function", f.m_name));
 	CAPTURE(expectedContains);
 	REQUIRE(TestUtil::contains(embind, expectedContains));
 }
 
 TEST_CASE("Templated class", "[classBuilder]") {
-	std::string moduleName = "MyModule";
-	std::string removedTemplatePars = "SomeClass_int";
-	auto s = getStruct("SomeClass<int>");
-	IR::Type t;
-	t.m_isConst = false;
-	t.m_isReference = false;
-	t.m_numPointers = 0;
-	t.m_representation = "int";
-	auto v = IR::Type::Value();
-	v.m_base = IR::BaseType::Int;
-	t.m_type = v;
+	auto s = TestUtil::getStruct("SomeClass<int>");
+	IR::Type t = TestUtil::getType();
 	s.m_templateArguments.push_back(t);
 
 	EmbindProxy::TypeInfo typeInfo;
 	auto myStruct = Builders::buildClass(s, typeInfo).value();
-	auto embind = myStruct.getEmbind(moduleName);
-	auto expectedContains = fmt::format(
-	    R"(py::class_<{fullyQualifiedClassName}>({moduleName}, "{className}"))",
-	    fmt::arg("fullyQualifiedClassName", s.m_representation),
-	    fmt::arg("moduleName", moduleName),
-	    fmt::arg("className", removedTemplatePars));
+	auto embind = myStruct.getEmbind();
+	auto expectedContains =
+	    fmt::format(R"(class_<{fullyQualifiedClassName}>("SomeClass_int"))",
+	                fmt::arg("fullyQualifiedClassName", s.m_representation));
 	CAPTURE(embind);
-	CAPTURE(expectedContains);
-	REQUIRE(TestUtil::contains(embind, expectedContains));
-}
-
-TEST_CASE("Class within namespace", "[classBuilder]") {
-	std::string moduleName = "MyModule";
-	IR::Struct s;
-	s.m_name = "MyStruct";
-	s.m_representation = fmt::format("MyNamespace::{className}",
-	                                 fmt::arg("className", s.m_name));
-	s.m_hasImplicitDefaultConstructor = true;
-
-	EmbindProxy::TypeInfo typeInfo;
-	auto myStruct = Builders::buildClass(s, typeInfo).value();
-	auto embind = myStruct.getEmbind(moduleName);
-	CAPTURE(embind);
-
-	auto expectedContains = fmt::format(
-	    R"(py::class_<{fullyQualifiedClassName}>({moduleName}, "{className}"))",
-	    fmt::arg("fullyQualifiedClassName", s.m_representation),
-	    fmt::arg("moduleName", moduleName),
-	    fmt::arg("className", s.m_name));
 	CAPTURE(expectedContains);
 	REQUIRE(TestUtil::contains(embind, expectedContains));
 }
 
 TEST_CASE("Empty class gets default constructor", "[classBuilder]") {
-	std::string moduleName = "MyModule";
-	IR::Struct s;
-	s.m_name = "MyStruct";
-	s.m_representation = s.m_name;
+	IR::Struct s = TestUtil::getStruct("MyStruct");
 	s.m_hasImplicitDefaultConstructor = true;
 
 	EmbindProxy::TypeInfo typeInfo;
 	auto myStruct = Builders::buildClass(s, typeInfo).value();
-	auto embind = myStruct.getEmbind(moduleName);
+	auto embind = myStruct.getEmbind();
 	CAPTURE(embind);
 
-	auto expectedContains = "def(py::init<>(), \"\")";
-	CAPTURE(expectedContains);
-	REQUIRE(TestUtil::contains(embind, expectedContains));
-}
-
-TEST_CASE("Class with a constructor", "[classBuilder]") {
-	std::string moduleName = "MyModule";
-	IR::Struct s;
-	s.m_name = "MyStruct";
-	s.m_representation = s.m_name;
-	s.m_hasImplicitDefaultConstructor = true;
-
-	IR::Function f;
-	f.m_name = s.m_name;
-	f.m_representation = f.m_name;
-	f.m_isStatic = false;
-	IR::Variable v;
-	v.m_name = 's';
-	IR::Type t;
-	t.m_representation = "const std::string&";
-	v.m_type = t;
-	f.m_arguments.push_back(v);
-	s.m_public.m_constructors.push_back(f);
-
-	EmbindProxy::TypeInfo typeInfo;
-	auto myStruct = Builders::buildClass(s, typeInfo).value();
-	auto embind = myStruct.getEmbind(moduleName);
-	CAPTURE(embind);
-
-	auto expectedContains =
-	    fmt::format(R"(.def(py::init<{type}>(), "", py::arg("s"))",
-	                fmt::arg("type", t.m_representation));
+	auto expectedContains = ".constructor<>()";
 	CAPTURE(expectedContains);
 	REQUIRE(TestUtil::contains(embind, expectedContains));
 }
 
 TEST_CASE("Class with functions", "[classBuilder]") {
-	std::string moduleName = "MyModule";
-	IR::Struct s;
-	s.m_name = "MyStruct";
-	s.m_representation = s.m_name;
-	s.m_hasImplicitDefaultConstructor = true;
+	IR::Struct s = TestUtil::getStruct("MyStruct");
 
 	std::vector<std::pair<std::string, std::string>> functions = {
 	    std::make_pair("f", "int"),
 	    std::make_pair("another_func", "std::string"),
 	    std::make_pair("fun", "double")};
 	for (auto const& [function, type] : functions) {
-		IR::Function f;
-
-		f.m_name = function;
-		f.m_representation = f.m_name;
-		f.m_isStatic = false;
+		IR::Function f = TestUtil::getFunction(function);
 
 		IR::Variable v;
 		v.m_name = "myVar";
@@ -209,25 +124,37 @@ TEST_CASE("Class with functions", "[classBuilder]") {
 		v.m_type = arg;
 		f.m_arguments.push_back(v);
 
-		IR::Type returnType;
-		returnType.m_representation = "void";
-		f.m_returnType = returnType;
+		f.m_returnType = TestUtil::getType();
 
 		s.m_public.m_functions.push_back(f);
 	}
 
 	EmbindProxy::TypeInfo typeInfo;
 	auto myStruct = Builders::buildClass(s, typeInfo).value();
-	auto embind = myStruct.getEmbind(moduleName);
+	auto embind = myStruct.getEmbind();
 	CAPTURE(embind);
 
 	for (auto const& [function, argument] : functions) {
 		auto expectedContains =
-		    fmt::format("\t.def(\"{function}\", &{function}",
+		    fmt::format("\t.function(\"{function}\", &{function})",
 		                fmt::arg("function", function));
 		CAPTURE(expectedContains);
 		REQUIRE(TestUtil::contains(embind, expectedContains));
 	}
+}
+
+TEST_CASE("Class with vector in constructor gives the correct register command",
+          "[classBuilder]") {
+	IR::Struct s = TestUtil::getStruct("MyStruct");
+	IR::Function constructor = TestUtil::getFunction("MyStruct");
+	IR::Type arg = TestUtil::getVector();
+	constructor.m_arguments.push_back({"myVar", arg});
+	s.m_public.m_functions.push_back(constructor);
+	EmbindProxy::TypeInfo typeInfo;
+	Builders::buildClass(s, typeInfo).value();
+	auto& regs = typeInfo.m_registerCommands;
+	REQUIRE(regs.size() == 1);
+	REQUIRE(regs.find(R"(register_vector<int>("vector_int"))") != regs.end());
 }
 
 TEST_CASE("Class with member variables", "[classBuilder]") {
@@ -235,109 +162,93 @@ TEST_CASE("Class with member variables", "[classBuilder]") {
 	                              Var({"s", "const std::string&", false}),
 	                              Var({"myVar", "double", false})};
 
-	std::string moduleName = "MyModule";
-	IR::Struct s;
-	s.m_name = "MyStruct";
-	s.m_representation = s.m_name;
-	s.m_hasImplicitDefaultConstructor = true;
+	IR::Struct s = TestUtil::getStruct("MyStruct");
 
 	for (auto const& var : variables) {
 		IR::Variable v;
 		v.m_name = var.name;
-		IR::Type t;
-		t.m_representation = var.type;
-		t.m_isConst = var.isConst;
-		t.m_isStatic = false;
-		v.m_type = t;
+		v.m_type = TestUtil::getType();
+		v.m_type.m_representation = var.type;
+		v.m_type.m_isConst = var.isConst;
 		s.m_public.m_memberVariables.push_back(v);
 	}
 
 	EmbindProxy::TypeInfo typeInfo;
 	auto myStruct = Builders::buildClass(s, typeInfo).value();
-	auto embind = myStruct.getEmbind(moduleName);
+	auto embind = myStruct.getEmbind();
 	CAPTURE(embind);
 
 	for (auto const& var : variables) {
-		auto accessor = var.isConst ? "readonly" : "readwrite";
-		auto expectedContains = fmt::format(
-		    R"(def_{accessor}("{variableName}", &{className}::{variableName}))",
-		    fmt::arg("accessor", accessor),
-		    fmt::arg("variableName", var.name),
-		    fmt::arg("className", s.m_name));
-		CAPTURE(expectedContains);
-		REQUIRE(TestUtil::contains(embind, expectedContains));
+		auto property = fmt::format(R"(.property("{variableName}")",
+		                            fmt::arg("variableName", var.name));
+		CAPTURE(property);
+		REQUIRE(TestUtil::contains(embind, property));
+
+		if (var.isConst) {
+			auto getter = fmt::format(R"(&{className}::{variableName})",
+			                          fmt::arg("className", s.m_representation),
+			                          fmt::arg("variableName", var.name));
+			CAPTURE(getter);
+			REQUIRE(TestUtil::contains(embind, getter));
+		} else {
+			auto getter =
+			    fmt::format(R"(&{ns}::{className}_get_{variableName})",
+			                fmt::arg("ns", typeInfo.m_functionsNamespace),
+			                fmt::arg("className", s.m_representation),
+			                fmt::arg("variableName", var.name));
+			auto setter =
+			    fmt::format(R"(&{ns}::{className}_set_{variableName})",
+			                fmt::arg("ns", typeInfo.m_functionsNamespace),
+			                fmt::arg("className", s.m_representation),
+			                fmt::arg("variableName", var.name));
+			CAPTURE(getter);
+			CAPTURE(setter);
+			REQUIRE(TestUtil::contains(embind, getter));
+			REQUIRE(TestUtil::contains(embind, setter));
+		}
 	}
 }
 
-TEST_CASE("Class with vector in constructor gives the correct include",
-          "[classBuilder]") {
-	std::string moduleName = "MyModule";
-	IR::Struct s;
-	s.m_name = "MyStruct";
-	s.m_hasImplicitDefaultConstructor = true;
-	IR::Function constructor;
-	constructor.m_name = s.m_name;
-	constructor.m_isStatic = false;
-	IR::Type arg;
-	IR::Type::Container c;
-	c.m_container = IR::ContainerType::Vector;
-	arg.m_type = c;
-	constructor.m_arguments.push_back({"myVar", arg});
-	s.m_public.m_functions.push_back(constructor);
+// TEST_CASE("Class within namespace", "[classBuilder]") {
+// 	IR::Struct s;
+// 	s.m_name = "MyStruct";
+// 	s.m_representation = fmt::format("MyNamespace::{className}",
+// 	                                 fmt::arg("className", s.m_name));
+// 	s.m_hasImplicitDefaultConstructor = true;
 
-	EmbindProxy::TypeInfo typeInfo;
-	auto myStruct = Builders::buildClass(s, typeInfo).value();
-	REQUIRE(typeInfo.m_includes.size() == 1);
-	for (auto const& include : typeInfo.m_includes) {
-		REQUIRE(include == "<embind11/stl.h>");
-	}
-}
+// 	EmbindProxy::TypeInfo typeInfo;
+// 	auto myStruct = Builders::buildClass(s, typeInfo).value();
+// 	auto embind = myStruct.getEmbind();
+// 	CAPTURE(embind);
 
-TEST_CASE("Class with vector in member function gives the correct include",
-          "[classBuilder]") {
-	std::string moduleName = "MyModule";
-	IR::Struct s;
-	s.m_name = "SomeClass";
-	s.m_hasImplicitDefaultConstructor = true;
-	IR::Function constructor;
-	constructor.m_name = s.m_name;
-	constructor.m_isStatic = false;
-	IR::Type arg;
-	IR::Type::Container c;
-	c.m_container = IR::ContainerType::Vector;
-	arg.m_type = c;
-	constructor.m_arguments.push_back({"myVar", arg});
-	s.m_public.m_functions.push_back(constructor);
+// 	auto expectedContains =
+// 	    fmt::format(R"(py::class_<{fullyQualifiedClassName}>("{className}"))",
+// 	                fmt::arg("fullyQualifiedClassName", s.m_representation),
+// 	                fmt::arg("className", s.m_name));
+// 	CAPTURE(expectedContains);
+// 	REQUIRE(TestUtil::contains(embind, expectedContains));
+// }
 
-	EmbindProxy::TypeInfo typeInfo;
-	auto myStruct = Builders::buildClass(s, typeInfo).value();
-	REQUIRE(typeInfo.m_includes.size() == 1);
-	for (auto const& include : typeInfo.m_includes) {
-		REQUIRE(include == "<embind11/stl.h>");
-	}
-}
+// TEST_CASE("Class with enum", "[classBuilder]") {
+// 	IR::Struct s;
+// 	s.m_name = "SomeClass";
+// 	s.m_hasImplicitDefaultConstructor = true;
+// 	IR::Enum e;
+// 	e.m_isScoped = true;
+// 	e.m_name = "MyEnum";
+// 	e.m_representation = "::" + e.m_name;
+// 	e.m_values.push_back("Hi");
+// 	s.m_public.m_enums.push_back(e);
 
-TEST_CASE("Class with enum", "[classBuilder]") {
-	std::string moduleName = "MyModule";
-	IR::Struct s;
-	s.m_name = "SomeClass";
-	s.m_hasImplicitDefaultConstructor = true;
-	IR::Enum e;
-	e.m_isScoped = true;
-	e.m_name = "MyEnum";
-	e.m_representation = moduleName + "::" + e.m_name;
-	e.m_values.push_back("Hi");
-	s.m_public.m_enums.push_back(e);
-
-	EmbindProxy::TypeInfo typeInfo;
-	auto myStruct = Builders::buildClass(s, typeInfo).value();
-	auto embind = myStruct.getEmbind(moduleName);
-	auto expectedContains = fmt::format(
-	    R"(py::enum_<{representation}>({structureName}, "{enumName}")",
-	    fmt::arg("representation", e.m_representation),
-	    fmt::arg("enumName", e.m_name),
-	    fmt::arg("structureName", s.m_name));
-	CAPTURE(embind);
-	CAPTURE(expectedContains);
-	REQUIRE(TestUtil::contains(embind, expectedContains));
-}
+// 	EmbindProxy::TypeInfo typeInfo;
+// 	auto myStruct = Builders::buildClass(s, typeInfo).value();
+// 	auto embind = myStruct.getEmbind();
+// 	auto expectedContains = fmt::format(
+// 	    R"(py::enum_<{representation}>({structureName}, "{enumName}")",
+// 	    fmt::arg("representation", e.m_representation),
+// 	    fmt::arg("enumName", e.m_name),
+// 	    fmt::arg("structureName", s.m_name));
+// 	CAPTURE(embind);
+// 	CAPTURE(expectedContains);
+// 	REQUIRE(TestUtil::contains(embind, expectedContains));
+// }

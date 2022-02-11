@@ -14,7 +14,7 @@ Note that any restriction this poses only applies to the public interface of you
 | Class                               | Class                          |
 | Public function                     | Class function                 |
 | Private function                    | Not converted                  |
-| Static member function              | ???                            |
+| Static member function              | Static class function          |
 | Static member variable              | ???                            |
 | Public const member variable        | Read only property             |
 | Public non const member variable    | Read write property            |

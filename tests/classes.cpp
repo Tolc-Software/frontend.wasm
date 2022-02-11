@@ -12,11 +12,10 @@ TEST_CASE("Classes", "[classes]") {
 	    TestUtil::EmbindStage(TestStage::getRootStagePath(), moduleName);
 	// Add instantiation in a source file.
 	// This cannot be just declared, must be instantiated
-	// See https://github.com/pybind/pybind11/issues/682
-	// And https://en.cppreference.com/w/cpp/language/static
+	// See https://en.cppreference.com/w/cpp/language/static
 	//
 	// Instantiation (must be in a source file):
-	stage.addModuleFile("test.cpp", "int const WithConstructor::i;");
+	// stage.addModuleFile("test.cpp", "int const WithConstructor::i;");
 
 	auto cppCode = R"(
 #include <string>
@@ -26,13 +25,20 @@ class WithConstructor {
 public:
 	explicit WithConstructor(std::string s) : m_s(s) {}
 
-	static int const i = 5;
+	// static int const i = 5;
 
 	std::string getS() { return m_s; }
-	std::string_view getSView() { return m_s; }
+	// std::string_view getSView() { return m_s; }
+
+	static int getStatic() { return 55; }
 
 private:
 	std::string m_s;
+};
+
+struct WithMembers {
+	int const i = 5;
+	std::string s = "hello";
 };
 
 class WithFunction {
@@ -48,50 +54,50 @@ class WithPrivateFunction {
 	}
 };
 
-namespace MyLib {
-
-	class Nested {
-	public:
-		double divideByTwo(double d) {
-			return d / 2;
-		}
-	};
-}
-
 )";
 
-	auto pythonTestCode = fmt::format(R"(
-# You can access static variables without instantiating class
-self.assertEqual({moduleName}.WithConstructor.i, 5)
+	auto jsTestCode = R"(
+expect(m.WithConstructor.getStatic()).toBe(55);
 
-withConstructor = {moduleName}.WithConstructor("Hello")
-self.assertEqual(withConstructor.getS(), "Hello")
-withConstructor = {moduleName}.WithConstructor(s="named argument")
-self.assertEqual(withConstructor.getS(), "named argument")
-self.assertEqual(withConstructor.getSView(), "named argument")
+var withConstructor = new m.WithConstructor("Hello");
 
-withFunction = {moduleName}.WithFunction()
-self.assertEqual(withFunction.add(2, 5), 7)
+expect(withConstructor.getS()).toBe("Hello");
+// expect(withConstructor.getSView()).toBe("Hello");
+// expect(withConstructor.i).toBe(5);
 
-# Test private function
-with self.assertRaises(AttributeError) as error_context:
-    withPrivateFunction = {moduleName}.WithPrivateFunction()
-    withPrivateFunction.multiply(3, 2)
+withConstructor.delete();
 
-self.assertEqual(len(error_context.exception.args), 1)
-# print(error_context.test_case)
-self.assertEqual(
-    "'{moduleName}.WithPrivateFunction' object has no attribute 'multiply'",
-    error_context.exception.args[0],
-    "Not correct exception on private functions",
-)
+var withMembers = new m.WithMembers();
 
-nested = {moduleName}.MyLib.Nested()
-self.assertEqual(nested.divideByTwo(10), 5)
-)",
-	                                  fmt::arg("moduleName", moduleName));
+expect(withMembers.i).toBe(5);
+try {
+	withMembers.i = 10;
+} catch (err) {
+	expect(err.toString()).toMatch(/BindingError: WithMembers.i is a read-only property/i);
+}
+
+expect(withMembers.s).toBe("hello");
+
+withMembers.delete();
+
+var withFunction = new m.WithFunction();
+
+expect(withFunction.add(5, 10)).toBe(15);
+
+withFunction.delete();
+
+var withPrivateFunction = new m.WithPrivateFunction();
+
+try {
+	withPrivateFunction.multiply(5, 10);
+} catch (err) {
+	expect(err.toString()).toMatch(/TypeError: withPrivateFunction.multiply is not a function/i);
+}
+
+withPrivateFunction.delete();
+)";
 
 	auto errorCode =
-	    TestUtil::runEmbindTest(stage, cppCode, pythonTestCode, moduleName);
+	    TestUtil::runEmbindTest(stage, cppCode, jsTestCode, moduleName);
 	REQUIRE(errorCode == 0);
 }

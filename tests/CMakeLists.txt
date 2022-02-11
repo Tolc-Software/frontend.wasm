@@ -89,7 +89,7 @@ foreach(
   test
 
   # Builders/attributeBuilder.cpp
-  # Builders/classBuilder.cpp
+  Builders/classBuilder.cpp
   # Builders/enumBuilder.cpp
   # Builders/functionBuilder.cpp
   # Builders/moduleFileBuilder.cpp
@@ -104,7 +104,7 @@ foreach(
   EmbindProxy/module.cpp
   EmbindProxy/moduleFile.cpp
   arrays.cpp
-  # classes.cpp
+  classes.cpp
   # complex.cpp
   # deques.cpp
   # enums.cpp
