@@ -9,11 +9,11 @@ public:
 	Enum(std::string const& name, std::string const& fullyQualifiedName);
 
 	/**
-	* Creates a string corresponding to the pybind11 conversion of this enum.
+	* Creates a string corresponding to the embind conversion of this enum.
 	* E.g.
-	*   py::enum_<Pet::Kind>(pet, "Kind", py::arithmetic())
+	*   enum_<Pet::Kind>("Kind").value("Dog", Pet::Kind::Dog)
 	*/
-	std::string getEmbind(std::string const& moduleOrClassName) const;
+	std::string getEmbind() const;
 
 	/**
 	* Add an enum value. Should be just the value name.
@@ -25,13 +25,10 @@ public:
 	*/
 	void addValue(std::string const& value);
 
-	void setScoped(bool isScoped);
-
 private:
 	// The user defined name of the enum
 	std::string m_name;
 	std::string m_fullyQualifiedName;
 	std::vector<std::string> m_values;
-	bool m_isScoped;
 };
 }    // namespace EmbindProxy

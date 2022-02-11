@@ -19,20 +19,17 @@ TEST_CASE("Can build simple enums", "[enumBuilder]") {
 	std::vector<std::string> values = {"A", "B", "Ending"};
 	e.m_values = values;
 
-	e.m_isScoped = true;
-
 	auto proxyEnum = Builders::buildEnum(e);
-	auto embind = proxyEnum.getEmbind(moduleName);
+	auto embind = proxyEnum.getEmbind();
 	CAPTURE(embind);
 
 	// Since it is an enum class we should not export it
 	REQUIRE(!TestUtil::contains(embind, "export_values()"));
 
-	auto expectedContains = fmt::format(
-	    R"(py::enum_<{fullyQualifiedName}>({moduleName}, "{enumName}")",
-	    fmt::arg("fullyQualifiedName", e.m_representation),
-	    fmt::arg("moduleName", moduleName),
-	    fmt::arg("enumName", e.m_name));
+	auto expectedContains =
+	    fmt::format(R"(enum_<{fullyQualifiedName}>("{enumName}"))",
+	                fmt::arg("fullyQualifiedName", e.m_representation),
+	                fmt::arg("enumName", e.m_name));
 	CAPTURE(expectedContains);
 	REQUIRE(TestUtil::contains(embind, expectedContains));
 	for (auto const& value : values) {
@@ -40,7 +37,7 @@ TEST_CASE("Can build simple enums", "[enumBuilder]") {
 		// .value("A", Module::MyEnum::A)
 		REQUIRE(TestUtil::contains(
 		    embind,
-		    fmt::format(R"(.value("{value}", {fullyQualifiedName}::{value})",
+		    fmt::format(R"(.value("{value}", {fullyQualifiedName}::{value}))",
 		                fmt::arg("value", value),
 		                fmt::arg("fullyQualifiedName", e.m_representation))));
 	}

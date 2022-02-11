@@ -16,7 +16,7 @@ std::string Module::getEmbind() const {
 	}
 
 	for (auto const& e : m_enums) {
-		out += fmt::format("\t{};\n", e.getEmbind(m_prefix));
+		out += fmt::format("\t{};\n", e.getEmbind());
 	}
 
 	for (auto const& attribute : m_attributes) {

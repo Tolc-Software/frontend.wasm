@@ -1,4 +1,3 @@
-#include "Frontend/Wasm/frontend.hpp"
 #include "TestStage/paths.hpp"
 #include "TestUtil/embindStage.hpp"
 #include "TestUtil/runEmbindTest.hpp"
@@ -10,6 +9,7 @@ TEST_CASE("Testing enums", "[enums]") {
 	auto stage =
 	    TestUtil::EmbindStage(TestStage::getRootStagePath(), moduleName);
 
+	stage.keepAliveAfterTest();
 	auto cppCode = R"(
 enum Unscoped {
 	A,
@@ -34,31 +34,20 @@ Unscoped f(Unscoped s) {
 	return s;
 }
 
-namespace NS {
-enum class Deep {
-	G,
-	H,
-	I
-};
-}
-
 )";
 
-	auto pythonTestCode = fmt::format(R"(
-scoped = {moduleName}.Scoped.D
-enumTest = {moduleName}.EnumTest(scoped)
-self.assertEqual(enumTest.e, scoped)
+	auto jsTestCode = R"(
+var scoped = m.Scoped.D;
+var enumTest = new m.EnumTest(scoped);
+expect(enumTest.e).toBe(scoped);
+enumTest.delete();
 
-unscoped = {moduleName}.Unscoped.B
-u = {moduleName}.f(unscoped)
-self.assertEqual(u, unscoped)
-
-deep = {moduleName}.NS.Deep.I
-self.assertNotEqual(deep, {moduleName}.NS.Deep.H)
-)",
-	                                  fmt::arg("moduleName", moduleName));
+unscoped = m.Unscoped.B
+u = m.f(unscoped)
+expect(u).toBe(unscoped);
+)";
 
 	auto errorCode =
-	    TestUtil::runEmbindTest(stage, cppCode, pythonTestCode, moduleName);
+	    TestUtil::runEmbindTest(stage, cppCode, jsTestCode, moduleName);
 	REQUIRE(errorCode == 0);
 }

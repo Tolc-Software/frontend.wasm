@@ -47,7 +47,7 @@ std::string Class::getEmbind() const {
 		out += ";\n\n";
 
 		for (auto const& e : m_enums) {
-			out += fmt::format("{};\n", e.getEmbind(m_name));
+			out += fmt::format("{};\n", e.getEmbind());
 		}
 	}
 

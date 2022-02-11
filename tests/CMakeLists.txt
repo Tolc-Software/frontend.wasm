@@ -90,7 +90,7 @@ foreach(
 
   # Builders/attributeBuilder.cpp
   Builders/classBuilder.cpp
-  # Builders/enumBuilder.cpp
+  Builders/enumBuilder.cpp
   # Builders/functionBuilder.cpp
   # Builders/moduleFileBuilder.cpp
   Builders/typeToStringBuilder.cpp
@@ -99,7 +99,7 @@ foreach(
   Helpers/string.cpp
   # EmbindProxy/attribute.cpp
   EmbindProxy/class.cpp
-  # EmbindProxy/enum.cpp
+  EmbindProxy/enum.cpp
   EmbindProxy/function.cpp
   EmbindProxy/module.cpp
   EmbindProxy/moduleFile.cpp
@@ -107,7 +107,7 @@ foreach(
   classes.cpp
   # complex.cpp
   # deques.cpp
-  # enums.cpp
+  enums.cpp
   # filesystem_paths.cpp
   # functional.cpp
   functions.cpp
