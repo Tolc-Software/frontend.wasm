@@ -1,3 +1,6 @@
+# Ignore everything
+/*
+
 # Ignore all files named (wherever they are):
 .DS_Store
 .log
