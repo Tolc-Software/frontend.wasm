@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <filesystem>
 #include <fmt/format.h>
 #include <fstream>
@@ -12,6 +13,14 @@ namespace TestUtil {
 		std::string code;
 	};
 
+    namespace {
+    std::string makeValidFileName(std::string s) {
+	    std::replace(s.begin(), s.end(), ' ', '_');
+	    std::replace(s.begin(), s.end(), ':', '_');
+	    return s;
+    }
+    }    // namespace
+
     /**
 	* Output as Markdown example
 	*/
@@ -19,7 +28,7 @@ namespace TestUtil {
                          std::vector<Code> const& exports,
                          std::filesystem::path const& examplesDir) {
 	    std::filesystem::path fileName =
-	        examplesDir / fmt::format("{}.md", name);
+	        examplesDir / fmt::format("{}.md", makeValidFileName(name));
 	    std::string content = fmt::format(R"(
 ## {} ##
 

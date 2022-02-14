@@ -1,5 +1,17 @@
 # Examples #
 
-Each example is is made up of a `C++` section and how it can be used from `javascript`. Note that the examples are part of the test suite for `Tolc`, so the `javascript` uses statements from the test framework [`jest`](https://jestjs.io/). You may assume that each test passes if you run the latest version of `Tolc`.
+Each example is is made up of a `C++` section and how it can be used from `javascript`. Each example exports the module `m` and is called as follows:
 
+```javascript
+var m = require('./m.js');
+
+m.onRuntimeInitialized = function() {
+	// The actual example body
+	expect(m.sayTen()).toBe(10);
+};
+```
+
+Since `WebAssembly` is loaded asynchronously, it has to use the `onRuntimeInitialized` callback.
+
+Note that the examples are part of the test suite for `Tolc`, so the `javascript` uses statements from the test framework [`jest`](https://jestjs.io/). You may assume that each test passes if you run the latest version of `Tolc`.
 

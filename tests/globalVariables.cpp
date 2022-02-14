@@ -33,7 +33,7 @@ expect(m.c).toBe("Hello world");
 
 	using Code = TestUtil::Code;
 	TestUtil::exportAsExample(
-	    "Globals",
+	    "Global Variables",
 	    {Code {"cpp", cppCode}, Code {"javascript", jsTestCode}},
 	    TestStage::getExamplesPath());
 }
