@@ -16,7 +16,7 @@ TEST_CASE("Enums", "[enum]") {
 	auto embind = e.getEmbind();
 
 	auto expectedContains =
-	    fmt::format(R"(enum_<{fullyQualifiedName}>("{name}"))",
+	    fmt::format(R"(em::enum_<{fullyQualifiedName}>("{name}"))",
 	                fmt::arg("fullyQualifiedName", fullyQualifiedName),
 	                fmt::arg("name", name));
 
