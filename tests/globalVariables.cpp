@@ -10,32 +10,30 @@ TEST_CASE("Global variables are converted",
 	std::string moduleName = "defaultModule";
 	auto stage =
 	    TestUtil::EmbindStage(TestStage::getRootStagePath(), moduleName);
+	stage.keepAliveAfterTest();
 
 	auto cppCode = R"(
-#include <string>
+#include <string_view>
 
-static int i = 0;
-namespace Nested {
-	int i = 0;
-	std::string s = "Hello world";
-}
+int const i = 0;
+double const d = 55;
+std::string_view const s = "Hello world";
+const char* c = "Hello world";
 )";
 
-	auto pythonTestCode = fmt::format(R"(
-# Starts at 0 and can be changed
-self.assertEqual({moduleName}.i, 0)
-{moduleName}.i = 5
-self.assertEqual({moduleName}.i, 5)
+	auto jsTestCode = R"(
+// # Starts at 0 and can be changed
+// self.assertEqual(m.i, 0)
+// m.i = 5
+// self.assertEqual(m.i, 5)
 
-# Nested with the same name
-self.assertEqual({moduleName}.Nested.i, 0)
-
-# More complex variables are available aswell
-self.assertEqual({moduleName}.Nested.s, "Hello world")
-)",
-	                                  fmt::arg("moduleName", moduleName));
+expect(m.i).toBe(0);
+expect(m.d).toBe(55);
+expect(m.s).toBe("Hello world");
+expect(m.c).toBe("Hello world");
+)";
 
 	auto errorCode =
-	    TestUtil::runEmbindTest(stage, cppCode, pythonTestCode, moduleName);
+	    TestUtil::runEmbindTest(stage, cppCode, jsTestCode, moduleName);
 	REQUIRE(errorCode == 0);
 }

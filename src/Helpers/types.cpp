@@ -1,5 +1,6 @@
 #include "Helpers/types.hpp"
 #include <IR/ir.hpp>
+#include <algorithm>
 #include <optional>
 #include <variant>
 
@@ -77,4 +78,17 @@ std::string toString(IR::ContainerType c) {
 	return "";
 }
 
+bool isCharPtr(IR::Type const& type) {
+	using IR::BaseType;
+	std::vector<IR::BaseType> chars = {BaseType::Char,
+	                                   BaseType::Char16_t,
+	                                   BaseType::Char32_t,
+	                                   BaseType::SignedChar,
+	                                   BaseType::UnsignedChar,
+	                                   BaseType::Wchar_t};
+	return type.m_numPointers != 0 &&
+	       std::any_of(chars.begin(), chars.end(), [&](auto const& c) {
+		       return Helpers::isBaseType(type, c);
+	       });
+}
 }    // namespace Helpers

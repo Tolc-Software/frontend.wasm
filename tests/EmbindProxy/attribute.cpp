@@ -10,7 +10,7 @@ TEST_CASE("Simple attribute", "[attribute]") {
 	auto pybindCode = a.getEmbind();
 	CAPTURE(pybindCode);
 
-	auto expectedContains = fmt::format(R"(attr("{name}") = &{fqName})",
+	auto expectedContains = fmt::format(R"(em::constant("{name}", {fqName}))",
 	                                    fmt::arg("name", name),
 	                                    fmt::arg("fqName", fqName));
 	CAPTURE(expectedContains);

@@ -9,7 +9,7 @@ Attribute::Attribute(std::string const& name,
     : m_name(name), m_fullyQualifiedName(fullyQualifiedName) {}
 
 std::string Attribute::getEmbind() const {
-	return fmt::format(R"(attr("{name}") = &{fullyQualifiedName})",
+	return fmt::format(R"(em::constant("{name}", {fullyQualifiedName}))",
 	                   fmt::arg("name", m_name),
 	                   fmt::arg("fullyQualifiedName", m_fullyQualifiedName));
 }

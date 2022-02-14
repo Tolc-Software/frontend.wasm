@@ -4,6 +4,36 @@
 
 namespace TestUtil {
 
+std::string getAsString(IR::BaseType type) {
+	using IR::BaseType;
+	switch (type) {
+		case BaseType::Bool: return "bool";
+		case BaseType::Char16_t: return "char16_t";
+		case BaseType::Char32_t: return "char32_t";
+		case BaseType::Char: return "char";
+		case BaseType::Complex: return "std::complex<double>";
+		case BaseType::Double: return "double";
+		case BaseType::FilesystemPath: return "std::filesystem::path";
+		case BaseType::Float: return "float";
+		case BaseType::Int: return "int";
+		case BaseType::LongDouble: return "long double";
+		case BaseType::LongInt: return "long int";
+		case BaseType::LongLongInt: return "long long int";
+		case BaseType::ShortInt: return "short int";
+		case BaseType::SignedChar: return "signed char";
+		case BaseType::String: return "std::string";
+		case BaseType::StringView: return "std::string_view";
+		case BaseType::UnsignedChar: return "unsigned char";
+		case BaseType::UnsignedInt: return "unsigned int";
+		case BaseType::UnsignedLongInt: return "unsigned long int";
+		case BaseType::UnsignedLongLongInt: return "unsigned long long int";
+		case BaseType::UnsignedShortInt: return "unsigned short int";
+		case BaseType::Void: return "void";
+		case BaseType::Wchar_t: return "wchar_t";
+	}
+	return "";
+}
+
 IR::Struct getStruct(std::string const& name) {
 	IR::Struct s;
 	s.m_name = name;
@@ -20,15 +50,15 @@ IR::Function getFunction(std::string const& name) {
 	return f;
 }
 
-IR::Type getType() {
+IR::Type getType(IR::BaseType base = IR::BaseType::Int) {
 	IR::Type t;
 	IR::Type::Value v;
-	v.m_base = IR::BaseType::Int;
+	v.m_base = base;
 	t.m_type = v;
 	t.m_isConst = false;
 	t.m_isReference = false;
 	t.m_numPointers = 0;
-	t.m_representation = "int";
+	t.m_representation = getAsString(base);
 	return t;
 }
 
@@ -93,36 +123,6 @@ std::vector<IR::BaseType> getTypes() {
 	        BaseType::UnsignedShortInt,
 	        BaseType::Void,
 	        BaseType::Wchar_t};
-}
-
-std::string getAsString(IR::BaseType type) {
-	using IR::BaseType;
-	switch (type) {
-		case BaseType::Bool: return "bool";
-		case BaseType::Char16_t: return "char16_t";
-		case BaseType::Char32_t: return "char32_t";
-		case BaseType::Char: return "char";
-		case BaseType::Complex: return "std::complex<double>";
-		case BaseType::Double: return "double";
-		case BaseType::FilesystemPath: return "std::filesystem::path";
-		case BaseType::Float: return "float";
-		case BaseType::Int: return "int";
-		case BaseType::LongDouble: return "long double";
-		case BaseType::LongInt: return "long int";
-		case BaseType::LongLongInt: return "long long int";
-		case BaseType::ShortInt: return "short int";
-		case BaseType::SignedChar: return "signed char";
-		case BaseType::String: return "std::string";
-		case BaseType::StringView: return "std::string_view";
-		case BaseType::UnsignedChar: return "unsigned char";
-		case BaseType::UnsignedInt: return "unsigned int";
-		case BaseType::UnsignedLongInt: return "unsigned long int";
-		case BaseType::UnsignedLongLongInt: return "unsigned long long int";
-		case BaseType::UnsignedShortInt: return "unsigned short int";
-		case BaseType::Void: return "void";
-		case BaseType::Wchar_t: return "wchar_t";
-	}
-	return "";
 }
 
 std::string getIncludesIfNeeded(IR::BaseType type) {

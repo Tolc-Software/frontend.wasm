@@ -27,6 +27,10 @@ struct TypeInfo {
 	//     }
 	std::set<std::string> m_extraFunctions;
 
+	// Do we need to include anything extra?
+	// Example entries: {<string>, "MyStuff.hpp"}
+	std::set<std::string> m_includes;
+
 	// The namespace under which all extra defined functions are placed to avoid conflicts
 	std::string m_functionsNamespace = "Tolc_";
 };

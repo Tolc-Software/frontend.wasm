@@ -3,6 +3,7 @@
 #include <IR/ir.hpp>
 
 namespace Helpers {
+
 /**
 * Return UserDefined if type is a Container, otherwise nullptr
 */
@@ -27,6 +28,12 @@ bool isBaseType(IR::Type const& type, IR::BaseType base);
 * Return true iff type is a function
 */
 bool isFunctionType(IR::Type const& type);
+
+/**
+* Return true iff type is a char*
+* Can be any type of char (char_32, wchar, ...)
+*/
+bool isCharPtr(IR::Type const& t);
 
 /**
 * Return substring without the template parameters

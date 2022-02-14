@@ -20,7 +20,7 @@ std::string Module::getEmbind() const {
 	}
 
 	for (auto const& attribute : m_attributes) {
-		out += fmt::format("\t{}.{};\n\n", m_prefix, attribute.getEmbind());
+		out += fmt::format("\t{};\n\n", attribute.getEmbind());
 	}
 
 	// Define all the children

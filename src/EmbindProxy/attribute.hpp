@@ -1,21 +1,19 @@
 #pragma once
 
 #include <string>
-#include <vector>
 
 namespace EmbindProxy {
 /**
 * An attribute is a global value
-* NOTE: python throws away const so the value will always be mutable
 */
 class Attribute {
 public:
 	Attribute(std::string const& name, std::string const& fullyQualifiedName);
 
 	/**
-	* Creates a string corresponding to the pybind11 conversion of this attribute.
+	* Creates a string corresponding to the embind conversion of this attribute.
 	* E.g.
-	*   attr("i") = &MyNamespace::i;
+	*   em::constant("myGlobal", myGlobal)
 	*/
 	std::string getEmbind() const;
 

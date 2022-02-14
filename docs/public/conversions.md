@@ -19,8 +19,8 @@ Note that any restriction this poses only applies to the public interface of you
 | Public const member variable        | Read only property             |
 | Public non const member variable    | Read write property            |
 | Private member variable             | Not converted                  |
-| Global variable                     | Module variable                |
-| Global static variable              | Module variable                |
+| Global variable                     | Module constant                |
+| Global static variable              | Module constant                |
 | Free function                       | Module function                |
 | Overloaded function                 | Module function*               |
 | Enum                                | ???                            |

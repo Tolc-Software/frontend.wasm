@@ -88,7 +88,7 @@ set_tests_properties(ConfigureTestStage PROPERTIES FIXTURES_SETUP TestStage)
 foreach(
   test
 
-  # Builders/attributeBuilder.cpp
+  Builders/attributeBuilder.cpp
   Builders/classBuilder.cpp
   Builders/enumBuilder.cpp
   Builders/functionBuilder.cpp
@@ -97,7 +97,7 @@ foreach(
   Helpers/Embind/checkType.cpp
   Helpers/combine.cpp
   Helpers/string.cpp
-  # EmbindProxy/attribute.cpp
+  EmbindProxy/attribute.cpp
   EmbindProxy/class.cpp
   EmbindProxy/enum.cpp
   EmbindProxy/function.cpp
@@ -111,7 +111,7 @@ foreach(
   # filesystem_paths.cpp
   # functional.cpp
   functions.cpp
-  # globalVariables.cpp
+  globalVariables.cpp
   # lists.cpp
   maps.cpp
   # memberVariables.cpp
