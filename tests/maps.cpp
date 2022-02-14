@@ -1,5 +1,6 @@
 #include "TestStage/paths.hpp"
 #include "TestUtil/embindStage.hpp"
+#include "TestUtil/exportAsExample.hpp"
 #include "TestUtil/runEmbindTest.hpp"
 #include <catch2/catch.hpp>
 #include <fmt/format.h>
@@ -37,4 +38,10 @@ expect(data.get(50)).toBe("Stuff");
 	auto errorCode =
 	    TestUtil::runEmbindTest(stage, cppCode, jsTestCode, moduleName);
 	REQUIRE(errorCode == 0);
+
+	using Code = TestUtil::Code;
+	TestUtil::exportAsExample(
+	    "std::map",
+	    {Code {"cpp", cppCode}, Code {"javascript", jsTestCode}},
+	    TestStage::getExamplesPath());
 }

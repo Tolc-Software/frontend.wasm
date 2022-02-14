@@ -1,23 +1,9 @@
-#include "TestStage/paths.hpp"
-#include "TestUtil/embindStage.hpp"
-#include "TestUtil/exportAsExample.hpp"
-#include "TestUtil/files.hpp"
-#include "TestUtil/runEmbindTest.hpp"
-#include <catch2/catch.hpp>
-#include <fmt/format.h>
 
-TEST_CASE("Classes", "[classes]") {
-	std::string moduleName = "defaultModule";
-	auto stage =
-	    TestUtil::EmbindStage(TestStage::getRootStagePath(), moduleName);
-	// Add instantiation in a source file.
-	// This cannot be just declared, must be instantiated
-	// See https://en.cppreference.com/w/cpp/language/static
-	//
-	// Instantiation (must be in a source file):
-	stage.addModuleFile("test.cpp", "int const WithConstructor::i;");
+## Classes ##
 
-	auto cppCode = R"(
+
+```cpp
+
 #include <string>
 #include <string_view>
 
@@ -54,9 +40,11 @@ class WithPrivateFunction {
 	}
 };
 
-)";
 
-	auto jsTestCode = R"(
+```
+
+```javascript
+
 expect(m.WithConstructor.getStatic()).toBe(55);
 
 var withConstructor = new m.WithConstructor("Hello");
@@ -95,15 +83,5 @@ try {
 }
 
 withPrivateFunction.delete();
-)";
 
-	auto errorCode =
-	    TestUtil::runEmbindTest(stage, cppCode, jsTestCode, moduleName);
-	REQUIRE(errorCode == 0);
-
-	using Code = TestUtil::Code;
-	TestUtil::exportAsExample(
-	    "Classes",
-	    {Code {"cpp", cppCode}, Code {"javascript", jsTestCode}},
-	    TestStage::getExamplesPath());
-}
+```
