@@ -1,0 +1,5 @@
+# Examples #
+
+Each example is is made up of a `C++` section and how it can be used from `javascript`. Note that the examples are part of the test suite for `Tolc`, so the `javascript` uses statements from the test framework [`jest`](https://jestjs.io/). You may assume that each test passes if you run the latest version of `Tolc`.
+
+
