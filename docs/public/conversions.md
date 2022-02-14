@@ -50,7 +50,7 @@ Note that any restriction this poses only applies to the public interface of you
 | std::multimap                   | Not converted                                                     |
 | std::multiset                   | Not converted                                                     |
 | std::optional                   | ???                                                               |
-| std::pair                       | ???                                                               |
+| std::pair                       | array                                                             |
 | std::priority\_queue            | Not converted                                                     |
 | std::queue                      | Not converted                                                     |
 | std::set                        | ???                                                               |

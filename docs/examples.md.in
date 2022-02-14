@@ -5,10 +5,13 @@ Each example is is made up of a `C++` section and how it can be used from `javas
 ```javascript
 var m = require('./m.js');
 
-m.onRuntimeInitialized = function() {
-	// The actual example body
-	expect(m.sayTen()).toBe(10);
+test('Main', () => {
+	m.onRuntimeInitialized = () => {
+		// The actual example body
+		expect(m.sayTen()).toBe(10);
+	};
 };
+
 ```
 
 Since `WebAssembly` is loaded asynchronously, it has to use the `onRuntimeInitialized` callback.

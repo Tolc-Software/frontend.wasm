@@ -112,7 +112,7 @@ foreach(
   # namespaces.cpp
   # optionals.cpp
   # overloadedFunctions.cpp
-  # pairs.cpp
+  pairs.cpp
   # sets.cpp
   # smartPointers.cpp
   # templates.cpp

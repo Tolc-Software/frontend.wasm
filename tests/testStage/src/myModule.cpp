@@ -40,6 +40,14 @@ const std::string_view s = "Hello world";
 const std::string s2 = "Hello world";
 const char* sc = "Hello world";
 
+int getter(std::pair<int, int> const& p) {
+	return p.first;
+}
+
+int setter(std::pair<int, int>& p, int i) {
+	return p.first = i;
+}
+
 // Binding code
 EMSCRIPTEN_BINDINGS(my_class_example) {
 	emscripten::class_<MyClass>("MyClass")
@@ -48,6 +56,11 @@ EMSCRIPTEN_BINDINGS(my_class_example) {
 	    .property("x", &MyClass::getX, &MyClass::setX)
 	    .class_function("getStringFromInstance",
 	                    &MyClass::getStringFromInstance);
+
+	// Pair with getters and setters aswell as direct access
+	em::value_object<std::pair<int, int>>("pair_int_int")
+	    .field("first", &getter, &setter)
+	    .field("second", &std::pair<int, int>::second);
 
 	emscripten::function("f", &f);
 	emscripten::register_vector<int>("vector<int>");

@@ -72,6 +72,17 @@ IR::Type getVector() {
 	return t;
 }
 
+IR::Type getPair() {
+	auto t = getType();
+	t.m_representation = "std::pair<int, std::string>";
+	IR::Type::Container c;
+	c.m_container = IR::ContainerType::Pair;
+	c.m_containedTypes.push_back(getType(IR::BaseType::Int));
+	c.m_containedTypes.push_back(getType(IR::BaseType::String));
+	t.m_type = c;
+	return t;
+}
+
 IR::Type getMap() {
 	auto t = getType();
 	t.m_representation = "std::map<int, int>";

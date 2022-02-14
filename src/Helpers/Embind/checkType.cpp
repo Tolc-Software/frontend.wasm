@@ -14,13 +14,16 @@ std::optional<std::string> getRegisterString(IR::ContainerType container) {
 	// See https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html
 	switch (container) {
 		case IR::ContainerType::Array:
-			return R"(em::value_array<std::array<{}>>("{}"))";
+			return "em::value_array<std::array<{}>>(\"{}\")\n";
 			break;
 		case IR::ContainerType::Map:
 			return R"(em::register_map<{}>("{}"))";
 			break;
 		case IR::ContainerType::Vector:
 			return R"(em::register_vector<{}>("{}"))";
+			break;
+		case IR::ContainerType::Pair:
+			return "em::value_array<std::pair<{}>>(\"{}\")\n";
 			break;
 
 		case IR::ContainerType::Deque:
@@ -29,7 +32,6 @@ std::optional<std::string> getRegisterString(IR::ContainerType container) {
 		case IR::ContainerType::MultiMap:
 		case IR::ContainerType::MultiSet:
 		case IR::ContainerType::Optional:
-		case IR::ContainerType::Pair:
 		case IR::ContainerType::PriorityQueue:
 		case IR::ContainerType::Queue:
 		case IR::ContainerType::Set:
@@ -58,6 +60,30 @@ std::optional<std::string> getRegisterString(IR::ContainerType container) {
 }
 
 /**
+* Adds elements statements if the container type has them
+* Ex: value_array has elements based on index of the underlying std::array
+*/
+std::string addElementsIfNecessary(IR::ContainerType c,
+                                   std::string const& representation) {
+	std::string elements;
+	if (c == IR::ContainerType::Array) {
+		for (int i = 0;
+		     i < std::stoi(Builders::extractArraySize(representation));
+		     ++i) {
+			// See https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html#value-types
+			elements +=
+			    fmt::format("\t\t.element(emscripten::index<{}>())\n", i);
+		}
+		// Remove last \n
+		elements.pop_back();
+	} else if (c == IR::ContainerType::Pair) {
+		elements += fmt::format("\t\t.element(&{}::first)\n", representation);
+		elements += fmt::format("\t\t.element(&{}::second)", representation);
+	}
+	return elements;
+}
+
+/**
 * Go through type and check if it requires any extra pybind11 includes
 * E.g. vector conversion requires inclusion of <pybind11/stl.h>
 */
@@ -68,15 +94,9 @@ std::optional<std::string> extractRegisterCommands(IR::Type const& type) {
 			    fmt::format(s.value(),
 			                Builders::getTemplateParameters(type),
 			                Builders::buildTypeString(type, "_"));
-			if (container->m_container == IR::ContainerType::Array) {
-				for (int i = 0; i < std::stoi(Builders::extractArraySize(
-				                        type.m_representation));
-				     ++i) {
-					// See https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html#value-types
-					registerCmd +=
-					    fmt::format(".element(emscripten::index<{}>())", i);
-				}
-			}
+
+			registerCmd += addElementsIfNecessary(container->m_container,
+			                                      type.m_representation);
 
 			return registerCmd;
 		}

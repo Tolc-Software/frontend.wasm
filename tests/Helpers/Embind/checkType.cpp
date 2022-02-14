@@ -42,3 +42,23 @@ TEST_CASE("Construct value_array", "[checkType]") {
 		    TestUtil::contains(command, ".element(emscripten::index<1>())"));
 	}
 }
+
+TEST_CASE("Construct value_object for pair", "[checkType]") {
+	auto c = TestUtil::getPair();
+	EmbindProxy::TypeInfo typeInfo;
+	Helpers::Embind::checkType(c, typeInfo);
+	REQUIRE(typeInfo.m_registerCommands.size() == 1);
+	for (auto const& command : typeInfo.m_registerCommands) {
+		CAPTURE(command);
+		REQUIRE(TestUtil::contains(
+		    command,
+		    "em::value_object<std::pair<int, std::string>>(\"pair_int_string\")"));
+		REQUIRE(TestUtil::contains(
+		    command,
+		    R"(.field("first", &std::pair<int, std::string>::first))"));
+		TestUtil::contains(
+		    command,
+		    R"(.field("second", &std::pair<int, std::string>::second))");
+	}
+}
+
