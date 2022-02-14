@@ -23,8 +23,8 @@ Note that any restriction this poses only applies to the public interface of you
 | Global static variable              | Module variable                |
 | Free function                       | Module function                |
 | Overloaded function                 | Module function*               |
-| Enum                                | ???                            |
-| Scoped enum                         | ???                            |
+| Enum                                | Enum                           |
+| Scoped enum                         | Enum                           |
 | Templated class/function            | Not converted**                |
 | Specialized class template          | Class***                       |
 | Specialized function template       | Function****                   |
