@@ -6,7 +6,7 @@ set(parser_asset_name "Parser-${CMAKE_SYSTEM_NAME}-main")
 if(${CMAKE_HOST_SYSTEM_NAME} STREQUAL Windows)
   set(parser_asset_name "${parser_asset_name}-${CMAKE_BUILD_TYPE}")
 endif()
-get_parser(ASSET_NAME ${parser_asset_name}.tar.xz ${parser_source_switch})
+get_parser(ASSET_NAME ${parser_asset_name}.tar.xz)
 
 # Set the include path for the system library in the variable
 # We are using the standard library shipped
@@ -29,17 +29,6 @@ configure_file(
 
 include(FetchContent)
 FetchContent_Declare(
-  Catch2
-  GIT_REPOSITORY git@github.com:catchorg/Catch2.git
-  GIT_TAG v2.12.1)
-FetchContent_MakeAvailable(Catch2)
-
-# These are needed to use create_catch2_test
-set(Catch2_FOUND TRUE)
-set(Catch2_INCLUDE_DIRS ${Catch2_SOURCE_DIR}/single_include)
-
-include(FetchContent)
-FetchContent_Declare(
   stage_content
   GIT_REPOSITORY https://github.com/Tolc-Software/Stage.git
   GIT_TAG main)
@@ -54,9 +43,6 @@ find_package(fmt REQUIRED)
 
 add_warnings(TARGET TestUtil)
 add_options(TARGET TestUtil)
-
-# Defines create_catch2_test
-include(${modules}/Catch2Helpers.cmake)
 
 if(ENABLE_COVERAGE)
   include(${modules}/CodeCoverage.cmake)
@@ -84,6 +70,11 @@ add_test(
   WORKING_DIRECTORY ${test_stage}
   COMMAND ${CMAKE_COMMAND} -S. -Bbuild -GNinja)
 set_tests_properties(ConfigureTestStage PROPERTIES FIXTURES_SETUP TestStage)
+
+# Defines create_catch2_test and get_catch2
+include(${modules}/Catch2Helpers.cmake)
+
+get_catch2(VERSION v2.12.1)
 
 foreach(
   test
