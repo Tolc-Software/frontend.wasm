@@ -33,8 +33,11 @@ std::string Class::getEmbind() const {
 		        fmt::format(", &{}", variable.m_setter.value()) :
                 "";
 
+		std::string isStatic = variable.m_isStatic ? "class_" : "";
+
 		out += fmt::format(
-		    "\t\t.property(\"{variableName}\", &{getter}{setter})\n",
+		    "\t\t.{isStatic}property(\"{variableName}\", &{getter}{setter})\n",
+		    fmt::arg("isStatic", isStatic),
 		    fmt::arg("getter", variable.m_getter),
 		    fmt::arg("setter", setter),
 		    fmt::arg("variableName", variable.m_name));

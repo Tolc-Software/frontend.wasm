@@ -124,6 +124,19 @@ TEST_CASE("Class with member variables", "[class]") {
 	}
 }
 
+TEST_CASE("Static variable", "[class]") {
+	std::string className = "myClass";
+	EmbindProxy::Class c(className, className);
+	c.addMemberVariable("v", "v", std::nullopt, true);
+	auto embindCode = c.getEmbind();
+	CAPTURE(embindCode);
+
+	using TestUtil::contains;
+	auto expectedProperty = fmt::format(".class_property(\"v\", &v)");
+	CAPTURE(expectedProperty);
+	REQUIRE(contains(embindCode, expectedProperty));
+}
+
 // TEST_CASE("Class with enum", "[class]") {
 // 	std::string className = "myFreshClass";
 // 	EmbindProxy::Class c(className, className);

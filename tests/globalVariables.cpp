@@ -10,7 +10,6 @@ TEST_CASE("Global variables are converted",
 	std::string moduleName = "defaultModule";
 	auto stage =
 	    TestUtil::EmbindStage(TestStage::getRootStagePath(), moduleName);
-	stage.keepAliveAfterTest();
 
 	auto cppCode = R"(
 #include <string_view>
@@ -22,11 +21,6 @@ const char* c = "Hello world";
 )";
 
 	auto jsTestCode = R"(
-// # Starts at 0 and can be changed
-// self.assertEqual(m.i, 0)
-// m.i = 5
-// self.assertEqual(m.i, 5)
-
 expect(m.i).toBe(0);
 expect(m.d).toBe(55);
 expect(m.s).toBe("Hello world");

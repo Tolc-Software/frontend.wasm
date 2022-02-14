@@ -15,12 +15,12 @@ Note that any restriction this poses only applies to the public interface of you
 | Public function                     | Class function                 |
 | Private function                    | Not converted                  |
 | Static member function              | Static class function          |
-| Static member variable              | ???                            |
+| Static member variable              | Static member variable         |
 | Public const member variable        | Read only property             |
 | Public non const member variable    | Read write property            |
 | Private member variable             | Not converted                  |
-| Global variable                     | Module constant                |
-| Global static variable              | Module constant                |
+| Global variable                     | Module variable                |
+| Global static variable              | Module variable                |
 | Free function                       | Module function                |
 | Overloaded function                 | Module function*               |
 | Enum                                | ???                            |

@@ -15,7 +15,7 @@ TEST_CASE("Classes", "[classes]") {
 	// See https://en.cppreference.com/w/cpp/language/static
 	//
 	// Instantiation (must be in a source file):
-	// stage.addModuleFile("test.cpp", "int const WithConstructor::i;");
+	stage.addModuleFile("test.cpp", "int const WithConstructor::i;");
 
 	auto cppCode = R"(
 #include <string>
@@ -25,7 +25,7 @@ class WithConstructor {
 public:
 	explicit WithConstructor(std::string s) : m_s(s) {}
 
-	// static int const i = 5;
+	static int const i = 5;
 
 	std::string getS() { return m_s; }
 	// std::string_view getSView() { return m_s; }
