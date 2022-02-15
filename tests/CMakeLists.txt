@@ -34,6 +34,11 @@ FetchContent_Declare(
   GIT_TAG main)
 FetchContent_MakeAvailable(stage_content)
 
+# Defines create_catch2_test and get_catch2
+include(${modules}/Catch2Helpers.cmake)
+
+get_catch2(VERSION v2.13.8)
+
 # Everything put in TestUtil/include is available
 add_library(TestUtil TestUtil/include/TestUtil/embindStage.cpp TestUtil/include/TestUtil/parse.cpp)
 target_include_directories(TestUtil PUBLIC TestUtil/include)
@@ -72,11 +77,6 @@ add_test(
   WORKING_DIRECTORY ${test_stage}
   COMMAND ${CMAKE_COMMAND} -S. -Bbuild -GNinja)
 set_tests_properties(ConfigureTestStage PROPERTIES FIXTURES_SETUP TestStage)
-
-# Defines create_catch2_test and get_catch2
-include(${modules}/Catch2Helpers.cmake)
-
-get_catch2(VERSION v2.12.1)
 
 foreach(
   test

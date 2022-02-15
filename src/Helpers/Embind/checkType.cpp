@@ -83,12 +83,18 @@ std::string addElementsIfNecessary(IR::ContainerType c,
 	return elements;
 }
 
+bool noneOfIsConst(std::vector<IR::Type> const& types) {
+	return std::none_of(
+	    types.begin(), types.end(), [](auto const& t) { return t.m_isConst; });
+}
+
 /**
 * Go through type and check if it requires any extra pybind11 includes
 * E.g. vector conversion requires inclusion of <pybind11/stl.h>
 */
 std::optional<std::string> extractRegisterCommands(IR::Type const& type) {
-	if (auto container = Helpers::getContainer(type)) {
+	if (auto container = Helpers::getContainer(type);
+	    container && noneOfIsConst(container->m_containedTypes)) {
 		if (auto s = getRegisterString(container->m_container)) {
 			auto registerCmd =
 			    fmt::format(s.value(),
