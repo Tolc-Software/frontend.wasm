@@ -25,10 +25,12 @@ class WithConstructor {
 public:
 	explicit WithConstructor(std::string s) : m_s(s) {}
 
+	// There is a separate .cpp file containing
+	// int const WithConstructor::i;
+	// To initialize i
 	static int const i = 5;
 
 	std::string getS() { return m_s; }
-	// std::string_view getSView() { return m_s; }
 
 	static int getStatic() { return 55; }
 
@@ -57,14 +59,15 @@ class WithPrivateFunction {
 )";
 
 	auto jsTestCode = R"(
+// Static function
 expect(m.WithConstructor.getStatic()).toBe(55);
+// Static variable
+expect(m.WithConstructor.i).toBe(5);
 
 var withConstructor = new m.WithConstructor("Hello");
-
 expect(withConstructor.getS()).toBe("Hello");
-// expect(withConstructor.getSView()).toBe("Hello");
-// expect(withConstructor.i).toBe(5);
 
+// Classes need to be deleted manually
 withConstructor.delete();
 
 var withMembers = new m.WithMembers();

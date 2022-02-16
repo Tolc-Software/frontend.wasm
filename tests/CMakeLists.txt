@@ -116,7 +116,7 @@ foreach(
   # sets.cpp
   # smartPointers.cpp
   # templates.cpp
-  # tuples.cpp
+  tuples.cpp
   # unordered_maps.cpp
   # unordered_sets.cpp
   # userDefined.cpp

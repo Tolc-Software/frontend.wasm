@@ -1,6 +1,7 @@
 #include "Helpers/Embind/checkType.hpp"
 #include "Builders/typeToStringBuilder.hpp"
 #include "EmbindProxy/typeInfo.hpp"
+#include "Helpers/Embind/createFunctions.hpp"
 #include "Helpers/types.hpp"
 #include <IR/ir.hpp>
 #include <fmt/format.h>
@@ -25,6 +26,9 @@ std::optional<std::string> getRegisterString(IR::ContainerType container) {
 		case IR::ContainerType::Pair:
 			return "em::value_array<std::pair<{}>>(\"{}\")\n";
 			break;
+		case IR::ContainerType::Tuple:
+			return "em::value_array<std::tuple<{}>>(\"{}\")\n";
+			break;
 
 		case IR::ContainerType::Deque:
 		case IR::ContainerType::ForwardList:
@@ -36,7 +40,6 @@ std::optional<std::string> getRegisterString(IR::ContainerType container) {
 		case IR::ContainerType::Queue:
 		case IR::ContainerType::Set:
 		case IR::ContainerType::Stack:
-		case IR::ContainerType::Tuple:
 		case IR::ContainerType::UnorderedMap:
 		case IR::ContainerType::UnorderedMultiMap:
 		case IR::ContainerType::UnorderedMultiSet:
@@ -63,10 +66,12 @@ std::optional<std::string> getRegisterString(IR::ContainerType container) {
 * Adds elements statements if the container type has them
 * Ex: value_array has elements based on index of the underlying std::array
 */
-std::string addElementsIfNecessary(IR::ContainerType c,
-                                   std::string const& representation) {
+std::string addElementsIfNecessary(IR::Type::Container const& c,
+                                   std::string const& representation,
+                                   std::string const& typeString,
+                                   EmbindProxy::TypeInfo& typeInfo) {
 	std::string elements;
-	if (c == IR::ContainerType::Array) {
+	if (c.m_container == IR::ContainerType::Array) {
 		for (int i = 0;
 		     i < std::stoi(Builders::extractArraySize(representation));
 		     ++i) {
@@ -76,9 +81,27 @@ std::string addElementsIfNecessary(IR::ContainerType c,
 		}
 		// Remove last \n
 		elements.pop_back();
-	} else if (c == IR::ContainerType::Pair) {
+	} else if (c.m_container == IR::ContainerType::Pair) {
 		elements += fmt::format("\t\t.element(&{}::first)\n", representation);
 		elements += fmt::format("\t\t.element(&{}::second)", representation);
+	} else if (c.m_container == IR::ContainerType::Tuple) {
+		int index = 0;
+		for (auto const& element : c.m_containedTypes) {
+			auto [getterName, setterName] =
+			    Helpers::Embind::createGetterSetter(typeString,
+			                                        representation,
+			                                        element.m_representation,
+			                                        index,
+			                                        typeInfo);
+			// Record the element
+			elements +=
+			    fmt::format("\t\t.element(&{getterName}, &{setterName})\n",
+			                fmt::arg("getterName", getterName),
+			                fmt::arg("setterName", setterName));
+			index++;
+		}
+		// Remove last \n
+		// elements.pop_back();
 	}
 	return elements;
 }
@@ -92,17 +115,17 @@ bool noneOfIsConst(std::vector<IR::Type> const& types) {
 * Go through type and check if it requires any extra pybind11 includes
 * E.g. vector conversion requires inclusion of <pybind11/stl.h>
 */
-std::optional<std::string> extractRegisterCommands(IR::Type const& type) {
+std::optional<std::string>
+extractRegisterCommands(IR::Type const& type, EmbindProxy::TypeInfo& typeInfo) {
 	if (auto container = Helpers::getContainer(type);
 	    container && noneOfIsConst(container->m_containedTypes)) {
 		if (auto s = getRegisterString(container->m_container)) {
-			auto registerCmd =
-			    fmt::format(s.value(),
-			                Builders::getTemplateParameters(type),
-			                Builders::buildTypeString(type, "_"));
+			auto typeString = Builders::buildTypeString(type, "_");
+			auto registerCmd = fmt::format(
+			    s.value(), Builders::getTemplateParameters(type), typeString);
 
-			registerCmd += addElementsIfNecessary(container->m_container,
-			                                      type.m_representation);
+			registerCmd += addElementsIfNecessary(
+			    *container, type.m_representation, typeString, typeInfo);
 
 			return registerCmd;
 		}
@@ -141,7 +164,7 @@ void checkType(IR::Type const& type, EmbindProxy::TypeInfo& info) {
 	while (!typesToCheck.empty()) {
 		auto& current = typesToCheck.front();
 
-		if (auto registerCmd = extractRegisterCommands(current)) {
+		if (auto registerCmd = extractRegisterCommands(current, info)) {
 			info.m_registerCommands.insert(registerCmd.value());
 		}
 

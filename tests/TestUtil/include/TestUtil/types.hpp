@@ -62,6 +62,17 @@ IR::Type getType(IR::BaseType base = IR::BaseType::Int) {
 	return t;
 }
 
+IR::Type getIntegral(std::string const& representation) {
+	IR::Type t;
+	IR::Type::Integral i;
+	t.m_type = i;
+	t.m_isConst = false;
+	t.m_isReference = false;
+	t.m_numPointers = 0;
+	t.m_representation = representation;
+	return t;
+}
+
 IR::Type getVector() {
 	auto t = getType();
 	t.m_representation = "std::vector<int>";
@@ -77,6 +88,17 @@ IR::Type getPair() {
 	t.m_representation = "std::pair<int, std::string>";
 	IR::Type::Container c;
 	c.m_container = IR::ContainerType::Pair;
+	c.m_containedTypes.push_back(getType(IR::BaseType::Int));
+	c.m_containedTypes.push_back(getType(IR::BaseType::String));
+	t.m_type = c;
+	return t;
+}
+
+IR::Type getTuple() {
+	auto t = getType();
+	t.m_representation = "std::tuple<int, std::string>";
+	IR::Type::Container c;
+	c.m_container = IR::ContainerType::Tuple;
 	c.m_containedTypes.push_back(getType(IR::BaseType::Int));
 	c.m_containedTypes.push_back(getType(IR::BaseType::String));
 	t.m_type = c;
@@ -100,6 +122,7 @@ IR::Type getArray() {
 	IR::Type::Container c;
 	c.m_container = IR::ContainerType::Array;
 	c.m_containedTypes.push_back(getType());
+	c.m_containedTypes.push_back(getIntegral("2"));
 	t.m_type = c;
 	return t;
 }

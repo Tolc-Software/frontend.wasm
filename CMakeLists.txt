@@ -46,18 +46,19 @@ add_library(
   src/Builders/moduleBuilder.cpp
   src/Builders/moduleFileBuilder.cpp
   src/Builders/typeToStringBuilder.cpp
-  src/Frontend/Wasm/frontend.cpp
-  src/Helpers/Embind/checkType.cpp
-  src/Helpers/getOverloadedFunctions.cpp
-  src/Helpers/split.cpp
-  src/Helpers/string.cpp
-  src/Helpers/types.cpp
   src/EmbindProxy/attribute.cpp
   src/EmbindProxy/class.cpp
   src/EmbindProxy/enum.cpp
   src/EmbindProxy/function.cpp
   src/EmbindProxy/module.cpp
-  src/EmbindProxy/moduleFile.cpp)
+  src/EmbindProxy/moduleFile.cpp
+  src/Frontend/Wasm/frontend.cpp
+  src/Helpers/Embind/checkType.cpp
+  src/Helpers/Embind/createFunctions.cpp
+  src/Helpers/getOverloadedFunctions.cpp
+  src/Helpers/split.cpp
+  src/Helpers/string.cpp
+  src/Helpers/types.cpp)
 
 add_warnings(TARGET Frontend.wasm)
 add_options(TARGET Frontend.wasm)

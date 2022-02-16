@@ -4,6 +4,7 @@
 #include "Builders/typeToStringBuilder.hpp"
 #include "EmbindProxy/typeInfo.hpp"
 #include "Helpers/Embind/checkType.hpp"
+#include "Helpers/Embind/createFunctions.hpp"
 #include "Helpers/combine.hpp"
 #include "Helpers/getOverloadedFunctions.hpp"
 #include "Helpers/types.hpp"
@@ -78,39 +79,11 @@ std::optional<EmbindProxy::Class> buildClass(IR::Struct const& cppClass,
 			    fmt::arg("variable", variable.m_name));
 		} else {
 			// Not const => Need to create setters and getters
-			getter = fmt::format(R"({className}_get_{variable})",
-			                     fmt::arg("variable", variable.m_name),
-			                     fmt::arg("className", jsClass.getName()));
-			setter = fmt::format(R"({className}_set_{variable})",
-			                     fmt::arg("variable", variable.m_name),
-			                     fmt::arg("className", jsClass.getName()));
-
-			std::string getterFunction = fmt::format(
-			    R"(
-decltype({fullyQualifiedClassName}::{variable}) {getter}({fullyQualifiedClassName} const& c_) {{
-	return c_.{variable};
-}})",
-			    fmt::arg("fullyQualifiedClassName", cppClass.m_representation),
-			    fmt::arg("variable", variable.m_name),
-			    fmt::arg("getter", getter));
-
-			std::string setterFunction = fmt::format(
-			    R"(
-void {setter}({fullyQualifiedClassName}& c_, decltype({fullyQualifiedClassName}::{variable}) const& v_) {{
-	c_.{variable} = v_;
-}}
-)",
-			    fmt::arg("fullyQualifiedClassName", cppClass.m_representation),
-			    fmt::arg("variable", variable.m_name),
-			    fmt::arg("setter", setter.value()));
-
-			// The getters may be in a namespace
-			getter = typeInfo.m_functionsNamespace + "::" + getter;
-			setter = typeInfo.m_functionsNamespace + "::" + setter.value();
-
-			// Save them add to module later
-			typeInfo.m_extraFunctions.insert(getterFunction);
-			typeInfo.m_extraFunctions.insert(setterFunction);
+			std::tie(getter, setter) =
+			    Helpers::Embind::createGetterSetter(jsClass.getName(),
+			                                        cppClass.m_representation,
+			                                        variable.m_name,
+			                                        typeInfo);
 		}
 		jsClass.addMemberVariable(
 		    variable.m_name, getter, setter, variable.m_type.m_isStatic);

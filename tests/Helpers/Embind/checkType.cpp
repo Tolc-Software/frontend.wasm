@@ -6,7 +6,6 @@
 #include <TestUtil/parse.hpp>
 #include <TestUtil/types.hpp>
 #include <catch2/catch.hpp>
-#include <iostream>
 
 TEST_CASE("Construct register_vector", "[checkType]") {
 	auto c = TestUtil::getVector();
@@ -14,6 +13,7 @@ TEST_CASE("Construct register_vector", "[checkType]") {
 	Helpers::Embind::checkType(c, typeInfo);
 	REQUIRE(typeInfo.m_registerCommands.size() == 1);
 	for (auto const& command : typeInfo.m_registerCommands) {
+		CAPTURE(command);
 		REQUIRE(command == "em::register_vector<int>(\"vector_int\")");
 	}
 }
@@ -24,6 +24,7 @@ TEST_CASE("Construct register_map", "[checkType]") {
 	Helpers::Embind::checkType(c, typeInfo);
 	REQUIRE(typeInfo.m_registerCommands.size() == 1);
 	for (auto const& command : typeInfo.m_registerCommands) {
+		CAPTURE(command);
 		REQUIRE(command == "em::register_map<int, int>(\"map_int_int\")");
 	}
 }
@@ -34,6 +35,7 @@ TEST_CASE("Construct value_array", "[checkType]") {
 	Helpers::Embind::checkType(c, typeInfo);
 	REQUIRE(typeInfo.m_registerCommands.size() == 1);
 	for (auto const& command : typeInfo.m_registerCommands) {
+		CAPTURE(command);
 		REQUIRE(TestUtil::contains(
 		    command, "em::value_array<std::array<int, 2>>(\"array_int_2\")"));
 		REQUIRE(
@@ -43,7 +45,7 @@ TEST_CASE("Construct value_array", "[checkType]") {
 	}
 }
 
-TEST_CASE("Construct value_object for pair", "[checkType]") {
+TEST_CASE("Construct value_array for pair", "[checkType]") {
 	auto c = TestUtil::getPair();
 	EmbindProxy::TypeInfo typeInfo;
 	Helpers::Embind::checkType(c, typeInfo);
@@ -57,6 +59,26 @@ TEST_CASE("Construct value_object for pair", "[checkType]") {
 		    command, R"(.element(&std::pair<int, std::string>::first))"));
 		TestUtil::contains(command,
 		                   R"(.element(&std::pair<int, std::string>::second))");
+	}
+}
+
+TEST_CASE("Construct value_array for tuple", "[checkType]") {
+	auto c = TestUtil::getTuple();
+	EmbindProxy::TypeInfo typeInfo;
+	Helpers::Embind::checkType(c, typeInfo);
+	REQUIRE(typeInfo.m_registerCommands.size() == 1);
+	for (auto const& command : typeInfo.m_registerCommands) {
+		CAPTURE(command);
+		REQUIRE(TestUtil::contains(
+		    command,
+		    "em::value_array<std::tuple<int, std::string>>(\"tuple_int_string\")"));
+		REQUIRE(TestUtil::contains(
+		    command,
+		    R"(.element(&Tolc_::tuple_int_string_get_0, &Tolc_::tuple_int_string_set_0))"));
+
+		REQUIRE(TestUtil::contains(
+		    command,
+		    R"(.element(&Tolc_::tuple_int_string_get_1, &Tolc_::tuple_int_string_set_1))"));
 	}
 }
 

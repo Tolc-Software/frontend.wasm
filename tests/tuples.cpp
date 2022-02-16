@@ -1,6 +1,6 @@
-#include "Frontend/Wasm/frontend.hpp"
 #include "TestStage/paths.hpp"
 #include "TestUtil/embindStage.hpp"
+#include "TestUtil/exportAsExample.hpp"
 #include "TestUtil/runEmbindTest.hpp"
 #include <catch2/catch.hpp>
 #include <fmt/format.h>
@@ -16,11 +16,11 @@ TEST_CASE("Using std::tuples", "[tuples]") {
 
 class MyClass {
 public:
-	explicit MyClass(std::tuple<std::string, int> s) : m_s(s) {}
+	explicit MyClass(std::tuple<std::string, int> _tuple) : m_tuple(_tuple) {}
 
-	std::tuple<std::string, int> getS() { return m_s; }
+	std::tuple<std::string, int> getTuple() { return m_tuple; }
 
-	std::tuple<std::string, int> m_s;
+	std::tuple<std::string, int> m_tuple;
 };
 
 class WithFunction {
@@ -35,19 +35,37 @@ public:
 
 )";
 
-	auto pythonTestCode = fmt::format(R"(
-# Converts to a tuple, but is convertible from array aswell
-myArray = ["hi", 4]
-for t in [myArray, tuple(myArray)]:
-    withMember = {moduleName}.MyClass(t)
-    self.assertEqual(withMember.getS(), tuple(t))
+	auto jsTestCode = R"(
 
-withFunction = {moduleName}.WithFunction()
-self.assertAlmostEqual(withFunction.sum((1, 2, 3.3, 2.0)), 8.3, delta=0.0001)
-)",
-	                                  fmt::arg("moduleName", moduleName));
+// Tuple converts from javascript array
+const myArray = ["Hello World", 42];
+var myClass = new m.MyClass(myArray);
+expect(myClass.getTuple()).toStrictEqual(myArray);
+
+// The array still need to match the underlying std::tuple structure
+try {
+	// m_tuple is public
+	myClass.m_tuple = [1, 2, 3];
+} catch (err) {
+	expect(err.toString()).toMatch(/TypeError: Incorrect number of tuple elements for tuple_string_int: expected=2, actual=3/i);
+}
+
+myClass.delete();
+
+// Can handle different Number types
+var withFunction = new m.WithFunction();
+expect(withFunction.sum([1, 2, 3.3, 2.0])).toBeCloseTo(8.3, 5);
+
+withFunction.delete();
+)";
 
 	auto errorCode =
-	    TestUtil::runEmbindTest(stage, cppCode, pythonTestCode, moduleName);
+	    TestUtil::runEmbindTest(stage, cppCode, jsTestCode, moduleName);
 	REQUIRE(errorCode == 0);
+
+	using Code = TestUtil::Code;
+	TestUtil::exportAsExample(
+	    "std::pair",
+	    {Code {"cpp", cppCode}, Code {"javascript", jsTestCode}},
+	    TestStage::getExamplesPath());
 }

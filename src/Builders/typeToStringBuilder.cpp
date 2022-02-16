@@ -1,7 +1,6 @@
 #include "Helpers/string.hpp"
 #include <IR/ir.hpp>
 #include <fmt/format.h>
-#include <iostream>
 #include <numeric>
 #include <stack>
 #include <string>
@@ -176,6 +175,9 @@ std::string toString(IR::Type::Container const& type,
 		        [&typeString](IR::Type::Function) {
 			        // NOTE: Function to string is too complicated -> Give up
 			        typeString.push_back("f");
+		        },
+		        [&typeString, &current](IR::Type::Integral) {
+			        typeString.push_back(current.m_representation);
 		        }},
 		    current.m_type);
 	}
@@ -192,12 +194,8 @@ std::string buildTypeString(IR::Type const& t, std::string const& separator) {
 			              typeString.push_back(s);
 		              }
 	              },
-	              [&typeString, &separator, &t](IR::Type::Container type) {
+	              [&typeString, &separator](IR::Type::Container type) {
 		              if (auto s = toString(type, separator); !s.empty()) {
-			              if (type.m_container == IR::ContainerType::Array) {
-				              s += separator +
-				                   extractArraySize(t.m_representation);
-			              }
 			              typeString.push_back(s);
 		              }
 	              },
@@ -210,6 +208,9 @@ std::string buildTypeString(IR::Type const& t, std::string const& separator) {
 	              [&typeString](IR::Type::Function) {
 		              // NOTE: Function to string is too complicated -> Give up
 		              typeString.push_back("f");
+	              },
+	              [&typeString, &t](IR::Type::Integral) {
+		              typeString.push_back(t.m_representation);
 	              }},
 	    // , std::variant<Value, Container, EnumValue, UserDefined, Function> m_type;
 	    t.m_type);
