@@ -65,7 +65,7 @@ withFunction.delete();
 
 	using Code = TestUtil::Code;
 	TestUtil::exportAsExample(
-	    "std::pair",
+	    "std::tuple",
 	    {Code {"cpp", cppCode}, Code {"javascript", jsTestCode}},
 	    TestStage::getExamplesPath());
 }
