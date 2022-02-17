@@ -18,13 +18,22 @@ int const i = 0;
 double const d = 55;
 std::string_view const s = "Hello world";
 const char* c = "Hello world";
+
+namespace MyNamespace {
+	int const i = 5;
+}
 )";
 
 	auto jsTestCode = R"(
 expect(m.i).toBe(0);
+
 expect(m.d).toBe(55);
+
 expect(m.s).toBe("Hello world");
+
 expect(m.c).toBe("Hello world");
+
+expect(m.MyNamespace_i).toBe(5);
 )";
 
 	auto errorCode =

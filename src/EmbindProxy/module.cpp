@@ -16,11 +16,11 @@ std::string Module::getEmbind() const {
 	}
 
 	for (auto const& e : m_enums) {
-		out += fmt::format("\t{};\n\n", e.getEmbind());
+		out += fmt::format("\t{};\n\n", e.getEmbind(m_namePrefix));
 	}
 
 	for (auto const& attribute : m_attributes) {
-		out += fmt::format("\t{};\n\n", attribute.getEmbind());
+		out += fmt::format("\t{};\n\n", attribute.getEmbind(m_namePrefix));
 	}
 
 	return out;

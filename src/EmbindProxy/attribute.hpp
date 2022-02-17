@@ -15,7 +15,7 @@ public:
 	* E.g.
 	*   em::constant("myGlobal", myGlobal)
 	*/
-	std::string getEmbind() const;
+	std::string getEmbind(std::string const& namePrefix = "") const;
 
 private:
 	// The user defined name of the enum
