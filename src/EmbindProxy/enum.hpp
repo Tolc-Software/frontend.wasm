@@ -13,7 +13,7 @@ public:
 	* E.g.
 	*   enum_<Pet::Kind>("Kind").value("Dog", Pet::Kind::Dog)
 	*/
-	std::string getEmbind() const;
+	std::string getEmbind(std::string const& namePrefix = "") const;
 
 	/**
 	* Add an enum value. Should be just the value name.

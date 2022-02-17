@@ -4,6 +4,14 @@
 
 namespace EmbindProxy {
 
+namespace {
+std::string getClassNamePrefix(std::string const& namespacePrefix,
+                               std::string const& className) {
+	return namespacePrefix.empty() ? className + '_' :
+                                     namespacePrefix + className + '_';
+}
+}    // namespace
+
 std::string Class::getEmbind(std::string const& namePrefix) const {
 	std::string out = fmt::format(
 	    "em::class_<{fullyQualifiedName}>(\"{namePrefix}{name}\")\n",
@@ -51,7 +59,11 @@ std::string Class::getEmbind(std::string const& namePrefix) const {
 		out += ";\n\n";
 
 		for (auto const& e : m_enums) {
-			out += fmt::format("{};\n", e.getEmbind());
+			// Need to add class prefix to nested enums
+			// i.e ClassName_Enum
+			// or MyNamespace_ClassName_Enum
+			out += fmt::format(
+			    "{};\n", e.getEmbind(getClassNamePrefix(namePrefix, m_name)));
 		}
 	}
 

@@ -62,10 +62,20 @@ namespace MyNamespace {
 	};
 }
 
+struct WithEnum {
+	enum class Instrument {
+		Guitarr,
+		Flute
+	};
+	Instrument i = Instrument::Flute;
+};
+
+
 
 )";
 
 	auto jsTestCode = R"(
+// Statics are available without instantiation
 // Static function
 expect(m.WithConstructor.getStatic()).toBe(55);
 // Static variable
@@ -77,40 +87,40 @@ expect(withConstructor.getS()).toBe("Hello");
 // Classes need to be deleted manually
 withConstructor.delete();
 
+// Const properties are read-only
 var withMembers = new m.WithMembers();
-
 expect(withMembers.i).toBe(5);
 try {
 	withMembers.i = 10;
 } catch (err) {
 	expect(err.toString()).toMatch(/BindingError: WithMembers.i is a read-only property/i);
 }
-
 expect(withMembers.s).toBe("hello");
-
 withMembers.delete();
 
+// Public functions are available
 var withFunction = new m.WithFunction();
-
 expect(withFunction.add(5, 10)).toBe(15);
-
 withFunction.delete();
 
+// Cannot access private functions
 var withPrivateFunction = new m.WithPrivateFunction();
-
 try {
 	withPrivateFunction.multiply(5, 10);
 } catch (err) {
 	expect(err.toString()).toMatch(/TypeError: withPrivateFunction.multiply is not a function/i);
 }
-
 withPrivateFunction.delete();
 
+// Classes can be found under their namespace
 var nested = new m.MyNamespace_Nested();
-
 expect(nested.i).toBe(42);
-
 nested.delete();
+
+// Ok to nest Enums within classes
+var withEnum = new m.WithEnum();
+expect(withEnum.i).toBe(m.WithEnum_Instrument.Flute);
+withEnum.delete();
 )";
 
 	auto errorCode =
