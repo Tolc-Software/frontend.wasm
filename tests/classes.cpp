@@ -56,6 +56,13 @@ class WithPrivateFunction {
 	}
 };
 
+namespace MyNamespace {
+	struct Nested {
+		int const i = 42;
+	};
+}
+
+
 )";
 
 	auto jsTestCode = R"(
@@ -98,6 +105,12 @@ try {
 }
 
 withPrivateFunction.delete();
+
+var nested = new m.MyNamespace_Nested();
+
+expect(nested.i).toBe(42);
+
+nested.delete();
 )";
 
 	auto errorCode =

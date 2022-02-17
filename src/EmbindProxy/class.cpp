@@ -4,11 +4,12 @@
 
 namespace EmbindProxy {
 
-std::string Class::getEmbind() const {
-	std::string out =
-	    fmt::format("em::class_<{fullyQualifiedName}>(\"{name}\")\n",
-	                fmt::arg("fullyQualifiedName", m_fullyQualifiedName),
-	                fmt::arg("name", m_name));
+std::string Class::getEmbind(std::string const& namePrefix) const {
+	std::string out = fmt::format(
+	    "em::class_<{fullyQualifiedName}>(\"{namePrefix}{name}\")\n",
+	    fmt::arg("fullyQualifiedName", m_fullyQualifiedName),
+	    fmt::arg("namePrefix", namePrefix),
+	    fmt::arg("name", m_name));
 
 	if (m_isManagedByShared) {
 		out += fmt::format(
