@@ -8,7 +8,7 @@ namespace EmbindProxy {
 std::string Module::getEmbind() const {
 	std::string out;
 	for (auto const& function : m_functions) {
-		out += fmt::format("\t{};\n\n", function.getEmbind());
+		out += fmt::format("\t{};\n\n", function.getEmbind(m_namePrefix));
 	}
 
 	for (auto const& cls : m_classes) {
@@ -23,21 +23,43 @@ std::string Module::getEmbind() const {
 		out += fmt::format("\t{};\n\n", attribute.getEmbind());
 	}
 
-	// Define all the children
-	for (auto const& [submoduleName, submoduleVariable] : m_submodules) {
-		out += fmt::format(
-		    "\tauto {submoduleVariable} = {variableName}.def_submodule(\"{submoduleName}\");\n",
-		    fmt::arg("submoduleVariable", submoduleVariable),
-		    fmt::arg("submoduleName", submoduleName),
-		    fmt::arg("variableName", m_prefix));
+	return out;
+}
+
+namespace {
+std::string getModuleDeclaration(std::string const& name, int level) {
+	return level == 1 ? fmt::format("Module['{}'] =", name) :
+                        fmt::format("{}:", name);
+}
+}    // namespace
+
+void Module::setLevel(int level) {
+	m_level = level;
+}
+
+std::string Module::getPreJS() const {
+	if (m_name.empty()) {
+		// The global namespace is not touched in the preJS
+		return "";
 	}
+
+	// If isFirstLevel
+	// Module['Stuff'] = {
+	// else
+	// Inner: {
+	std::string out = fmt::format(
+	    R"(
+{moduleDeclaration} {{
+}},
+)",
+	    fmt::arg("moduleDeclaration", getModuleDeclaration(m_name, m_level)));
 
 	return out;
 }
 
-Module::Module(std::string const& prefix)
-    : m_prefix(prefix), m_submodules({}), m_functions(), m_enums(),
-      m_attributes() {}
+Module::Module(std::string const& name, std::string const& prefix)
+    : m_name(name), m_namePrefix(prefix), m_functions(), m_enums(),
+      m_attributes(), m_level(0) {}
 
 void Module::addFunction(Function const& function) {
 	m_functions.push_back(function);
@@ -56,12 +78,7 @@ void Module::addAttribute(Attribute const& a) {
 }
 
 std::string const& Module::getPrefix() const {
-	return m_prefix;
-}
-
-void Module::addSubmodule(std::string const& name,
-                          std::string const& variableName) {
-	m_submodules.push_back({name, variableName});
+	return m_namePrefix;
 }
 
 }    // namespace EmbindProxy

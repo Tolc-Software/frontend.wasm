@@ -13,7 +13,7 @@ std::string getEmbindSelect(std::string const& signature,
 	return fmt::format("select_overload<{}>(&{})", signature, functionName);
 }
 
-std::string getPrefix(bool isClassFunction, bool isStatic) {
+std::string getFunctionPrefix(bool isClassFunction, bool isStatic) {
 	// Defined inside a class
 	// => No need for namespaces
 	if (isClassFunction) {
@@ -24,7 +24,7 @@ std::string getPrefix(bool isClassFunction, bool isStatic) {
 }
 }    // namespace
 
-std::string Function::getEmbind() const {
+std::string Function::getEmbind(std::string const& namePrefix) const {
 	std::string f;
 	if (m_isConstructor) {
 		// Results in
@@ -33,12 +33,16 @@ std::string Function::getEmbind() const {
 	} else {
 		// Results in
 		// class_function("myFunction", select_overload<void()>(&MyNS::myFunction))
-		f = fmt::format(R"({}function("{}", {}))",
-		                getPrefix(m_isClassFunction, m_isStatic),
-		                m_isOverloaded ? createOverloadedName() : m_name,
-		                m_isOverloaded ? getEmbindSelect(getSignature(),
-		                                                 m_fullyQualifiedName) :
-                                         '&' + m_fullyQualifiedName);
+		f = fmt::format(
+		    R"({functionPrefix}function("{namePrefix}{name}", {qualifiedName}))",
+		    fmt::arg("functionPrefix",
+		             getFunctionPrefix(m_isClassFunction, m_isStatic)),
+		    fmt::arg("namePrefix", namePrefix),
+		    fmt::arg("name", m_isOverloaded ? createOverloadedName() : m_name),
+		    fmt::arg("qualifiedName",
+		             m_isOverloaded ?
+		                 getEmbindSelect(getSignature(), m_fullyQualifiedName) :
+                         '&' + m_fullyQualifiedName));
 	}
 
 	return f;

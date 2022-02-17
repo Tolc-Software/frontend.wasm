@@ -24,14 +24,15 @@ std::string getPrefix(std::string qualifiedName) {
 
 	// If qualifiedName is the root name (global namespace has no name)
 	// This will return ""
-	return fmt::format("{}",
-	                   fmt::join(Helpers::split(qualifiedName, "::"), "_"));
+	auto prefix =
+	    fmt::format("{}", fmt::join(Helpers::split(qualifiedName, "::"), "_"));
+	return prefix.empty() ? prefix : prefix + '_';
 }
 
 std::optional<EmbindProxy::Module>
 buildModule(IR::Namespace const& ns,
             EmbindProxy::TypeInfo& typeInfo) {
-	EmbindProxy::Module builtModule(getPrefix(ns.m_representation));
+	EmbindProxy::Module builtModule(ns.m_name, getPrefix(ns.m_representation));
 
 	auto overloadedFunctions = Helpers::getOverloadedFunctions(ns.m_functions);
 	for (auto const& function : ns.m_functions) {
@@ -64,11 +65,6 @@ buildModule(IR::Namespace const& ns,
 
 	for (auto const& e : ns.m_enums) {
 		builtModule.addEnum(Builders::buildEnum(e));
-	}
-
-	for (auto const& subNamespace : ns.m_namespaces) {
-		builtModule.addSubmodule(subNamespace.m_name,
-		                         getPrefix(subNamespace.m_representation));
 	}
 
 	return builtModule;

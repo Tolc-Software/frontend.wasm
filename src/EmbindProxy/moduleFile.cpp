@@ -14,8 +14,8 @@ std::string joinRegisterCommands(std::set<std::string> const& commands) {
 	return out;
 }
 
-std::string buildExtraFunctions(std::set<std::string> const& functions,
-                                std::string const& ns) {
+std::string joinExtraFunctions(std::set<std::string> const& functions,
+                               std::string const& ns) {
 	if (functions.empty()) {
 		return "";
 	}
@@ -27,13 +27,22 @@ std::string buildExtraFunctions(std::set<std::string> const& functions,
 	}
 
 	// Add the namespace
-
 	out = fmt::format(R"(
 namespace {} {{
 {}
 }})",
 	                  ns,
 	                  out);
+
+	return out;
+}
+
+std::string joinPreJSModules(std::vector<Module> const& modules) {
+	std::string out;
+
+	for (auto const& m : modules) {
+		out += fmt::format("{}", m.getPreJS());
+	}
 
 	return out;
 }
@@ -69,8 +78,8 @@ EMSCRIPTEN_BINDINGS({libraryName}) {{
 {registerCommands}
 )",
 	    fmt::arg("joinedFunctions",
-	             buildExtraFunctions(m_typeInfo.m_extraFunctions,
-	                                 m_typeInfo.m_functionsNamespace)),
+	             joinExtraFunctions(m_typeInfo.m_extraFunctions,
+	                                m_typeInfo.m_functionsNamespace)),
 	    fmt::arg("libraryName", m_libraryName),
 	    fmt::arg("registerCommands",
 	             joinRegisterCommands(m_typeInfo.m_registerCommands)));
@@ -82,4 +91,18 @@ EMSCRIPTEN_BINDINGS({libraryName}) {{
 
 	return out;
 }
+
+std::string ModuleFile::getPreJS() const {
+	std::string out =
+	    fmt::format(R"(
+var Module = {{
+	postRun: [() => {{
+		{modules}
+	}}],
+}};)",
+	                fmt::arg("modules", joinPreJSModules(m_modules)));
+
+	return out;
+}
+
 }    // namespace EmbindProxy

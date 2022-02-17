@@ -20,12 +20,26 @@ int sayTen() {
 std::string giveBack(std::string const& s) {
 	return s;
 }
+
+namespace MyNamespace {
+	int add(int x, int y) {
+		return x + y;
+	}
+	namespace Nested {
+		int increase(int x) {
+			return x + 1;
+		}
+	}
+}
 )";
 
 	auto jsTestCode = R"(
 expect(m.sayTen()).toBe(10);
 
 expect(m.giveBack("hello")).toBe("hello");
+
+expect(m.MyNamespace_add(1, 2)).toBe(3);
+expect(m.MyNamespace_Nested_increase(2)).toBe(3);
 )";
 
 	auto errorCode =

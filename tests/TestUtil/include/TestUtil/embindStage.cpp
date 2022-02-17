@@ -68,7 +68,7 @@ void EmbindStage::addJestUnitTest(std::string const& body) {
 var m = require('./build/defaultModule');
 
 test('Default test', () => {
-	m.onRuntimeInitialized = function() {
+	m.onRuntimeInitialized = () => {
 )") + body + std::string(R"(
 	};
 });

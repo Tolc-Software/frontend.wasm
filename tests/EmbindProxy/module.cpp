@@ -5,11 +5,12 @@
 
 TEST_CASE("Modules defines their functions", "[module]") {
 	std::string moduleName = "myModule";
-	EmbindProxy::Module m(moduleName);
+	EmbindProxy::Module m(moduleName, moduleName + '_');
 
 	std::vector<std::string> functions = {"f", "calculate", "foo"};
 	for (auto const& function : functions) {
-		m.addFunction(EmbindProxy::Function(function, function));
+		m.addFunction(
+		    EmbindProxy::Function(function, moduleName + "::" + function));
 	}
 
 	auto embindCode = m.getEmbind();
@@ -17,9 +18,9 @@ TEST_CASE("Modules defines their functions", "[module]") {
 
 	using TestUtil::contains;
 	for (auto const& function : functions) {
-		auto expectedContains =
-		    fmt::format(R"(function("{function}", &{function})",
-		                fmt::arg("function", function));
+		auto expectedContains = fmt::format(
+		    R"(function("myModule_{function}", &myModule::{function})",
+		    fmt::arg("function", function));
 		CAPTURE(function);
 		CAPTURE(expectedContains);
 		REQUIRE(contains(embindCode, expectedContains));

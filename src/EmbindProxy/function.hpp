@@ -11,10 +11,12 @@ public:
 
 	/**
 	* Creates a string corresponding to the pybind11 conversion of this function.
+	* namePrefix gets prefixed to the name of the function
 	* E.g.
-	*   def("myFunction", &SomeNamespace::myFunction)
+	*   getEmbind("SomeNamespace_") =>
+	*   function("SomeNamespace_myFunction", &SomeNamespace::myFunction)
 	*/
-	std::string getEmbind() const;
+	std::string getEmbind(std::string const& namePrefix = "") const;
 
 	/**
 	* Adds an argument name.

@@ -8,7 +8,7 @@
 TEST_CASE("ModuleFile includes embind and default start of bindings",
           "[moduleFile]") {
 	std::string moduleName = "myModule";
-	EmbindProxy::Module m(moduleName);
+	EmbindProxy::Module m(moduleName, moduleName);
 	EmbindProxy::ModuleFile mf(m, moduleName);
 
 	auto embindCode = mf.getEmbind();
@@ -20,6 +20,22 @@ TEST_CASE("ModuleFile includes embind and default start of bindings",
 	// The default start of export
 	REQUIRE(TestUtil::contains(
 	    embindCode, fmt::format("EMSCRIPTEN_BINDINGS({})", moduleName)));
+}
+
+TEST_CASE("ModuleFile includes the default preJS", "[moduleFile]") {
+	std::string moduleName = "myModule";
+	EmbindProxy::Module m(moduleName, moduleName);
+	EmbindProxy::ModuleFile mf(m, moduleName);
+
+	auto preJSCode = mf.getPreJS();
+	CAPTURE(preJSCode);
+
+	using TestUtil::contains;
+	// The Module declaration
+	REQUIRE(contains(preJSCode, "var Module = {"));
+
+	// The postRun start
+	REQUIRE(contains(preJSCode, "postRun: [() => {"));
 }
 
 // TEST_CASE("ModuleFile can take a module", "[moduleFile]") {

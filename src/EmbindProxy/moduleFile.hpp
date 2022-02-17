@@ -25,6 +25,8 @@ public:
 
 	std::string getEmbind() const;
 
+	std::string getPreJS() const;
+
 private:
 	std::string m_rootModuleName;
 	std::string m_libraryName;

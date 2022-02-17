@@ -30,26 +30,32 @@ TEST_CASE("Contains the correct boilerplate", "[moduleFileBuilder]") {
 	}
 }
 
-// TEST_CASE("One level namespace", "[moduleFileBuilder]") {
-// 	IR::Namespace ns;
-// 	std::string moduleName = "MyModule";
+TEST_CASE(
+    "Two level namespace creates two different module declarations in the preJS",
+    "[moduleFileBuilder]") {
+	IR::Namespace globalNS;
+	IR::Namespace ns;
+	std::string moduleName = "MyModule";
+	ns.m_name = moduleName;
+	ns.m_representation = moduleName;
 
-// 	auto file = Builders::buildModuleFile(ns, moduleName).value();
-// 	auto path = file.getFilepath();
-// 	auto embind = file.getEmbind();
-// 	CAPTURE(path);
-// 	CAPTURE(embind);
+	IR::Namespace nested;
+	nested.m_name = "Nested";
+	nested.m_representation = "Nested";
+	ns.m_namespaces.push_back(nested);
+	globalNS.m_namespaces.push_back(ns);
 
-// 	REQUIRE(path == "MyModule.cpp");
+	auto file = Builders::buildModuleFile(globalNS, moduleName).value();
+	auto preJS = file.getPreJS();
+	CAPTURE(preJS);
 
-// 	for (auto const& expectedContains :
-// 	     {"#include <embind11/embind11.h>",
-// 	      "namespace em = pybind11;",
-// 	      "PYBIND11_MODULE(MyModule, MyModule)"}) {
-// 		CAPTURE(expectedContains);
-// 		REQUIRE(TestUtil::contains(embind, expectedContains));
-// 	}
-// }
+	// They seem to come in the wrong order
+	for (auto const& expectedContains :
+	     {"Module['MyModule'] = {", "Nested: {"}) {
+		CAPTURE(expectedContains);
+		REQUIRE(TestUtil::contains(preJS, expectedContains));
+	}
+}
 
 // TEST_CASE("Two level namespace", "[moduleFileBuilder]") {
 // 	IR::Namespace ns;

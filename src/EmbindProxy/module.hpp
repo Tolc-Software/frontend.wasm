@@ -11,7 +11,7 @@
 namespace EmbindProxy {
 
 struct Module {
-	explicit Module(std::string const& variableName);
+	explicit Module(std::string const& name, std::string const& prefix);
 
 	void addFunction(Function const& function);
 
@@ -23,27 +23,33 @@ struct Module {
 
 	std::string const& getPrefix() const;
 
-	void addSubmodule(std::string const& name, std::string const& variableName);
-
 	std::string getEmbind() const;
 
+	void setLevel(int level);
+
+	std::string getPreJS() const;
+
 private:
+	// The name of the associated namespace
+	std::string m_name;
+
 	// Every variable starts with this.
 	// Should be "" for global modules
 	// Should be "Nested_Namespace" for other modules
 	// Will result in function "MyNS::func" being used from js as "MyNS_func"
-	std::string m_prefix;
-
-	// If this is non empty,
-	// then this module is a submodule
-	// {Simple name, Variable name}
-	// E.g.
-	// {"Sub", "NS_Nested_Sub"}
-	std::vector<std::pair<std::string, std::string>> m_submodules;
+	std::string m_namePrefix;
 
 	std::vector<Function> m_functions;
 	std::vector<Class> m_classes;
 	std::vector<Enum> m_enums;
 	std::vector<Attribute> m_attributes;
+
+	// m_level is the amount of nested namespaces this corresponds to
+	// i.e.
+	//    // Global namespace here => m_level = 0
+	//    namespace ThisModule {
+	//    // One nested level => m_level = 1
+	//    }
+	int m_level;
 };
 }    // namespace EmbindProxy
