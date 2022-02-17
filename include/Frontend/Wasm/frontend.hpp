@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <optional>
 #include <string>
+#include <vector>
 
 namespace Frontend::Wasm {
 /**
@@ -11,6 +12,6 @@ namespace Frontend::Wasm {
   * Returns a file and the corresponding file content.
   * The file content is the converted IR into embind bindings.
   */
-std::optional<std::pair<std::filesystem::path, std::string>>
+std::optional<std::vector<std::pair<std::filesystem::path, std::string>>>
 createModule(IR::Namespace const& rootNamespace, std::string const& moduleName);
 }    // namespace Frontend::Wasm

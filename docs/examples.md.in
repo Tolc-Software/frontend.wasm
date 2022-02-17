@@ -1,17 +1,16 @@
 # Examples #
 
-Each example is is made up of a `C++` section and how it can be used from `javascript`. Each example exports the module `m` and is called as follows:
+Each example is is made up of a `C++` section and how it can be used from `javascript`. Each example exports the `Promise` `load{libraryName}`, where `libraryName` is `m` here:
 
 ```javascript
-var m = require('./m.js');
+var loadm = require('./build/m');
 
-test('Main', () => {
-	m.onRuntimeInitialized = () => {
+test('Tolc Test', () => {
+	loadm().then(m => {
 		// The actual example body
 		expect(m.sayTen()).toBe(10);
-	};
-};
-
+	});
+});
 ```
 
 Since `WebAssembly` is loaded asynchronously, it has to use the `onRuntimeInitialized` callback.

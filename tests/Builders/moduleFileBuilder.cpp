@@ -15,7 +15,7 @@ TEST_CASE("Contains the correct boilerplate", "[moduleFileBuilder]") {
 	std::string moduleName = "MyModule";
 
 	auto file = Builders::buildModuleFile(ns, moduleName).value();
-	auto path = file.getFilepath();
+	auto path = file.getCppFilepath();
 	auto embind = file.getEmbind();
 	CAPTURE(path);
 	CAPTURE(embind);
@@ -41,7 +41,7 @@ TEST_CASE(
 
 	IR::Namespace nested;
 	nested.m_name = "Nested";
-	nested.m_representation = "Nested";
+	nested.m_representation = "MyModule::Nested";
 	ns.m_namespaces.push_back(nested);
 	globalNS.m_namespaces.push_back(ns);
 
@@ -51,7 +51,7 @@ TEST_CASE(
 
 	// They seem to come in the wrong order
 	for (auto const& expectedContains :
-	     {"Module['MyModule'] = {", "Nested: {"}) {
+	     {"Module['MyModule'] = {", "Module['MyModule']['Nested'] = {"}) {
 		CAPTURE(expectedContains);
 		REQUIRE(TestUtil::contains(preJS, expectedContains));
 	}
@@ -70,7 +70,7 @@ TEST_CASE(
 
 // 	std::string moduleName = "MyModule";
 // 	auto file = Builders::buildModuleFile(ns, moduleName).value();
-// 	auto path = file.getFilepath();
+// 	auto path = file.getCppFilepath();
 // 	auto embind = file.getEmbind();
 // 	CAPTURE(path);
 // 	CAPTURE(embind);

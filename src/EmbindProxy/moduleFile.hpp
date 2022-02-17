@@ -21,7 +21,9 @@ public:
 	// Copies the type info into this classes
 	void setTypeInfo(EmbindProxy::TypeInfo const& info);
 
-	std::filesystem::path getFilepath() const;
+	std::filesystem::path getCppFilepath() const;
+
+	std::filesystem::path getPreJSFilepath() const;
 
 	std::string getEmbind() const;
 

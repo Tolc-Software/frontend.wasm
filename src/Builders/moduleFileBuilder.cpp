@@ -20,11 +20,9 @@ struct ModulePair {
 // Returns false on failure
 bool tryBuildSubModules(IR::Namespace const& currentNamespace,
                         EmbindProxy::TypeInfo& typeInfo,
-                        std::queue<ModulePair>& namespaces,
-                        int currentLevel) {
+                        std::queue<ModulePair>& namespaces) {
 	for (auto const& subNamespace : currentNamespace.m_namespaces) {
 		if (auto m = Builders::buildModule(subNamespace, typeInfo)) {
-			m.value().setLevel(currentLevel + 1);
 			namespaces.push({subNamespace, m.value()});
 		} else {
 			return false;
@@ -44,15 +42,12 @@ buildModuleFile(IR::Namespace const& rootNamespace,
 
 	if (auto maybeRootModule = Builders::buildModule(rootNamespace, typeInfo)) {
 		auto rootModule = maybeRootModule.value();
-		int level = 0;
-		rootModule.setLevel(level);
 		EmbindProxy::ModuleFile moduleFile(rootModule, rootModuleName);
 
 		std::queue<ModulePair> namespaces;
-		if (!tryBuildSubModules(rootNamespace, typeInfo, namespaces, level)) {
+		if (!tryBuildSubModules(rootNamespace, typeInfo, namespaces)) {
 			return std::nullopt;
 		}
-		level++;
 
 		while (!namespaces.empty()) {
 			auto const& [currentNamespace, currentModule] = namespaces.front();
@@ -60,11 +55,9 @@ buildModuleFile(IR::Namespace const& rootNamespace,
 			moduleFile.addModule(currentModule);
 
 			// Go deeper into the nested namespaces
-			if (!tryBuildSubModules(
-			        currentNamespace, typeInfo, namespaces, level)) {
+			if (!tryBuildSubModules(currentNamespace, typeInfo, namespaces)) {
 				return std::nullopt;
 			}
-			level++;
 
 			// Need currentNamespace and currentModule to live this far
 			namespaces.pop();

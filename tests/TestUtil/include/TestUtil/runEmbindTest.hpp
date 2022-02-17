@@ -2,6 +2,7 @@
 
 #include "Frontend/Wasm/frontend.hpp"
 #include "TestUtil/embindStage.hpp"
+#include <iostream>
 
 namespace TestUtil {
 
@@ -12,10 +13,14 @@ int runEmbindTest(TestUtil::EmbindStage& stage,
 	auto globalNS = stage.parseModuleFile(cppCode);
 
 	if (auto m = Frontend::Wasm::createModule(globalNS, moduleName)) {
-		auto [file, content] = m.value();
+		for (auto const& [filename, content] : m.value()) {
+			if (filename.string() == "pre.js") {
+				stage.m_stage.addFile("src" / filename, content);
+			} else {
+				stage.addModuleFile(filename, content);
+			}
 
-		stage.addModuleFile(file, content);
-
+		}
 		return stage.runEmbindUnittest(jsUnittestCode);
 	}
 

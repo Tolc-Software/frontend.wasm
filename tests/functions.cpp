@@ -38,8 +38,9 @@ expect(m.sayTen()).toBe(10);
 
 expect(m.giveBack("hello")).toBe("hello");
 
-expect(m.MyNamespace_add(1, 2)).toBe(3);
-expect(m.MyNamespace_Nested_increase(2)).toBe(3);
+// Nested functions are under their respective namespace
+expect(m.MyNamespace.add(1, 2)).toBe(3);
+expect(m.MyNamespace.Nested.increase(2)).toBe(3);
 )";
 
 	auto errorCode =

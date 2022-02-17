@@ -25,7 +25,14 @@ enum class Scoped {
 
 class EnumTest {
 public:
-	explicit EnumTest(Scoped s) : e(s) {};
+	enum class Inside {
+		One,
+		Two
+	};
+
+	explicit EnumTest(Scoped s) : e(s), i(Inside::One) {};
+
+	Inside i;
 
 	Scoped e;
 };
@@ -34,17 +41,32 @@ Unscoped f(Unscoped s) {
 	return s;
 }
 
+namespace MyNamespace {
+	enum class Color {
+		Red,
+		Green,
+		Blue
+	};
+}
+
 )";
 
 	auto jsTestCode = R"(
-var scoped = m.Scoped.D;
+const scoped = m.Scoped.D;
+
+// Can be passed as arguments
 var enumTest = new m.EnumTest(scoped);
 expect(enumTest.e).toBe(scoped);
 enumTest.delete();
 
-unscoped = m.Unscoped.B
-u = m.f(unscoped)
+// Unscoped enums work exactly the same
+unscoped = m.Unscoped.B;
+u = m.f(unscoped);
 expect(u).toBe(unscoped);
+
+// Nested enums work aswell
+const c = m.MyNamespace.Color.Green;
+expect(c).toBe(m.MyNamespace.Color.Green);
 )";
 
 	auto errorCode =

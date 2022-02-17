@@ -18,6 +18,8 @@ public:
 	*/
 	std::string getEmbind(std::string const& namePrefix = "") const;
 
+	std::string getPreJS(std::string const& namePrefix = "") const;
+
 	/**
 	* Adds an argument name.
 	* E.g.
@@ -45,6 +47,8 @@ private:
 	// => {m_name}_{argType0}_{argType1}
 	// If there are no argument types, then just {m_name}
 	std::string createOverloadedName() const;
+
+	std::string createName(std::string const& namePrefix) const;
 
 	struct Argument {
 		// E.g.

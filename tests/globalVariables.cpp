@@ -16,8 +16,8 @@ TEST_CASE("Global variables are converted",
 
 int const i = 0;
 double const d = 55;
-std::string_view const s = "Hello world";
-const char* c = "Hello world";
+std::string_view const stringView = "Hello world";
+const char* charPtr = "Hello world";
 
 namespace MyNamespace {
 	int const i = 5;
@@ -26,14 +26,16 @@ namespace MyNamespace {
 
 	auto jsTestCode = R"(
 expect(m.i).toBe(0);
-
 expect(m.d).toBe(55);
 
-expect(m.s).toBe("Hello world");
+// Global strings of type std::string_view and const char* are converted
+// Globals of type std::string has an open issue:
+//   https://github.com/emscripten-core/emscripten/issues/16275
+expect(m.stringView).toBe("Hello world");
+expect(m.charPtr).toBe("Hello world");
 
-expect(m.c).toBe("Hello world");
-
-expect(m.MyNamespace_i).toBe(5);
+// Globals within namespaces work
+expect(m.MyNamespace.i).toBe(5);
 )";
 
 	auto errorCode =

@@ -5,7 +5,7 @@
 
 TEST_CASE("Modules defines their functions", "[module]") {
 	std::string moduleName = "myModule";
-	EmbindProxy::Module m(moduleName, moduleName + '_');
+	EmbindProxy::Module m(moduleName, moduleName);
 
 	std::vector<std::string> functions = {"f", "calculate", "foo"};
 	for (auto const& function : functions) {
@@ -27,29 +27,36 @@ TEST_CASE("Modules defines their functions", "[module]") {
 	}
 }
 
-// TEST_CASE("Modules defines their submodules", "[module]") {
+TEST_CASE("PreJS includes function", "[module]") {
+	std::string moduleName = "myModule";
+	EmbindProxy::Module m(moduleName, moduleName);
+
+	std::vector<std::string> functions = {"f", "calculate", "foo"};
+	for (auto const& function : functions) {
+		m.addFunction(
+		    EmbindProxy::Function(function, moduleName + "::" + function));
+	}
+
+	auto preJS = m.getPreJS();
+	CAPTURE(preJS);
+	using TestUtil::contains;
+	for (auto const& function : functions) {
+		auto expectedContains =
+		    fmt::format(R"({function}: Module['myModule_{function}'],)",
+		                fmt::arg("function", function));
+		CAPTURE(function);
+		CAPTURE(expectedContains);
+		REQUIRE(contains(preJS, expectedContains));
+	}
+}
+
+// TEST_CASE("Module variable name", "[module]") {
 // 	std::string moduleName = "myTestModule";
-// 	EmbindProxy::Module m(moduleName);
-
-// 	std::vector<std::string> submodules = {"sub1", "mySub", "child"};
-// 	for (auto const& submodule : submodules) {
-// 		m.addSubmodule(submodule, moduleName + "__" + submodule);
-// 	}
-
-// 	auto embindCode = m.getEmbind();
-// 	CAPTURE(embindCode);
+// 	std::string variableName = moduleName + "__ns";
+// 	EmbindProxy::Module m(variableName);
 
 // 	using TestUtil::contains;
-// 	for (auto const& submodule : submodules) {
-// 		auto expectedContains = fmt::format(
-// 		    R"(auto {moduleName}__{submodule} = {module}.def_submodule("{submodule}");)",
-// 		    fmt::arg("moduleName", moduleName),
-// 		    fmt::arg("module", m.getPrefix()),
-// 		    fmt::arg("submodule", submodule));
-// 		CAPTURE(submodule);
-// 		CAPTURE(expectedContains);
-// 		REQUIRE(contains(embindCode, expectedContains));
-// 	}
+// 	REQUIRE(m.getPrefix() == "myTestModule__ns");
 // }
 
 // TEST_CASE("Modules defines their classes", "[module]") {
@@ -75,22 +82,4 @@ TEST_CASE("Modules defines their functions", "[module]") {
 // 		CAPTURE(expectedContains);
 // 		REQUIRE(contains(embindCode, expectedContains));
 // 	}
-// }
-
-// TEST_CASE("Modules gets a somewhat unique variable name", "[module]") {
-// 	std::string moduleName = "myTestModule";
-// 	std::string variableName = std::string("rootModule__") + moduleName;
-// 	EmbindProxy::Module m(variableName);
-
-// 	using TestUtil::contains;
-// 	REQUIRE(variableName == "rootModule__myTestModule");
-// }
-
-// TEST_CASE("Module variable name", "[module]") {
-// 	std::string moduleName = "myTestModule";
-// 	std::string variableName = moduleName + "__ns";
-// 	EmbindProxy::Module m(variableName);
-
-// 	using TestUtil::contains;
-// 	REQUIRE(m.getPrefix() == "myTestModule__ns");
 // }

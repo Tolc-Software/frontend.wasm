@@ -56,8 +56,12 @@ void ModuleFile::addModule(Module const& m) {
 	m_modules.push_back(m);
 }
 
-std::filesystem::path ModuleFile::getFilepath() const {
+std::filesystem::path ModuleFile::getCppFilepath() const {
 	return m_libraryName + ".cpp";
+}
+
+std::filesystem::path ModuleFile::getPreJSFilepath() const {
+	return "pre.js";
 }
 
 void ModuleFile::setTypeInfo(EmbindProxy::TypeInfo const& info) {

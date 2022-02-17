@@ -9,10 +9,9 @@ Enum::Enum(std::string const& name, std::string const& fullyQualifiedName)
 
 std::string Enum::getEmbind(std::string const& namePrefix) const {
 	std::string out =
-	    fmt::format("em::enum_<{fullyQualifiedName}>(\"{namePrefix}{name}\")\n",
-	                fmt::arg("namePrefix", namePrefix),
+	    fmt::format("em::enum_<{fullyQualifiedName}>(\"{name}\")\n",
 	                fmt::arg("fullyQualifiedName", m_fullyQualifiedName),
-	                fmt::arg("name", m_name));
+	                fmt::arg("name", createName(namePrefix)));
 
 	for (auto const& value : m_values) {
 		out += fmt::format(
@@ -27,8 +26,26 @@ std::string Enum::getEmbind(std::string const& namePrefix) const {
 	return out;
 }
 
+std::string Enum::getPreJS(std::string const& namePrefix) const {
+	if (namePrefix.empty()) {
+		// No need to rename the function if there is no prefix to remove
+		return "";
+	}
+	// Renaming the function
+	// Expects to be injected where necessary
+	return fmt::format(R"(
+{baseName}: Module['{globalName}'],
+)",
+	                   fmt::arg("baseName", m_name),
+	                   fmt::arg("globalName", createName(namePrefix)));
+}
+
 void Enum::addValue(std::string const& value) {
 	m_values.push_back(value);
+}
+
+std::string Enum::createName(std::string const& namePrefix) const {
+	return namePrefix + m_name;
 }
 
 }    // namespace EmbindProxy

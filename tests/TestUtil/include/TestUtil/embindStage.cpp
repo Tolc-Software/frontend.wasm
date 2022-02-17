@@ -64,15 +64,16 @@ int EmbindStage::runEmbindUnittest(std::string const& testBody) {
 }
 
 void EmbindStage::addJestUnitTest(std::string const& body) {
-	std::string test = std::string(R"(
-var m = require('./build/defaultModule');
+	std::string test = fmt::format(R"(
+var loadm = require('./build/defaultModule');
 
-test('Default test', () => {
-	m.onRuntimeInitialized = () => {
-)") + body + std::string(R"(
-	};
-});
-	)");
+test('Tolc Test', () => {{
+	loadm().then(m => {{
+{body}
+	}});
+}});
+	)",
+	                               fmt::arg("body", body));
 
 	std::string filename = m_moduleName + ".test.js";
 	std::ofstream testFile(m_stage.m_stage / filename);

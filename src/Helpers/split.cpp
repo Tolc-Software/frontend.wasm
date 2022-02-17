@@ -5,6 +5,9 @@
 
 namespace Helpers {
 std::deque<std::string> split(std::string_view s, std::string_view delimiter) {
+	if (s.empty()) {
+		return {};
+	}
 	std::deque<std::string> splitStrings;
 	std::size_t last = 0;
 	std::size_t next = 0;

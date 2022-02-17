@@ -68,3 +68,15 @@ TEST_CASE("Function with arguments does not affect signature", "[function]") {
 	// The function bind
 	REQUIRE(TestUtil::contains(embindCode, R"(function("f", &f))"));
 }
+
+TEST_CASE(
+    "PreJS sets the base name to the global name within the Module Object",
+    "[function]") {
+	EmbindProxy::Function f("f", "MyNamespace::f");
+
+	auto preJS = f.getPreJS("MyNamespace_");
+	CAPTURE(preJS);
+
+	// The function bind
+	REQUIRE(TestUtil::contains(preJS, R"(f: Module['MyNamespace_f'],)"));
+}

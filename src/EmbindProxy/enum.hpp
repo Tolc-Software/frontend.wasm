@@ -15,6 +15,8 @@ public:
 	*/
 	std::string getEmbind(std::string const& namePrefix = "") const;
 
+	std::string getPreJS(std::string const& namePrefix = "") const;
+
 	/**
 	* Add an enum value. Should be just the value name.
 	* E.g.
@@ -30,5 +32,7 @@ private:
 	std::string m_name;
 	std::string m_fullyQualifiedName;
 	std::vector<std::string> m_values;
+
+	std::string createName(std::string const& namePrefix) const;
 };
 }    // namespace EmbindProxy

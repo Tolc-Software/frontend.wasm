@@ -22,6 +22,7 @@ std::string getFunctionPrefix(bool isClassFunction, bool isStatic) {
 	}
 	return "em::";
 }
+
 }    // namespace
 
 std::string Function::getEmbind(std::string const& namePrefix) const {
@@ -34,11 +35,10 @@ std::string Function::getEmbind(std::string const& namePrefix) const {
 		// Results in
 		// class_function("myFunction", select_overload<void()>(&MyNS::myFunction))
 		f = fmt::format(
-		    R"({functionPrefix}function("{namePrefix}{name}", {qualifiedName}))",
+		    R"({functionPrefix}function("{name}", {qualifiedName}))",
 		    fmt::arg("functionPrefix",
 		             getFunctionPrefix(m_isClassFunction, m_isStatic)),
-		    fmt::arg("namePrefix", namePrefix),
-		    fmt::arg("name", m_isOverloaded ? createOverloadedName() : m_name),
+		    fmt::arg("name", createName(namePrefix)),
 		    fmt::arg("qualifiedName",
 		             m_isOverloaded ?
 		                 getEmbindSelect(getSignature(), m_fullyQualifiedName) :
@@ -46,6 +46,20 @@ std::string Function::getEmbind(std::string const& namePrefix) const {
 	}
 
 	return f;
+}
+
+std::string Function::getPreJS(std::string const& namePrefix) const {
+	if (namePrefix.empty()) {
+		// No need to rename the function if there is no prefix to remove
+		return "";
+	}
+	// Renaming the function
+	// Expects to be injected where necessary
+	return fmt::format(R"(
+{baseName}: Module['{globalName}'],
+)",
+	                   fmt::arg("baseName", m_name),
+	                   fmt::arg("globalName", createName(namePrefix)));
 }
 
 std::string Function::createOverloadedName() const {
@@ -108,4 +122,10 @@ std::string Function::getSignature() const {
 	    fmt::arg("arguments", getArgumentTypes()));
 }
 
+std::string Function::createName(std::string const& namePrefix) const {
+	return fmt::format(
+	    R"({namePrefix}{name})",
+	    fmt::arg("namePrefix", namePrefix),
+	    fmt::arg("name", m_isOverloaded ? createOverloadedName() : m_name));
+}
 }    // namespace EmbindProxy

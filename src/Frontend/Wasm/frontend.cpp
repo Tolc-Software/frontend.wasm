@@ -8,13 +8,17 @@
 
 namespace Frontend::Wasm {
 
-std::optional<std::pair<std::filesystem::path, std::string>>
+std::optional<std::vector<std::pair<std::filesystem::path, std::string>>>
 createModule(IR::Namespace const& rootNamespace,
              std::string const& moduleName) {
-	if (auto moduleFile =
+	if (auto maybeModuleFile =
 	        Builders::buildModuleFile(rootNamespace, moduleName)) {
-		return std::make_pair(moduleFile.value().getFilepath(),
-		                      moduleFile.value().getEmbind());
+		auto& moduleFile = maybeModuleFile.value();
+
+		return std::vector {
+		    std::make_pair(moduleFile.getCppFilepath(), moduleFile.getEmbind()),
+		    std::make_pair(moduleFile.getPreJSFilepath(),
+		                   moduleFile.getPreJS())};
 	}
 	return std::nullopt;
 }

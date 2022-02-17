@@ -32,3 +32,21 @@ TEST_CASE("Enums", "[enum]") {
 	CAPTURE(valueExists);
 	REQUIRE(TestUtil::contains(embind, valueExists));
 }
+
+TEST_CASE("PreJS enum", "[enum]") {
+	std::string moduleName = "MyModule";
+	std::string name = "MyEnum";
+	std::string fullyQualifiedName = moduleName + "::" + name;
+
+	EmbindProxy::Enum e(name, fullyQualifiedName);
+	std::string value = "MyValue";
+	e.addValue(value);
+
+	auto prejs = e.getPreJS("MyModule_");
+
+	auto expectedContains = "MyEnum: Module['MyModule_MyEnum']";
+
+	CAPTURE(prejs);
+	CAPTURE(expectedContains);
+	REQUIRE(TestUtil::contains(prejs, expectedContains));
+}
