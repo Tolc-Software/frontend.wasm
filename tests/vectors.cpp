@@ -1,7 +1,5 @@
 #include "TestStage/paths.hpp"
 #include "TestUtil/embindStage.hpp"
-#include "TestUtil/exportAsExample.hpp"
-#include "TestUtil/runEmbindTest.hpp"
 #include <catch2/catch.hpp>
 #include <fmt/format.h>
 
@@ -35,13 +33,8 @@ expect(data.size()).toBe(4);
 expect(data.get(3)).toBe(3);
 )";
 
-	auto errorCode =
-	    TestUtil::runEmbindTest(stage, cppCode, jsTestCode, moduleName);
+	auto errorCode = stage.runEmbindTest(cppCode, jsTestCode, moduleName);
 	REQUIRE(errorCode == 0);
 
-	using Code = TestUtil::Code;
-	TestUtil::exportAsExample(
-	    "std::vector",
-	    {Code {"cpp", cppCode}, Code {"javascript", jsTestCode}},
-	    TestStage::getExamplesPath());
+	stage.exportAsExample("std::vector");
 }

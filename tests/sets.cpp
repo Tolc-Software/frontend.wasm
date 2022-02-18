@@ -1,7 +1,6 @@
 #include "Frontend/Wasm/frontend.hpp"
 #include "TestStage/paths.hpp"
 #include "TestUtil/embindStage.hpp"
-#include "TestUtil/runEmbindTest.hpp"
 #include <catch2/catch.hpp>
 #include <fmt/format.h>
 
@@ -65,7 +64,6 @@ self.assertTrue(
 )",
 	                                  fmt::arg("moduleName", moduleName));
 
-	auto errorCode =
-	    TestUtil::runEmbindTest(stage, cppCode, pythonTestCode, moduleName);
+	auto errorCode = stage.runEmbindTest(cppCode, pythonTestCode, moduleName);
 	REQUIRE(errorCode == 0);
 }

@@ -42,7 +42,7 @@ get_catch2(VERSION v2.13.8)
 # Everything put in TestUtil/include is available
 add_library(TestUtil TestUtil/include/TestUtil/embindStage.cpp TestUtil/include/TestUtil/parse.cpp)
 target_include_directories(TestUtil PUBLIC TestUtil/include)
-target_link_libraries(TestUtil PRIVATE Tolc::Parser Catch2::Catch2 Tolc::Stage)
+target_link_libraries(TestUtil PRIVATE Tolc::Frontend.wasm Tolc::Parser Catch2::Catch2 Tolc::Stage)
 target_link_libraries(TestUtil PUBLIC IR::IR)
 find_package(fmt REQUIRED)
 

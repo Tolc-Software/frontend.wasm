@@ -1,5 +1,7 @@
 #include "TestUtil/embindStage.hpp"
+#include "Frontend/Wasm/frontend.hpp"
 #include "Stage/cmakeStage.hpp"
+#include "TestStage/paths.hpp"
 #include "TestUtil/parse.hpp"
 #include <IR/ir.hpp>
 #include <Parser/Parse.hpp>
@@ -27,6 +29,61 @@ EmbindStage::EmbindStage(std::filesystem::path const& baseStage,
 	m_emscripten_toolchain = baseStage / "build" / "_deps" / "emsdk_entry-src" /
 	                         "upstream" / "emscripten" / "cmake" / "Modules" /
 	                         "Platform" / "Emscripten.cmake";
+}
+
+int EmbindStage::runEmbindTest(std::string const& cppCode,
+                               std::string const& jsUnittestCode,
+                               std::string const& moduleName) {
+	auto globalNS = parseModuleFile(cppCode);
+
+	// Save as what has been used
+	m_exports = {Code {"cpp", cppCode}, Code {"javascript", jsUnittestCode}};
+
+	if (auto m = Frontend::Wasm::createModule(globalNS, moduleName)) {
+		for (auto const& [filename, content] : m.value()) {
+			if (filename.string() == "pre.js") {
+				m_stage.addFile("src" / filename, content);
+			} else {
+				addModuleFile(filename, content);
+			}
+		}
+		return runEmbindUnittest(jsUnittestCode);
+	}
+
+	return 1;
+}
+
+namespace {
+std::string makeValidFileName(std::string s) {
+	std::replace(s.begin(), s.end(), ' ', '_');
+	std::replace(s.begin(), s.end(), ':', '_');
+	return s;
+}
+}    // namespace
+
+void EmbindStage::exportAsExample(std::string const& name) {
+	std::filesystem::path fileName =
+	    TestStage::getExamplesPath() /
+	    fmt::format("{}.md", makeValidFileName(name));
+	std::string content = fmt::format(R"(
+## {} ##
+
+)",
+	                                  name);
+	for (auto const& [language, code] : m_exports) {
+		content += fmt::format(R"(
+```{language}
+{code}
+```
+
+)",
+		                       fmt::arg("language", language),
+		                       fmt::arg("code", code));
+	}
+
+	std::ofstream example(fileName);
+	example << content;
+	example.close();
 }
 
 void EmbindStage::addModuleFile(std::filesystem::path const& file,

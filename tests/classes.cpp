@@ -1,8 +1,6 @@
 #include "TestStage/paths.hpp"
 #include "TestUtil/embindStage.hpp"
-#include "TestUtil/exportAsExample.hpp"
 #include "TestUtil/files.hpp"
-#include "TestUtil/runEmbindTest.hpp"
 #include <catch2/catch.hpp>
 #include <fmt/format.h>
 
@@ -123,13 +121,8 @@ expect(withEnum.i).toBe(m.WithEnum_Instrument.Flute);
 withEnum.delete();
 )";
 
-	auto errorCode =
-	    TestUtil::runEmbindTest(stage, cppCode, jsTestCode, moduleName);
+	auto errorCode = stage.runEmbindTest(cppCode, jsTestCode, moduleName);
 	REQUIRE(errorCode == 0);
 
-	using Code = TestUtil::Code;
-	TestUtil::exportAsExample(
-	    "Classes",
-	    {Code {"cpp", cppCode}, Code {"javascript", jsTestCode}},
-	    TestStage::getExamplesPath());
+	stage.exportAsExample("Classes");
 }

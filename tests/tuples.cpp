@@ -1,7 +1,5 @@
 #include "TestStage/paths.hpp"
 #include "TestUtil/embindStage.hpp"
-#include "TestUtil/exportAsExample.hpp"
-#include "TestUtil/runEmbindTest.hpp"
 #include <catch2/catch.hpp>
 #include <fmt/format.h>
 
@@ -59,13 +57,8 @@ expect(withFunction.sum([1, 2, 3.3, 2.0])).toBeCloseTo(8.3, 5);
 withFunction.delete();
 )";
 
-	auto errorCode =
-	    TestUtil::runEmbindTest(stage, cppCode, jsTestCode, moduleName);
+	auto errorCode = stage.runEmbindTest(cppCode, jsTestCode, moduleName);
 	REQUIRE(errorCode == 0);
 
-	using Code = TestUtil::Code;
-	TestUtil::exportAsExample(
-	    "std::tuple",
-	    {Code {"cpp", cppCode}, Code {"javascript", jsTestCode}},
-	    TestStage::getExamplesPath());
+	stage.exportAsExample("std::tuple");
 }

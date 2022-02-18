@@ -10,6 +10,19 @@ struct EmbindStage {
 	            std::string const& moduleName);
 
 	/**
+	 * Runs the whole pipeline
+	 */
+	int runEmbindTest(std::string const& cppCode,
+	                  std::string const& jsUnittestCode,
+	                  std::string const& moduleName);
+
+	/**
+	 * Exports as example. Assumes that runEmbindTest has been called before
+	 * (to save the cppCode and jsUnittestCode)
+	 */
+	void exportAsExample(std::string const& name);
+
+	/**
 	* Adds the source file moduleName.hpp to the stage with provided content
 	* Uses Tolc::Parser to parse the file and returns the global namespace
 	*/
@@ -33,8 +46,14 @@ struct EmbindStage {
 	 */
 	void addJestUnitTest(std::string const& body);
 
+	struct Code {
+		std::string language;
+		std::string code;
+	};
+
 	Stage::CMakeStage m_stage;
 	std::string m_moduleName;
+	std::vector<Code> m_exports;
 
 	std::filesystem::path m_emscripten_toolchain;
 };

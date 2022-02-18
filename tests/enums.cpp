@@ -1,7 +1,5 @@
 #include "TestStage/paths.hpp"
 #include "TestUtil/embindStage.hpp"
-#include "TestUtil/exportAsExample.hpp"
-#include "TestUtil/runEmbindTest.hpp"
 #include <catch2/catch.hpp>
 #include <fmt/format.h>
 
@@ -78,13 +76,8 @@ const company = m.MyNamespace.Carrier.Translator.Tolc;
 expect(company).toBe(m.MyNamespace.Carrier.Translator.Tolc);
 )";
 
-	auto errorCode =
-	    TestUtil::runEmbindTest(stage, cppCode, jsTestCode, moduleName);
+	auto errorCode = stage.runEmbindTest(cppCode, jsTestCode, moduleName);
 	REQUIRE(errorCode == 0);
 
-	using Code = TestUtil::Code;
-	TestUtil::exportAsExample(
-	    "Enums",
-	    {Code {"cpp", cppCode}, Code {"javascript", jsTestCode}},
-	    TestStage::getExamplesPath());
+	stage.exportAsExample("Enums");
 }
