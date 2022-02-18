@@ -9,8 +9,8 @@ Note that any restriction this poses only applies to the public interface of you
 
 | C++                                 | Wasm translation               |
 |:----------------------------------- |:------------------------------ |
-| Namespace                           | ???                            |
-| Nested namespace                    | ???                            |
+| Namespace                           | Object namespace               |
+| Nested namespace                    | Nested object namespace        |
 | Class                               | Class                          |
 | Public function                     | Class function                 |
 | Private function                    | Not converted                  |
@@ -91,7 +91,7 @@ Note that any restriction this poses only applies to the public interface of you
 | short int                  | Number                                                           |
 | signed char                | Number                                                           |
 | string                     | ArrayBuffer, Uint8Array, Uint8ClampedArray, Int8Array, or String |
-| string\_view               | ???                                                              |
+| string\_view               | String*                                                          |
 | uint8_t                    | Number                                                           |
 | uint16_t                   | Number                                                           |
 | uint32_t                   | Number                                                           |
@@ -103,3 +103,4 @@ Note that any restriction this poses only applies to the public interface of you
 | unsigned short int         | Number                                                           |
 | wchar\_t                   | Number                                                           |
 
+\* Only works for globals (see [examples](./examples.md))
