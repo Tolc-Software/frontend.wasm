@@ -9,24 +9,18 @@
 namespace EmbindProxy {
 
 std::string Module::getEmbind() const {
-	std::string out;
-	for (auto const& function : m_functions) {
-		out += fmt::format("\t{};\n\n", function.getEmbind(m_namePrefix));
-	}
-
-	for (auto const& cls : m_classes) {
-		out += fmt::format("\t{};\n\n", cls.getEmbind(m_namePrefix));
-	}
-
-	for (auto const& e : m_enums) {
-		out += fmt::format("\t{};\n\n", e.getEmbind(m_namePrefix));
-	}
-
-	for (auto const& attribute : m_attributes) {
-		out += fmt::format("\t{};\n\n", attribute.getEmbind(m_namePrefix));
-	}
-
-	return out;
+	using namespace Helpers::Embind;
+	return fmt::format(
+	    R"(
+{functions}
+{classes}
+{enums}
+{attributes}
+)",
+	    fmt::arg("functions", joinEmbind(m_namePrefix, m_functions)),
+	    fmt::arg("classes", joinEmbind(m_namePrefix, m_classes)),
+	    fmt::arg("enums", joinEmbind(m_namePrefix, m_enums)),
+	    fmt::arg("attributes", joinEmbind(m_namePrefix, m_attributes)));
 }
 
 namespace {

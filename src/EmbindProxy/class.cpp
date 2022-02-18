@@ -14,7 +14,7 @@ std::string getClassNamePrefix(std::string const& namespacePrefix,
 
 std::string Class::getEmbind(std::string const& namePrefix) const {
 	std::string out =
-	    fmt::format("em::class_<{fullyQualifiedName}>(\"{name}\")\n",
+	    fmt::format("\tem::class_<{fullyQualifiedName}>(\"{name}\")\n",
 	                fmt::arg("fullyQualifiedName", m_fullyQualifiedName),
 	                fmt::arg("name", createName(namePrefix)));
 
@@ -25,12 +25,12 @@ std::string Class::getEmbind(std::string const& namePrefix) const {
 	}
 
 	for (auto const& init : m_constructors) {
-		out += fmt::format("\t\t.{constructorEmbind}\n",
+		out += fmt::format("\t\t.{constructorEmbind}",
 		                   fmt::arg("constructorEmbind", init.getEmbind()));
 	}
 
 	for (auto const& function : m_functions) {
-		out += fmt::format("\t\t.{functionEmbind}\n",
+		out += fmt::format("\t\t.{functionEmbind}",
 		                   fmt::arg("functionEmbind", function.getEmbind()));
 	}
 
@@ -51,11 +51,15 @@ std::string Class::getEmbind(std::string const& namePrefix) const {
 		    fmt::arg("variableName", variable.m_name));
 	}
 
+	// Remove the last newline
+	out.pop_back();
+
+	// End the class statement and put in a few newlines before enums
+	out += ";\n\n";
+
 	// To put the enums at the end of the class
 	// we have to do some trickery since we are not allowed to insert the last ';'
 	if (!m_enums.empty()) {
-		// End the class statement and put in a few newlines before enums
-		out += ";\n\n";
 
 		for (auto const& e : m_enums) {
 			// Need to add class prefix to nested enums
@@ -67,10 +71,8 @@ std::string Class::getEmbind(std::string const& namePrefix) const {
 	}
 
 	// Remove the trailing endlines
-	if (!out.empty()) {
-		while (out.back() == '\n' && !out.empty()) {
-			out.pop_back();
-		}
+	while (!out.empty() && out.back() == '\n') {
+		out.pop_back();
 	}
 
 	return out;

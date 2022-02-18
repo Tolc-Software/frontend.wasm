@@ -9,7 +9,7 @@ Enum::Enum(std::string const& name, std::string const& fullyQualifiedName)
 
 std::string Enum::getEmbind(std::string const& namePrefix) const {
 	std::string out =
-	    fmt::format("em::enum_<{fullyQualifiedName}>(\"{name}\")\n",
+	    fmt::format("\tem::enum_<{fullyQualifiedName}>(\"{name}\")\n",
 	                fmt::arg("fullyQualifiedName", m_fullyQualifiedName),
 	                fmt::arg("name", createName(namePrefix)));
 
@@ -22,6 +22,8 @@ std::string Enum::getEmbind(std::string const& namePrefix) const {
 
 	// Remove the last newline
 	out.pop_back();
+	out.push_back(';');
+	out.push_back('\n');
 
 	return out;
 }

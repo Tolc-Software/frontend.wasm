@@ -20,7 +20,7 @@ std::string getFunctionPrefix(bool isClassFunction, bool isStatic) {
 		// Static functions are prefixed "class_"
 		return isStatic ? "class_" : "";
 	}
-	return "em::";
+	return "\tem::";
 }
 
 }    // namespace
@@ -30,15 +30,16 @@ std::string Function::getEmbind(std::string const& namePrefix) const {
 	if (m_isConstructor) {
 		// Results in
 		// constructor<std::string, int, double>)
-		f = fmt::format(R"(constructor<{}>())", getArgumentTypes());
+		f = fmt::format("constructor<{}>()\n", getArgumentTypes());
 	} else {
 		// Results in
 		// class_function("myFunction", select_overload<void()>(&MyNS::myFunction))
 		f = fmt::format(
-		    R"({functionPrefix}function("{name}", {qualifiedName}))",
+		    R"({functionPrefix}function("{name}", {qualifiedName}){ending})",
 		    fmt::arg("functionPrefix",
 		             getFunctionPrefix(m_isClassFunction, m_isStatic)),
 		    fmt::arg("name", createName(namePrefix)),
+		    fmt::arg("ending", m_isClassFunction ? "\n" : ";\n"),
 		    fmt::arg("qualifiedName",
 		             m_isOverloaded ?
 		                 getEmbindSelect(getSignature(), m_fullyQualifiedName) :
