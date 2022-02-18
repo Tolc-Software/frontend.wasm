@@ -78,6 +78,7 @@ struct WithEnum {
 
 ```
 
+
 ```javascript
 
 // Statics are available without instantiation
@@ -129,6 +130,7 @@ withEnum.delete();
 
 ```
 
+
 ## Enums ##
 
 
@@ -179,6 +181,7 @@ namespace MyNamespace {
 
 ```
 
+
 ```javascript
 
 // Can be passed as arguments
@@ -203,6 +206,7 @@ const company = m.MyNamespace.Carrier.Translator.Tolc;
 expect(company).toBe(m.MyNamespace.Carrier.Translator.Tolc);
 
 ```
+
 
 ## Functions ##
 
@@ -232,6 +236,7 @@ namespace MyNamespace {
 
 ```
 
+
 ```javascript
 
 expect(m.sayTen()).toBe(10);
@@ -243,6 +248,7 @@ expect(m.MyNamespace.add(1, 2)).toBe(3);
 expect(m.MyNamespace.Nested.increase(2)).toBe(3);
 
 ```
+
 
 ## Global Variables ##
 
@@ -262,6 +268,7 @@ namespace MyNamespace {
 
 ```
 
+
 ```javascript
 
 expect(m.i).toBe(0);
@@ -277,6 +284,7 @@ expect(m.charPtr).toBe("Hello world");
 expect(m.MyNamespace.i).toBe(5);
 
 ```
+
 
 ## std::array ##
 
@@ -298,6 +306,7 @@ std::array<int, 2> getData2() {
 
 ```
 
+
 ```javascript
 
 var data3 = m.getData3();
@@ -313,6 +322,7 @@ expect(data2.length).toBe(2);
 expect(data2).toStrictEqual([0, 1]);
 
 ```
+
 
 ## std::map ##
 
@@ -331,6 +341,7 @@ std::map<int, std::string> getData() {
 
 ```
 
+
 ```javascript
 
 var data = m.getData();
@@ -345,6 +356,7 @@ expect(data.size()).toBe(2);
 expect(data.get(50)).toBe("Stuff");
 
 ```
+
 
 ## std::pair ##
 
@@ -373,6 +385,7 @@ public:
 
 ```
 
+
 ```javascript
 
 // On the javascript side, std::pair<std::string, int> is a basic array
@@ -386,6 +399,7 @@ expect(withFunction.sum([1, 2])).toBe(3)
 withFunction.delete();
 
 ```
+
 
 ## std::tuple ##
 
@@ -417,6 +431,7 @@ public:
 
 ```
 
+
 ```javascript
 
 
@@ -443,6 +458,7 @@ withFunction.delete();
 
 ```
 
+
 ## std::vector ##
 
 
@@ -456,6 +472,7 @@ std::vector<int> getData() {
 
 
 ```
+
 
 ```javascript
 
@@ -474,3 +491,4 @@ expect(data.size()).toBe(4);
 expect(data.get(3)).toBe(3);
 
 ```
+
