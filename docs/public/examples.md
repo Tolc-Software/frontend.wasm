@@ -1,21 +1,19 @@
 # Examples #
 
-Each example is is made up of a `C++` section and how it can be used from `javascript`. Each example exports the `Promise` `load{libraryName}`, where `libraryName` is `m` here:
+Each example is taken from the test suite for `Tolc` and, given that you use the latest version, you can expect them all to work.
+
+To use `WebAssembly` from `javascript`, one has to load it in asynchronously. When using `Tolc` this is done with a [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) on the `javascript` side. Each library named `MyLib` exports a `Promise` called `loadMyLib`, in every test the name is simply `m` for brevity. All tests use [`jest`](https://jestjs.io/), and the `javascript` test boiler plate is omitted:
 
 ```javascript
 var loadm = require('./build/m');
 
 test('Tolc Test', () => {
 	loadm().then(m => {
-		// The actual example body
+		// The actual javascript example body goes here
 		expect(m.sayTen()).toBe(10);
 	});
 });
 ```
-
-Since `WebAssembly` is loaded asynchronously, it has to use the `onRuntimeInitialized` callback.
-
-Note that the examples are part of the test suite for `Tolc`, so the `javascript` uses statements from the test framework [`jest`](https://jestjs.io/). You may assume that each test passes if you run the latest version of `Tolc`.
 
 
 ## Classes ##
