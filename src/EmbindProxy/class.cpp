@@ -13,11 +13,10 @@ std::string getClassNamePrefix(std::string const& namespacePrefix,
 }    // namespace
 
 std::string Class::getEmbind(std::string const& namePrefix) const {
-	std::string out = fmt::format(
-	    "em::class_<{fullyQualifiedName}>(\"{namePrefix}{name}\")\n",
-	    fmt::arg("fullyQualifiedName", m_fullyQualifiedName),
-	    fmt::arg("namePrefix", namePrefix),
-	    fmt::arg("name", m_name));
+	std::string out =
+	    fmt::format("em::class_<{fullyQualifiedName}>(\"{name}\")\n",
+	                fmt::arg("fullyQualifiedName", m_fullyQualifiedName),
+	                fmt::arg("name", createName(namePrefix)));
 
 	if (m_isManagedByShared) {
 		out += fmt::format(
@@ -75,6 +74,39 @@ std::string Class::getEmbind(std::string const& namePrefix) const {
 	}
 
 	return out;
+}
+
+std::string Class::getGlobalPreJS(std::string const& namePrefix) const {
+	// Expects to be injected where necessary
+	std::string preJS;
+	for (auto const& e : m_enums) {
+		// Rename enums that are declared within the class
+		// Since this class will then be moved to it's correct namespace
+		// The renamed enum will follow
+		preJS += fmt::format(
+		    R"(
+Module['{globalName}']['{enumName}'] = Module['{globalEnumName}'];
+)",
+		    fmt::arg("globalName", createName(namePrefix)),
+		    fmt::arg("enumName", e.getName()),
+		    fmt::arg("globalEnumName",
+		             e.createName(getClassNamePrefix(namePrefix, m_name))));
+	}
+	return preJS;
+}
+
+std::string Class::getPreJS(std::string const& namePrefix) const {
+	// Renaming the class
+	// Expects to be injected where necessary
+	return fmt::format(R"(
+{baseName}: Module['{globalName}'],
+)",
+	                   fmt::arg("baseName", m_name),
+	                   fmt::arg("globalName", createName(namePrefix)));
+}
+
+std::string Class::createName(std::string const& namePrefix) const {
+	return namePrefix + m_name;
 }
 
 Class::Class(std::string const& name, std::string const& fullyQualifiedName)

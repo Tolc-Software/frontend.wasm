@@ -41,7 +41,7 @@ expect(data.get(3)).toBe(3);
 
 	using Code = TestUtil::Code;
 	TestUtil::exportAsExample(
-	    "Enums",
+	    "std::vector",
 	    {Code {"cpp", cppCode}, Code {"javascript", jsTestCode}},
 	    TestStage::getExamplesPath());
 }

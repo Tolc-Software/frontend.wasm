@@ -27,12 +27,16 @@ public:
 	*/
 	void addValue(std::string const& value);
 
+	// Corresponds to the variable name on the Module Object
+	std::string createName(std::string const& namePrefix) const;
+
+	// Get the simple name of the enum
+	std::string getName() const;
+
 private:
 	// The user defined name of the enum
 	std::string m_name;
 	std::string m_fullyQualifiedName;
 	std::vector<std::string> m_values;
-
-	std::string createName(std::string const& namePrefix) const;
 };
 }    // namespace EmbindProxy

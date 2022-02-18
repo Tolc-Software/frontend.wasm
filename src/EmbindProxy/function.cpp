@@ -49,10 +49,6 @@ std::string Function::getEmbind(std::string const& namePrefix) const {
 }
 
 std::string Function::getPreJS(std::string const& namePrefix) const {
-	if (namePrefix.empty()) {
-		// No need to rename the function if there is no prefix to remove
-		return "";
-	}
 	// Renaming the function
 	// Expects to be injected where necessary
 	return fmt::format(R"(

@@ -41,7 +41,7 @@ std::string joinPreJSModules(std::vector<Module> const& modules) {
 	std::string out;
 
 	for (auto const& m : modules) {
-		out += fmt::format("{}", m.getPreJS());
+		out += m.getPreJS();
 	}
 
 	return out;

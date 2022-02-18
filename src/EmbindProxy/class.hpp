@@ -32,6 +32,11 @@ public:
 
 	std::string getEmbind(std::string const& namePrefix = "") const;
 
+	std::string getPreJS(std::string const& namePrefix = "") const;
+
+	// Same as getPreJS but is assumed to be injected into the root of the Module
+	std::string getGlobalPreJS(std::string const& namePrefix = "") const;
+
 private:
 	struct MemberVariable {
 		// User defined name of the member variable
@@ -52,5 +57,7 @@ private:
 	std::vector<Enum> m_enums;
 
 	bool m_isManagedByShared;
+
+	std::string createName(std::string const& namePrefix) const;
 };
 }    // namespace EmbindProxy

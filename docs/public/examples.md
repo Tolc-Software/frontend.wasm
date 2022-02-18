@@ -1,7 +1,21 @@
 # Examples #
 
-Each example is is made up of a `C++` section and how it can be used from `javascript`. Note that the examples are part of the test suite for `Tolc`, so the `javascript` uses statements from the test framework [`jest`](https://jestjs.io/). You may assume that each test passes if you run the latest version of `Tolc`.
+Each example is is made up of a `C++` section and how it can be used from `javascript`. Each example exports the `Promise` `load{libraryName}`, where `libraryName` is `m` here:
 
+```javascript
+var loadm = require('./build/m');
+
+test('Tolc Test', () => {
+	loadm().then(m => {
+		// The actual example body
+		expect(m.sayTen()).toBe(10);
+	});
+});
+```
+
+Since `WebAssembly` is loaded asynchronously, it has to use the `onRuntimeInitialized` callback.
+
+Note that the examples are part of the test suite for `Tolc`, so the `javascript` uses statements from the test framework [`jest`](https://jestjs.io/). You may assume that each test passes if you run the latest version of `Tolc`.
 
 
 ## Classes ##
@@ -16,10 +30,12 @@ class WithConstructor {
 public:
 	explicit WithConstructor(std::string s) : m_s(s) {}
 
+	// There is a separate .cpp file containing
+	// int const WithConstructor::i;
+	// To initialize i
 	static int const i = 5;
 
 	std::string getS() { return m_s; }
-	// std::string_view getSView() { return m_s; }
 
 	static int getStatic() { return 55; }
 
@@ -45,49 +61,73 @@ class WithPrivateFunction {
 	}
 };
 
+namespace MyNamespace {
+	struct Nested {
+		int const i = 42;
+	};
+}
+
+struct WithEnum {
+	enum class Instrument {
+		Guitarr,
+		Flute
+	};
+	Instrument i = Instrument::Flute;
+};
+
+
+
 
 ```
 
 ```javascript
 
+// Statics are available without instantiation
+// Static function
 expect(m.WithConstructor.getStatic()).toBe(55);
+// Static variable
+expect(m.WithConstructor.i).toBe(5);
 
 var withConstructor = new m.WithConstructor("Hello");
-
 expect(withConstructor.getS()).toBe("Hello");
-// expect(withConstructor.getSView()).toBe("Hello");
-// expect(withConstructor.i).toBe(5);
 
+// Classes need to be deleted manually
 withConstructor.delete();
 
+// Const properties are read-only
 var withMembers = new m.WithMembers();
-
 expect(withMembers.i).toBe(5);
 try {
 	withMembers.i = 10;
 } catch (err) {
 	expect(err.toString()).toMatch(/BindingError: WithMembers.i is a read-only property/i);
 }
-
 expect(withMembers.s).toBe("hello");
-
 withMembers.delete();
 
+// Public functions are available
 var withFunction = new m.WithFunction();
-
 expect(withFunction.add(5, 10)).toBe(15);
-
 withFunction.delete();
 
+// Cannot access private functions
 var withPrivateFunction = new m.WithPrivateFunction();
-
 try {
 	withPrivateFunction.multiply(5, 10);
 } catch (err) {
 	expect(err.toString()).toMatch(/TypeError: withPrivateFunction.multiply is not a function/i);
 }
-
 withPrivateFunction.delete();
+
+// Classes can be found under their namespace
+var nested = new m.MyNamespace_Nested();
+expect(nested.i).toBe(42);
+nested.delete();
+
+// Ok to nest Enums within classes
+var withEnum = new m.WithEnum();
+expect(withEnum.i).toBe(m.WithEnum_Instrument.Flute);
+withEnum.delete();
 
 ```
 
@@ -96,10 +136,46 @@ withPrivateFunction.delete();
 
 ```cpp
 
-#include <vector>
+enum Unscoped {
+	Under,
+	Uboat,
+};
 
-std::vector<int> getData() {
-	return {0, 1, 2};
+enum class Scoped {
+	Sacred,
+	Snail,
+};
+
+class EnumTest {
+public:
+	enum class Inside {
+		One,
+		Two
+	};
+
+	explicit EnumTest(Scoped s) : memberEnum(s), inside(Inside::One) {};
+
+	Inside inside;
+
+	Scoped memberEnum;
+};
+
+Unscoped echo(Unscoped s) {
+	return s;
+}
+
+namespace MyNamespace {
+	enum class Color {
+		Red,
+		Green,
+		Blue
+	};
+
+	struct Carrier {
+		enum class Translator {
+			Tolc
+		};
+	};
 }
 
 
@@ -107,19 +183,26 @@ std::vector<int> getData() {
 
 ```javascript
 
-var data = m.getData();
+// Can be passed as arguments
+const snail = m.Scoped.Snail;
+const enumTest = new m.EnumTest(snail);
+expect(enumTest.memberEnum).toBe(snail);
 
-expect(data.size()).toBe(3);
+// Nested enums within classes
+expect(enumTest.inside).toBe(m.EnumTest.Inside.One);
+enumTest.delete();
 
-for (var i = 0; i < data.size(); i++) {
-    expect(data.get(i)).toBe(i);
-}
+// Unscoped enums work exactly the same
+const uboat = m.Unscoped.Uboat;
+expect(m.echo(uboat)).toBe(uboat);
 
-data.push_back(3);
+// Nested enums inside namespaces
+const green = m.MyNamespace.Color.Green;
+expect(green).toBe(m.MyNamespace.Color.Green);
 
-expect(data.size()).toBe(4);
-
-expect(data.get(3)).toBe(3);
+// Nested enums inside namespaces inside structs
+const company = m.MyNamespace.Carrier.Translator.Tolc;
+expect(company).toBe(m.MyNamespace.Carrier.Translator.Tolc);
 
 ```
 
@@ -138,6 +221,17 @@ std::string giveBack(std::string const& s) {
 	return s;
 }
 
+namespace MyNamespace {
+	int add(int x, int y) {
+		return x + y;
+	}
+	namespace Nested {
+		int increase(int x) {
+			return x + 1;
+		}
+	}
+}
+
 ```
 
 ```javascript
@@ -146,9 +240,13 @@ expect(m.sayTen()).toBe(10);
 
 expect(m.giveBack("hello")).toBe("hello");
 
+// Nested functions are under their respective namespace
+expect(m.MyNamespace.add(1, 2)).toBe(3);
+expect(m.MyNamespace.Nested.increase(2)).toBe(3);
+
 ```
 
-## Globals ##
+## Global Variables ##
 
 
 ```cpp
@@ -157,8 +255,12 @@ expect(m.giveBack("hello")).toBe("hello");
 
 int const i = 0;
 double const d = 55;
-std::string_view const s = "Hello world";
-const char* c = "Hello world";
+std::string_view const stringView = "Hello world";
+const char* charPtr = "Hello world";
+
+namespace MyNamespace {
+	int const i = 5;
+}
 
 ```
 
@@ -166,8 +268,15 @@ const char* c = "Hello world";
 
 expect(m.i).toBe(0);
 expect(m.d).toBe(55);
-expect(m.s).toBe("Hello world");
-expect(m.c).toBe("Hello world");
+
+// Global strings of type std::string_view and const char* are converted
+// Globals of type std::string has an open issue:
+//   https://github.com/emscripten-core/emscripten/issues/16275
+expect(m.stringView).toBe("Hello world");
+expect(m.charPtr).toBe("Hello world");
+
+// Globals within namespaces work
+expect(m.MyNamespace.i).toBe(5);
 
 ```
 
@@ -236,5 +345,134 @@ data.set(50, "Stuff");
 
 expect(data.size()).toBe(2);
 expect(data.get(50)).toBe("Stuff");
+
+```
+
+## std::pair ##
+
+
+```cpp
+
+#include <string>
+
+class MyClass {
+public:
+	explicit MyClass(std::pair<std::string, int> s) : m_s(s) {}
+
+	std::pair<std::string, int> getS() { return m_s; }
+
+private:
+	std::pair<std::string, int> m_s;
+};
+
+class WithFunction {
+public:
+	int sum(std::pair<int, int> v) {
+		return v.first + v.second;
+	}
+};
+
+
+```
+
+```javascript
+
+// On the javascript side, std::pair<std::string, int> is a basic array
+const myArray = ["hi", 4];
+withMember = new m.MyClass(myArray);
+expect(withMember.getS()).toStrictEqual(myArray);
+withMember.delete();
+
+const withFunction = new m.WithFunction()
+expect(withFunction.sum([1, 2])).toBe(3)
+withFunction.delete();
+
+```
+
+## std::tuple ##
+
+
+```cpp
+
+#include <string>
+#include <tuple>
+
+class MyClass {
+public:
+	explicit MyClass(std::tuple<std::string, int> _tuple) : m_tuple(_tuple) {}
+
+	std::tuple<std::string, int> getTuple() { return m_tuple; }
+
+	std::tuple<std::string, int> m_tuple;
+};
+
+class WithFunction {
+public:
+	double sum(std::tuple<int, int, float, double> t) {
+		return std::get<0>(t)
+			   + std::get<1>(t)
+			   + std::get<2>(t)
+			   + std::get<3>(t);
+	}
+};
+
+
+```
+
+```javascript
+
+
+// Tuple converts from javascript array
+const myArray = ["Hello World", 42];
+var myClass = new m.MyClass(myArray);
+expect(myClass.getTuple()).toStrictEqual(myArray);
+
+// The array still need to match the underlying std::tuple structure
+try {
+	// m_tuple is public
+	myClass.m_tuple = [1, 2, 3];
+} catch (err) {
+	expect(err.toString()).toMatch(/TypeError: Incorrect number of tuple elements for tuple_string_int: expected=2, actual=3/i);
+}
+
+myClass.delete();
+
+// Can handle different Number types
+var withFunction = new m.WithFunction();
+expect(withFunction.sum([1, 2, 3.3, 2.0])).toBeCloseTo(8.3, 5);
+
+withFunction.delete();
+
+```
+
+## std::vector ##
+
+
+```cpp
+
+#include <vector>
+
+std::vector<int> getData() {
+	return {0, 1, 2};
+}
+
+
+```
+
+```javascript
+
+var data = m.getData();
+
+expect(data.size()).toBe(3);
+
+for (var i = 0; i < data.size(); i++) {
+    expect(data.get(i)).toBe(i);
+}
+
+data.push_back(3);
+
+expect(data.size()).toBe(4);
+
+expect(data.get(3)).toBe(3);
 
 ```

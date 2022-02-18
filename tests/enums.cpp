@@ -12,15 +12,13 @@ TEST_CASE("Testing enums", "[enums]") {
 
 	auto cppCode = R"(
 enum Unscoped {
-	A,
-	B,
-	C
+	Under,
+	Uboat,
 };
 
 enum class Scoped {
-	D,
-	E,
-	F
+	Sacred,
+	Snail,
 };
 
 class EnumTest {
@@ -30,14 +28,14 @@ public:
 		Two
 	};
 
-	explicit EnumTest(Scoped s) : e(s), i(Inside::One) {};
+	explicit EnumTest(Scoped s) : memberEnum(s), inside(Inside::One) {};
 
-	Inside i;
+	Inside inside;
 
-	Scoped e;
+	Scoped memberEnum;
 };
 
-Unscoped f(Unscoped s) {
+Unscoped echo(Unscoped s) {
 	return s;
 }
 
@@ -47,26 +45,37 @@ namespace MyNamespace {
 		Green,
 		Blue
 	};
+
+	struct Carrier {
+		enum class Translator {
+			Tolc
+		};
+	};
 }
 
 )";
 
 	auto jsTestCode = R"(
-const scoped = m.Scoped.D;
-
 // Can be passed as arguments
-var enumTest = new m.EnumTest(scoped);
-expect(enumTest.e).toBe(scoped);
+const snail = m.Scoped.Snail;
+const enumTest = new m.EnumTest(snail);
+expect(enumTest.memberEnum).toBe(snail);
+
+// Nested enums within classes
+expect(enumTest.inside).toBe(m.EnumTest.Inside.One);
 enumTest.delete();
 
 // Unscoped enums work exactly the same
-unscoped = m.Unscoped.B;
-u = m.f(unscoped);
-expect(u).toBe(unscoped);
+const uboat = m.Unscoped.Uboat;
+expect(m.echo(uboat)).toBe(uboat);
 
-// Nested enums work aswell
-const c = m.MyNamespace.Color.Green;
-expect(c).toBe(m.MyNamespace.Color.Green);
+// Nested enums inside namespaces
+const green = m.MyNamespace.Color.Green;
+expect(green).toBe(m.MyNamespace.Color.Green);
+
+// Nested enums inside namespaces inside structs
+const company = m.MyNamespace.Carrier.Translator.Tolc;
+expect(company).toBe(m.MyNamespace.Carrier.Translator.Tolc);
 )";
 
 	auto errorCode =

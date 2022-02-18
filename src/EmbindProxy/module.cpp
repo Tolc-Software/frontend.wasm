@@ -54,26 +54,33 @@ std::string getModuleDeclaration(std::deque<std::string> const& path) {
 }    // namespace
 
 std::string Module::getPreJS() const {
+	// Move things into classes that are not supported in Embind
+	std::string preJS =
+	    Helpers::Embind::joinGlobalPreJS(m_namePrefix, m_classes);
+
 	if (m_path.empty()) {
-		// The global namespace is not touched in the preJS
-		return "";
+		// The rest are renaming things into their namespace
+		// For the global there are no renames
+		return preJS;
 	}
 
 	using namespace Helpers::Embind;
-	std::string out = fmt::format(
+	preJS += fmt::format(
 	    R"(
 {moduleDeclaration} {{
 {functions}
 {enums}
 {attributes}
+{classes}
 }};
 )",
 	    fmt::arg("moduleDeclaration", getModuleDeclaration(m_path)),
 	    fmt::arg("functions", joinPreJS(m_namePrefix, m_functions)),
 	    fmt::arg("enums", joinPreJS(m_namePrefix, m_enums)),
-	    fmt::arg("attributes", joinPreJS(m_namePrefix, m_attributes)));
+	    fmt::arg("attributes", joinPreJS(m_namePrefix, m_attributes)),
+	    fmt::arg("classes", joinPreJS(m_namePrefix, m_classes)));
 
-	return out;
+	return preJS;
 }
 
 Module::Module(std::string const& name, std::string const& qualifiedName)

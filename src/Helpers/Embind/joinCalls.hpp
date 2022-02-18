@@ -23,4 +23,15 @@ std::string joinPreJS(std::string const& prefix,
 	}
 	return out;
 }
+
+template <typename EmbindObject>
+std::string joinGlobalPreJS(std::string const& prefix,
+                            std::vector<EmbindObject> const& objects) {
+	std::string out;
+	for (auto const& o : objects) {
+		out += o.getGlobalPreJS(prefix);
+	}
+	return out;
+}
+
 }    // namespace Helpers::Embind
