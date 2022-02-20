@@ -111,13 +111,13 @@ try {
 withPrivateFunction.delete();
 
 // Classes can be found under their namespace
-var nested = new m.MyNamespace_Nested();
+var nested = new m.MyNamespace.Nested();
 expect(nested.i).toBe(42);
 nested.delete();
 
 // Ok to nest Enums within classes
 var withEnum = new m.WithEnum();
-expect(withEnum.i).toBe(m.WithEnum_Instrument.Flute);
+expect(withEnum.i).toBe(m.WithEnum.Instrument.Flute);
 withEnum.delete();
 )";
 

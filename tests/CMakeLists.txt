@@ -109,6 +109,7 @@ foreach(
   # lists.cpp
   maps.cpp
   # memberVariables.cpp
+  namespaceRenaming.cpp
   # namespaceSameAsModule.cpp
   # namespaces.cpp
   # optionals.cpp

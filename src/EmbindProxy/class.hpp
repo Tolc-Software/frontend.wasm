@@ -32,10 +32,12 @@ public:
 
 	std::string getEmbind(std::string const& namePrefix = "") const;
 
-	std::string getPreJS(std::string const& namePrefix = "") const;
+	std::string getPreJS(std::string const& namePrefix,
+	                     std::vector<std::string>& namesToDelete) const;
 
 	// Same as getPreJS but is assumed to be injected into the root of the Module
-	std::string getGlobalPreJS(std::string const& namePrefix = "") const;
+	std::string getGlobalPreJS(std::string const& namePrefix,
+	                           std::vector<std::string>& namesToDelete) const;
 
 private:
 	struct MemberVariable {

@@ -15,7 +15,8 @@ public:
 	*/
 	std::string getEmbind(std::string const& namePrefix = "") const;
 
-	std::string getPreJS(std::string const& namePrefix = "") const;
+	std::string getPreJS(std::string const& namePrefix,
+	                     std::vector<std::string>& namesToDelete) const;
 
 	/**
 	* Add an enum value. Should be just the value name.

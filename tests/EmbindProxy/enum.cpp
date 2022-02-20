@@ -42,11 +42,14 @@ TEST_CASE("PreJS enum", "[enum]") {
 	std::string value = "MyValue";
 	e.addValue(value);
 
-	auto prejs = e.getPreJS("MyModule_");
+	std::vector<std::string> previousNames;
+	auto prejs = e.getPreJS("MyModule_", previousNames);
 
 	auto expectedContains = "MyEnum: Module['MyModule_MyEnum']";
 
 	CAPTURE(prejs);
 	CAPTURE(expectedContains);
 	REQUIRE(TestUtil::contains(prejs, expectedContains));
+	REQUIRE(previousNames.size() == 1);
+	REQUIRE(previousNames.back() == "MyModule_MyEnum");
 }

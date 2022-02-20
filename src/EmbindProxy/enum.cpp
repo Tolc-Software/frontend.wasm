@@ -28,14 +28,18 @@ std::string Enum::getEmbind(std::string const& namePrefix) const {
 	return out;
 }
 
-std::string Enum::getPreJS(std::string const& namePrefix) const {
+std::string Enum::getPreJS(std::string const& namePrefix,
+                           std::vector<std::string>& namesToDelete) const {
+	// Will no longer need the old name
+	namesToDelete.push_back(createName(namePrefix));
+
 	// Renaming the function
 	// Expects to be injected where necessary
 	return fmt::format(R"(
 {baseName}: Module['{globalName}'],
 )",
 	                   fmt::arg("baseName", m_name),
-	                   fmt::arg("globalName", createName(namePrefix)));
+	                   fmt::arg("globalName", namesToDelete.back()));
 }
 
 void Enum::addValue(std::string const& value) {

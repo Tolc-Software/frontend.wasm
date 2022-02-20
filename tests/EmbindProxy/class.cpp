@@ -137,30 +137,74 @@ TEST_CASE("Static variable", "[class]") {
 	REQUIRE(contains(embindCode, expectedProperty));
 }
 
-// TEST_CASE("Class with enum", "[class]") {
-// 	std::string className = "myFreshClass";
-// 	EmbindProxy::Class c(className, className);
+TEST_CASE("PreJS", "[class]") {
+	std::string ns = "Stuff";
+	std::string className = "myClass";
+	EmbindProxy::Class c(className, ns + "::" + className);
+	std::vector<std::string> namesToDelete;
+	auto preJS = c.getPreJS(ns + "_", namesToDelete);
+	CAPTURE(preJS);
 
-// 	std::string enumName = "MyEnum";
-// 	std::string fullyQualifiedName = moduleName + "::" + enumName;
-// 	EmbindProxy::Enum e(enumName, fullyQualifiedName);
-// 	e.setScoped(false);
-// 	e.addValue("Hi");
-// 	c.addEnum(e);
+	using TestUtil::contains;
+	auto expectedProperty =
+	    fmt::format("{}: Module['{}'],", className, ns + "_" + className);
+	CAPTURE(expectedProperty);
+	REQUIRE(contains(preJS, expectedProperty));
+}
 
-// 	using TestUtil::contains;
-// 	auto expectedContains = fmt::format(
-// 	    R"(py::enum_<{fullyQualifiedName}>({className}, "{enumName}")",
-// 	    fmt::arg("fullyQualifiedName", fullyQualifiedName),
-// 	    fmt::arg("enumName", enumName),
-// 	    fmt::arg("className", className));
-// 	auto pybind = c.getEmbind();
-// 	CAPTURE(pybind);
-// 	CAPTURE(expectedContains);
-// 	REQUIRE(TestUtil::contains(pybind, expectedContains));
-// 	// Require exporting since it is scoped
-// 	std::string exportValues = "\t.export_values()";
-// 	CAPTURE(exportValues);
-// 	REQUIRE(TestUtil::contains(pybind, exportValues));
-// }
+TEST_CASE("GlobalPreJS", "[class]") {
+	std::string ns = "Stuff";
+	std::string className = "myClass";
+	EmbindProxy::Class c(className, ns + "::" + className);
+	std::vector<std::string> namesToDelete;
+	auto noEnumsPrejs = c.getGlobalPreJS(ns + "_", namesToDelete);
+	REQUIRE(noEnumsPrejs.empty());
+
+	std::string enumName = "MyEnum";
+	std::string fullyQualifiedName = className + "::" + enumName;
+	EmbindProxy::Enum e(enumName, fullyQualifiedName);
+	e.addValue("Hi");
+	c.addEnum(e);
+	auto preJS = c.getGlobalPreJS(ns + "_", namesToDelete);
+
+	CAPTURE(preJS);
+
+	using TestUtil::contains;
+	auto expectedProperty = fmt::format(
+	    "Module['{globalClassName}']['{enumName}'] = Module['{globalEnumName}'];",
+	    fmt::arg("globalClassName", ns + "_" + className),
+	    fmt::arg("enumName", enumName),
+	    fmt::arg("globalEnumName", ns + "_" + className + "_" + enumName));
+	CAPTURE(expectedProperty);
+	REQUIRE(contains(preJS, expectedProperty));
+}
+
+TEST_CASE("Class with enum", "[class]") {
+	std::string className = "myFreshClass";
+	EmbindProxy::Class c(className, className);
+
+	std::string enumName = "MyEnum";
+	std::string fullyQualifiedName = className + "::" + enumName;
+	EmbindProxy::Enum e(enumName, fullyQualifiedName);
+	std::string valueName = "Hi";
+	e.addValue(valueName);
+	c.addEnum(e);
+
+	using TestUtil::contains;
+	for (std::string const& expectedContains :
+	     {fmt::format(R"(em::class_<{className}>("{className}");)",
+	                  fmt::arg("className", className)),
+	      fmt::format(R"(em::enum_<{fullyQualifiedName}>("{globalEnumName}"))",
+	                  fmt::arg("fullyQualifiedName", fullyQualifiedName),
+	                  fmt::arg("globalEnumName", className + "_" + enumName)),
+	      fmt::format(R"(.value("{valueName}", {fullyQualifiedValueName});)",
+	                  fmt::arg("fullyQualifiedValueName",
+	                           fullyQualifiedName + "::" + valueName),
+	                  fmt::arg("valueName", valueName))}) {
+		auto embind = c.getEmbind();
+		CAPTURE(embind);
+		CAPTURE(expectedContains);
+		REQUIRE(TestUtil::contains(embind, expectedContains));
+	}
+}
 

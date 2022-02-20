@@ -45,17 +45,27 @@ std::string getModuleDeclaration(std::deque<std::string> const& path) {
 	return decl += " =";
 }
 
+std::string joinDeletions(std::vector<std::string> const& deletions) {
+	std::string joined;
+	for (auto const& d : deletions) {
+		joined += fmt::format("delete Module['{}'];\n", d);
+	}
+	return joined;
+}
+
 }    // namespace
 
 std::string Module::getPreJS() const {
+	std::vector<std::string> namesToDelete;
+
 	// Move things into classes that are not supported in Embind
-	std::string preJS =
-	    Helpers::Embind::joinGlobalPreJS(m_namePrefix, m_classes);
+	std::string preJS = Helpers::Embind::joinGlobalPreJS(
+	    m_namePrefix, m_classes, namesToDelete);
 
 	if (m_path.empty()) {
 		// The rest are renaming things into their namespace
 		// For the global there are no renames
-		return preJS;
+		return preJS + "\n" + joinDeletions(namesToDelete);
 	}
 
 	using namespace Helpers::Embind;
@@ -67,12 +77,18 @@ std::string Module::getPreJS() const {
 {attributes}
 {classes}
 }};
+
 )",
 	    fmt::arg("moduleDeclaration", getModuleDeclaration(m_path)),
-	    fmt::arg("functions", joinPreJS(m_namePrefix, m_functions)),
-	    fmt::arg("enums", joinPreJS(m_namePrefix, m_enums)),
-	    fmt::arg("attributes", joinPreJS(m_namePrefix, m_attributes)),
-	    fmt::arg("classes", joinPreJS(m_namePrefix, m_classes)));
+	    fmt::arg("functions",
+	             joinPreJS(m_namePrefix, m_functions, namesToDelete)),
+	    fmt::arg("enums", joinPreJS(m_namePrefix, m_enums, namesToDelete)),
+	    fmt::arg("attributes",
+	             joinPreJS(m_namePrefix, m_attributes, namesToDelete)),
+	    fmt::arg("classes", joinPreJS(m_namePrefix, m_classes, namesToDelete)));
+
+	// Remove all the previous names
+	preJS += joinDeletions(namesToDelete);
 
 	return preJS;
 }

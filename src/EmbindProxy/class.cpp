@@ -65,23 +65,23 @@ std::string Class::getEmbind(std::string const& namePrefix) const {
 			// Need to add class prefix to nested enums
 			// i.e ClassName_Enum
 			// or MyNamespace_ClassName_Enum
-			out += fmt::format(
-			    "{};\n", e.getEmbind(getClassNamePrefix(namePrefix, m_name)));
+			out += e.getEmbind(getClassNamePrefix(namePrefix, m_name));
 		}
-	}
-
-	// Remove the trailing endlines
-	while (!out.empty() && out.back() == '\n') {
-		out.pop_back();
 	}
 
 	return out;
 }
 
-std::string Class::getGlobalPreJS(std::string const& namePrefix) const {
+std::string
+Class::getGlobalPreJS(std::string const& namePrefix,
+                      std::vector<std::string>& namesToDelete) const {
 	// Expects to be injected where necessary
 	std::string preJS;
 	for (auto const& e : m_enums) {
+		// Will no longer need the old name
+		namesToDelete.push_back(
+		    e.createName(getClassNamePrefix(namePrefix, m_name)));
+
 		// Rename enums that are declared within the class
 		// Since this class will then be moved to it's correct namespace
 		// The renamed enum will follow
@@ -91,20 +91,23 @@ Module['{globalName}']['{enumName}'] = Module['{globalEnumName}'];
 )",
 		    fmt::arg("globalName", createName(namePrefix)),
 		    fmt::arg("enumName", e.getName()),
-		    fmt::arg("globalEnumName",
-		             e.createName(getClassNamePrefix(namePrefix, m_name))));
+		    fmt::arg("globalEnumName", namesToDelete.back()));
 	}
 	return preJS;
 }
 
-std::string Class::getPreJS(std::string const& namePrefix) const {
+std::string Class::getPreJS(std::string const& namePrefix,
+                            std::vector<std::string>& namesToDelete) const {
+	// Will no longer need the old name
+	namesToDelete.push_back(createName(namePrefix));
+
 	// Renaming the class
 	// Expects to be injected where necessary
 	return fmt::format(R"(
 {baseName}: Module['{globalName}'],
 )",
 	                   fmt::arg("baseName", m_name),
-	                   fmt::arg("globalName", createName(namePrefix)));
+	                   fmt::arg("globalName", namesToDelete.back()));
 }
 
 std::string Class::createName(std::string const& namePrefix) const {

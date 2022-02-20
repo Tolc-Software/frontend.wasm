@@ -1,6 +1,7 @@
 #include "EmbindProxy/attribute.hpp"
 #include <fmt/format.h>
 #include <string>
+#include <vector>
 
 namespace EmbindProxy {
 
@@ -14,14 +15,18 @@ std::string Attribute::getEmbind(std::string const& namePrefix) const {
 	                   fmt::arg("fullyQualifiedName", m_fullyQualifiedName));
 }
 
-std::string Attribute::getPreJS(std::string const& namePrefix) const {
+std::string Attribute::getPreJS(std::string const& namePrefix,
+                                std::vector<std::string>& namesToDelete) const {
+	// Will no longer need the old name
+	namesToDelete.push_back(createName(namePrefix));
+
 	// Renaming the function
 	// Expects to be injected where necessary
 	return fmt::format(R"(
 {baseName}: Module['{globalName}'],
 )",
 	                   fmt::arg("baseName", m_name),
-	                   fmt::arg("globalName", createName(namePrefix)));
+	                   fmt::arg("globalName", namesToDelete.back()));
 }
 
 std::string Attribute::createName(std::string const& namePrefix) const {

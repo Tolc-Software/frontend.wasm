@@ -18,7 +18,8 @@ public:
 	*/
 	std::string getEmbind(std::string const& namePrefix = "") const;
 
-	std::string getPreJS(std::string const& namePrefix = "") const;
+	std::string getPreJS(std::string const& namePrefix,
+	                     std::vector<std::string>& namesToDelete) const;
 
 	/**
 	* Adds an argument name.

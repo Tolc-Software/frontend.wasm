@@ -74,9 +74,12 @@ TEST_CASE(
     "[function]") {
 	EmbindProxy::Function f("f", "MyNamespace::f");
 
-	auto preJS = f.getPreJS("MyNamespace_");
+	std::vector<std::string> previousNames;
+	auto preJS = f.getPreJS("MyNamespace_", previousNames);
 	CAPTURE(preJS);
 
 	// The function bind
 	REQUIRE(TestUtil::contains(preJS, R"(f: Module['MyNamespace_f'],)"));
+	REQUIRE(previousNames.size() == 1);
+	REQUIRE(previousNames.back() == "MyNamespace_f");
 }
