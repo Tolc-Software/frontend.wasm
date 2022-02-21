@@ -1,3 +1,4 @@
+#include "TestStage/paths.hpp"
 #include <filesystem>
 
 namespace TestStage {

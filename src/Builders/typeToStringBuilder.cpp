@@ -107,14 +107,6 @@ void reverseAndAdd(std::vector<IR::Type> const& toReverse,
 	}
 }
 
-std::string extractArraySize(std::string arr) {
-	// std::array<int, 3> => std::array<int, 3
-	arr = Helpers::trimRight(arr, '>');
-
-	// std::array<int, 3 => 3
-	return Helpers::extractRightUntil(arr, ' ');
-}
-
 std::string toString(IR::Type::Container const& type,
                      std::string const& separator) {
 	// Start with the base container
@@ -151,17 +143,11 @@ std::string toString(IR::Type::Container const& type,
 		        [&typeString](IR::Type::Value type) {
 			        typeString.push_back(toString(type));
 		        },
-		        [&typeString, &typesToStringify, &current, &separator](
-		            IR::Type::Container type) {
+		        [&typeString, &typesToStringify](IR::Type::Container type) {
 			        // Some container type should not be entered (such as Allocator etc.)
 			        // They are usually hidden from the user
 			        if (auto container = toString(type.m_container);
 			            !container.empty()) {
-				        if (type.m_container == IR::ContainerType::Array) {
-					        container +=
-					            separator +
-					            extractArraySize(current.m_representation);
-				        }
 				        typeString.push_back(container);
 				        reverseAndAdd(type.m_containedTypes, typesToStringify);
 			        }

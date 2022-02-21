@@ -26,10 +26,4 @@ std::string getSeparatedTypeString(std::vector<IR::Type> const& parameters,
 * std::map<int, double> -> "int, double"
 */
 std::string getTemplateParameters(IR::Type const& type);
-
-/**
-* std::array<int, 3> -> "3"
-* std::map<int, double> -> ""
-*/
-std::string extractArraySize(std::string arr);
 }    // namespace Builders

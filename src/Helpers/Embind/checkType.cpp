@@ -73,7 +73,7 @@ std::string addElementsIfNecessary(IR::Type::Container const& c,
 	std::string elements;
 	if (c.m_container == IR::ContainerType::Array) {
 		for (int i = 0;
-		     i < std::stoi(Builders::extractArraySize(representation));
+		     i < std::stoi(c.m_containedTypes.back().m_representation);
 		     ++i) {
 			// See https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html#value-types
 			elements +=
