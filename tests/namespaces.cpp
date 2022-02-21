@@ -35,15 +35,15 @@ int complexFunction() {
 
 )";
 
-	auto pythonTestCode = fmt::format(R"(
-result = {moduleName}.MyLib.complexFunction()
-self.assertEqual(result, 5)
+	auto jsTestCode = R"(
+expect(m.MyLib.complexFunction()).toBe(5);
 
-lifeProTips = {moduleName}.MyLib.We.Are.Going.Pretty.Deep.meaningOfLife()
-self.assertEqual(lifeProTips, "42")
-)",
-	                                  fmt::arg("moduleName", moduleName));
+// Namespaces can be nested arbitrarily
+expect(m.MyLib.We.Are.Going.Pretty.Deep.meaningOfLife()).toBe('42');
+)";
 
-	auto errorCode = stage.runEmbindTest(cppCode, pythonTestCode, moduleName);
+	auto errorCode = stage.runEmbindTest(cppCode, jsTestCode, moduleName);
 	REQUIRE(errorCode == 0);
+
+	stage.exportAsExample("Namespaces");
 }

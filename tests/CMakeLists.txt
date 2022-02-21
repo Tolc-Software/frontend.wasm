@@ -108,15 +108,13 @@ foreach(
   globalVariables.cpp
   # lists.cpp
   maps.cpp
-  # memberVariables.cpp
   namespaceRenaming.cpp
-  # namespaceSameAsModule.cpp
-  # namespaces.cpp
+  namespaces.cpp
   # optionals.cpp
   # overloadedFunctions.cpp
   pairs.cpp
   # sets.cpp
-  # smartPointers.cpp
+  smartPointers.cpp
   # templates.cpp
   tuples.cpp
   # unordered_maps.cpp

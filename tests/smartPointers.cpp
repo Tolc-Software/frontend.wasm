@@ -24,11 +24,11 @@ TEST_CASE("Smart pointers of custom types work", "[smartPointers]") {
 #include <memory>
 
 struct Example {
-	int m_hi = 5;
+	int m_value = 5;
 };
 
 struct ExampleShared {
-	int m_hi = 10;
+	int m_value = 10;
 };
 
 std::unique_ptr<Example> create_unique() {
@@ -40,15 +40,23 @@ std::shared_ptr<ExampleShared> create_shared() {
 }
 )";
 
-	auto pythonTestCode = fmt::format(R"(
-u = {moduleName}.create_unique()
-self.assertEqual(u.m_hi, 5)
+	auto jsTestCode = R"(
+// Note: Embind only supports *return*-values of std::unique_ptr
+//       An argument of type std::unique_ptr<T> will return in an error message
 
-s = {moduleName}.create_shared()
-self.assertEqual(s.m_hi, 10)
-)",
-	                                  fmt::arg("moduleName", moduleName));
+// std::unique_ptr just corresponds to the value
+u = m.create_unique();
+expect(u.m_value).toBe(5);
+u.delete();
 
-	auto errorCode = stage.runEmbindTest(cppCode, pythonTestCode, moduleName);
+// std::shared_ptr also just corresponds to the value
+s = m.create_shared();
+expect(s.m_value).toBe(10);
+s.delete();
+)";
+
+	auto errorCode = stage.runEmbindTest(cppCode, jsTestCode, moduleName);
 	REQUIRE(errorCode == 0);
+
+	stage.exportAsExample("Smart Pointers");
 }

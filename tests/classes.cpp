@@ -90,6 +90,7 @@ var withMembers = new m.WithMembers();
 expect(withMembers.i).toBe(5);
 try {
 	withMembers.i = 10;
+	expect(true).toBe(false);
 } catch (err) {
 	expect(err.toString()).toMatch(/BindingError: WithMembers.i is a read-only property/i);
 }
@@ -105,6 +106,7 @@ withFunction.delete();
 var withPrivateFunction = new m.WithPrivateFunction();
 try {
 	withPrivateFunction.multiply(5, 10);
+	expect(true).toBe(false);
 } catch (err) {
 	expect(err.toString()).toMatch(/TypeError: withPrivateFunction.multiply is not a function/i);
 }

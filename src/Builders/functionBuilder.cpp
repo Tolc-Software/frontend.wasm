@@ -18,9 +18,17 @@ buildFunction(IR::Function const& cppFunction,
 	std::set<std::string> includes;
 
 	for (auto const& arg : cppFunction.m_arguments) {
-		Helpers::Embind::checkType(arg.m_type, typeInfo);
+		if (!Helpers::isContainerType(arg.m_type,
+		                              IR::ContainerType::UniquePtr)) {
+			Helpers::Embind::checkType(arg.m_type, typeInfo);
 
-		jsFunction.addArgument(arg.m_type.m_representation, arg.m_name);
+			jsFunction.addArgument(arg.m_type.m_representation, arg.m_name);
+		} else {
+			spdlog::error(
+			    R"(The function {} takes a std::unique_ptr as one of its argument. Webassembly cannot give up ownership of an object to a function. See https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html#unique-ptr for more info.)",
+			    cppFunction.m_representation);
+			return std::nullopt;
+		}
 	}
 
 	Helpers::Embind::checkType(cppFunction.m_returnType, typeInfo);

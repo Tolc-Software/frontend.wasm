@@ -20,8 +20,9 @@ std::string Class::getEmbind(std::string const& namePrefix) const {
 
 	if (m_isManagedByShared) {
 		out += fmt::format(
-		    "\t\t.smart_ptr_constructor(\"{fullyQualifiedName}\", &std::make_shared<{fullyQualifiedName}>\n",
-		    fmt::arg("fullyQualifiedName", m_fullyQualifiedName));
+		    "\t\t.smart_ptr<std::shared_ptr<{fullyQualifiedName}>>(\"{name}\")\n",
+		    fmt::arg("fullyQualifiedName", m_fullyQualifiedName),
+		    fmt::arg("name", createName(namePrefix)));
 	}
 
 	for (auto const& init : m_constructors) {
