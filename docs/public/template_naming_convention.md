@@ -15,14 +15,17 @@ T f(T type) {
 template class Example<int>;
 ```
 
-The specialized `class` `Example<int>` will be available from `python` as `Example_int`:
+The specialized `class` `Example<int>` will be available from `javascript` as `Example_int`:
 
-```python
-import MyLib
+```javascript
+var loadMyLib = require('./build/MyLib');
 
-example = MyLib.Example_int
-# Prints 5
-print(example.f(5))
+loadm().then(MyLib => {
+	example = new MyLib.Example_int();
+	// Prints 5
+	print(example.f(5))
+	example.delete();
+});
 ```
 
 Multiple template parameters are separated with an underscore (_).
@@ -69,6 +72,7 @@ The names are meant to be as predictable as possible. The rules are:
 | double                          | double                   |
 | float                           | float                    |
 | int                             | int                      |
+| Integral                        | Integral literal*        |
 | long double                     | longdouble               |
 | long int                        | longint                  |
 | long long int                   | longlongint              |
@@ -82,3 +86,5 @@ The names are meant to be as predictable as possible. The rules are:
 | unsigned long long int          | unsignedlonglongint      |
 | unsigned short int              | unsignedshortint         |
 | wchar\_t                        | wchart                   |
+
+\* For example the `3` in `MyClass<std::array<int, 3>>` results in `MyClass_array_int_3`.
