@@ -25,8 +25,8 @@ include(${modules}/ConanHelpers.cmake)
 # Create the profile from variables known during configure
 setup_conan_profile(VARIABLE frontend_conan_profile)
 # This helps with packaging
-set(FRONTEND.PY_CONAN_REQUIRES_PACKAGES spdlog/1.8.0 fmt/7.1.3)
-find_conan_packages(REQUIRES ${FRONTEND.PY_CONAN_REQUIRES_PACKAGES} PROFILE
+set(FRONTEND.WASM_CONAN_REQUIRES_PACKAGES spdlog/1.8.0 fmt/7.1.3)
+find_conan_packages(REQUIRES ${FRONTEND.WASM_CONAN_REQUIRES_PACKAGES} PROFILE
                     ${frontend_conan_profile})
 
 include(FetchContent)
@@ -100,6 +100,6 @@ if(PROJECT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
 
   option(ENABLE_PACKAGING "Enables install and packaging via CPack" OFF)
   if(ENABLE_PACKAGING)
-    # add_subdirectory(tools/packaging)
+    add_subdirectory(tools/packaging)
   endif()
 endif()

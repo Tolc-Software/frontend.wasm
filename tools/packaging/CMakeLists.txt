@@ -2,9 +2,9 @@ include_guard()
 
 include(GNUInstallDirs)
 
-# Export the Frontend.py library
-install(TARGETS Frontend.py EXPORT Frontend.pyTargets DESTINATION ${CMAKE_INSTALL_LIBDIR})
-install(EXPORT Frontend.pyTargets DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Frontend.py NAMESPACE Tolc::)
+# Export the Frontend.wasm library
+install(TARGETS Frontend.wasm EXPORT Frontend.wasmTargets DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(EXPORT Frontend.wasmTargets DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Frontend.wasm NAMESPACE Tolc::)
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/include/Frontend
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
@@ -18,20 +18,21 @@ install(
     ${modules}/ConanHelpers.cmake
     ${CMAKE_SOURCE_DIR}/tools/conan_profiles/${CMAKE_SYSTEM_NAME}/clang.in
   DESTINATION
-    ${CMAKE_INSTALL_LIBDIR}/cmake/Frontend.py)
+    ${CMAKE_INSTALL_LIBDIR}/cmake/Frontend.wasm)
 
 # Add License
 install(
   FILES
     ${CMAKE_SOURCE_DIR}/LICENSE.md
+    ${CMAKE_SOURCE_DIR}/COPYRIGHT.md
   DESTINATION
     .)
 
-configure_file(${CMAKE_SOURCE_DIR}/cmake/packaging/Frontend.pyConfig.cmake.in
-  ${CMAKE_CURRENT_BINARY_DIR}/Frontend.pyConfig.cmake @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/cmake/packaging/Frontend.wasmConfig.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/Frontend.wasmConfig.cmake @ONLY)
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/Frontend.pyConfig.cmake
-          DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Frontend.py)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/Frontend.wasmConfig.cmake
+          DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Frontend.wasm)
 
 # Export IR
 install(TARGETS IR EXPORT IRTargets PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/IR)
