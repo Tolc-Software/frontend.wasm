@@ -29,7 +29,7 @@ Note that any restriction this poses only applies to the public interface of you
 | Specialized class template          | Class***                       |
 | Specialized function template       | Function****                   |
 
-\* Will try to match arguments to types provided.
+\* Changes the name of the function based on the arguments to avoid clashes.
 
 \*\* No direct translation to `javascript`. Will not emit warning.
 
@@ -57,19 +57,21 @@ Note that any restriction this poses only applies to the public interface of you
 | std::shared_ptr                 | ???                                                               |
 | std::stack                      | Not converted                                                     |
 | std::tuple                      | ???                                                               |
-| std::unique_ptr                 | ???                                                               |
-| std::shared_ptr                 | ???                                                               |
+| std::unique_ptr                 | Value**                                                           |
+| std::shared_ptr                 | Value                                                             |
 | std::unordered\_map             | ???                                                               |
 | std::unordered\_multimap        | Not converted                                                     |
 | std::unordered\_multiset        | Not converted                                                     |
 | std::unordered\_set             | ???                                                               |
 | std::valarray                   | ???                                                               |
 | std::variant                    | ???                                                               |
-| std::vector                     | Vector Object**                                                   |
+| std::vector                     | Vector Object***                                                  |
 
 \* Converted via the [`register_map`](https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html#built-in-type-conversions) function (behaves like a `Object` in `javascript`).
 
-\*\* Converted via the [`register_vector`](https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html#built-in-type-conversions) function (behaves like a `Object` in `javascript`).
+\*\* Note that arguments of type `unique_ptr<T>` are not supported. This behaviour is the same as in `python`. For more info see [here](https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html#unique-ptr).
+
+\*\*\* Converted via the [`register_vector`](https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html#built-in-type-conversions) function (behaves like a `Object` in `javascript`).
 
 
 | C++ builtin type           | Wasm translation                                                 |

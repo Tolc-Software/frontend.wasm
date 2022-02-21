@@ -1,10 +1,10 @@
 # Test overview #
 
-`frontend.py` is a library built on top of libraries. Therefore the integration testing needs some setup. This document tries to explain the process.
+`frontend.wasm` is a library built on top of libraries. Therefore the integration testing needs some setup. This document tries to explain the process.
 
 ## Understanding stages ##
 
-Since `frontend.em` is a high level library focusing on creating buildable `pybind11` modules, the integration tests need a realistic environment. The tests therefore uses the notion of a `stage`, which is a temporary copy of some provided project. To create a `stage`, you need to provide a `base stage` for it to inherit files from. This is usually located in `tests/testStage`, and the generated stages will be created at `tests/testStage/stages`.
+Since `frontend.em` is a high level library focusing on creating buildable `embind` modules, the integration tests need a realistic environment. The tests therefore uses the notion of a `stage`, which is a temporary copy of some provided project. To create a `stage`, you need to provide a `base stage` for it to inherit files from. This is usually located in `tests/testStage`, and the generated stages will be created at `tests/testStage/stages`.
 
 When a stage is built you can:
 
@@ -35,6 +35,4 @@ The `TestUtil` library provides `EmbindStage` which extends a normal `stage`, an
 
 ## Architecture ##
 
-Typically an integration test follows the flow described below. A `stage` is created from the `base stage` at `tests/testStage/`. A header file containing the `C++` code we want to translate into `emthon` is added to the `stage`. `Tolc::Parser` is used to produce `Tolc::IR`, that is then fed into our `frontend.em`. The frontend creates a set of `C++` files containing `pybind11` code and the `Pybind11Stage` ensures that our header is included. We then use `CMake` to generate and build our `pybind11` module. A `python` unittest is placed next to it in our `build` directory, and the `python` builtin test suite is called. As all other test suites, the `python` `unittest` module returns a non zero exit status on failure, so this is typically checked.
-
-![Test overview](../docs/Frontend.pyTest.png "Test overview")
+Typically an integration test follows the flow described below. A `stage` is created from the `base stage` at `tests/testStage/`. A header file containing the `C++` code we want to translate into `emthon` is added to the `stage`. `Tolc::Parser` is used to produce `Tolc::IR`, that is then fed into our `frontend.em`. The frontend creates a set of `C++` files containing `embind` code and the `EmbindStage` ensures that our header is included. We then use `CMake` to generate and build our `embind` module. A `javascript` unittest based on `jest` is placed next to it in our `build` directory. As all other test suites, the `javascript` `jest` module returns a non zero exit status on failure, so this is typically checked.

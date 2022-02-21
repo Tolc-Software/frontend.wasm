@@ -98,6 +98,7 @@ var withMembers = new m.WithMembers();
 expect(withMembers.i).toBe(5);
 try {
 	withMembers.i = 10;
+	expect(true).toBe(false);
 } catch (err) {
 	expect(err.toString()).toMatch(/BindingError: WithMembers.i is a read-only property/i);
 }
@@ -113,19 +114,20 @@ withFunction.delete();
 var withPrivateFunction = new m.WithPrivateFunction();
 try {
 	withPrivateFunction.multiply(5, 10);
+	expect(true).toBe(false);
 } catch (err) {
 	expect(err.toString()).toMatch(/TypeError: withPrivateFunction.multiply is not a function/i);
 }
 withPrivateFunction.delete();
 
 // Classes can be found under their namespace
-var nested = new m.MyNamespace_Nested();
+var nested = new m.MyNamespace.Nested();
 expect(nested.i).toBe(42);
 nested.delete();
 
 // Ok to nest Enums within classes
 var withEnum = new m.WithEnum();
-expect(withEnum.i).toBe(m.WithEnum_Instrument.Flute);
+expect(withEnum.i).toBe(m.WithEnum.Instrument.Flute);
 withEnum.delete();
 
 ```
@@ -282,6 +284,92 @@ expect(m.charPtr).toBe("Hello world");
 
 // Globals within namespaces work
 expect(m.MyNamespace.i).toBe(5);
+
+```
+
+
+## Namespaces ##
+
+
+```cpp
+
+#include <string>
+
+namespace MyLib {
+
+int complexFunction() {
+	return 5;
+}
+
+	namespace We {
+		namespace Are {
+			namespace Going {
+				namespace Pretty {
+					namespace Deep {
+						std::string meaningOfLife() {
+							return "42";
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+
+```
+
+
+```javascript
+
+expect(m.MyLib.complexFunction()).toBe(5);
+
+// Namespaces can be nested arbitrarily
+expect(m.MyLib.We.Are.Going.Pretty.Deep.meaningOfLife()).toBe('42');
+
+```
+
+
+## Smart Pointers ##
+
+
+```cpp
+
+#include <memory>
+
+struct Example {
+	int m_value = 5;
+};
+
+struct ExampleShared {
+	int m_value = 10;
+};
+
+std::unique_ptr<Example> create_unique() {
+	return std::make_unique<Example>();
+}
+
+std::shared_ptr<ExampleShared> create_shared() {
+	return std::make_shared<ExampleShared>();
+}
+
+```
+
+
+```javascript
+
+// Note: Embind only supports *return*-values of std::unique_ptr
+//       An argument of type std::unique_ptr<T> will return in an error message
+
+// std::unique_ptr just corresponds to the value
+u = m.create_unique();
+expect(u.m_value).toBe(5);
+u.delete();
+
+// std::shared_ptr also just corresponds to the value
+s = m.create_shared();
+expect(s.m_value).toBe(10);
+s.delete();
 
 ```
 
