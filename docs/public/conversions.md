@@ -1,4 +1,4 @@
-# C++ to python conversions #
+# C++ to WebAssembly conversions #
 
 This page shows what is automatically translated and to what.
 On the left is the `C++` and to the right what the corresponding interface in `javascript` will be.
@@ -7,7 +7,7 @@ Note that any restriction this poses only applies to the public interface of you
 
 ## Conversion tables ##
 
-| C++                                 | Wasm translation               |
+| C++                                 | WebAssembly translation        |
 |:----------------------------------- |:------------------------------ |
 | Namespace                           | Object namespace               |
 | Nested namespace                    | Nested object namespace        |
@@ -37,7 +37,7 @@ Note that any restriction this poses only applies to the public interface of you
 
 \*\*\*\* Functions with different template arguments will behave as overloaded functions.
 
-| C++ Standard library class      | Wasm translation                                                  |
+| C++ Standard library class      | WebAssembly translation                                           |
 |:------------------------------- |:----------------------------------------------------------------- |
 | std::array                      | array                                                             |
 | std::complex                    | ???                                                               |
@@ -69,12 +69,12 @@ Note that any restriction this poses only applies to the public interface of you
 
 \* Converted via the [`register_map`](https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html#built-in-type-conversions) function (behaves like a `Object` in `javascript`).
 
-\*\* Note that arguments of type `unique_ptr<T>` are not supported. This behaviour is the same as in `python`. For more info see [here](https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html#unique-ptr).
+\*\* Note that arguments of type `unique_ptr<T>` are not supported. For more info see [here](https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html#unique-ptr).
 
 \*\*\* Converted via the [`register_vector`](https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html#built-in-type-conversions) function (behaves like a `Object` in `javascript`).
 
 
-| C++ builtin type           | Wasm translation                                                 |
+| C++ builtin type           | WebAssembly translation                                          |
 |:-------------------------- |:---------------------------------------------------------------- |
 | bool                       | true || false                                                    |
 | char                       | Number                                                           |
