@@ -14,6 +14,9 @@ Requirements:
 * Emscripten (only for tests)
 * conan
 * clang
+* For the tests:
+  * [Emscripten](https://emscripten.org/docs/getting_started/downloads.html) (Compile integration tests)
+  * [npm & node](https://nodejs.org/en/download/) (Used to run parts of integration tests with [Jest](https://jestjs.io/))
 
 Configure the project:
 
