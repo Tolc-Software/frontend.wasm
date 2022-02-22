@@ -57,6 +57,7 @@ IR::Type getType(IR::BaseType base = IR::BaseType::Int) {
 	t.m_type = v;
 	t.m_isConst = false;
 	t.m_isReference = false;
+	t.m_isStatic = false;
 	t.m_numPointers = 0;
 	t.m_representation = getAsString(base);
 	return t;

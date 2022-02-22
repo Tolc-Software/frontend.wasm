@@ -23,6 +23,7 @@ tools/conan_profiles/Windows/clang
 !COPYRIGHT.md
 !LICENSE.md
 !README.md
+!VERSION.in
 
 # Directories
 !.github
