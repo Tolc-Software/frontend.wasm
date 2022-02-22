@@ -24,8 +24,8 @@ TEST_CASE("Class with vector in member function gives the correct register",
 	s.m_public.m_functions.push_back(constructor);
 
 	EmbindProxy::TypeInfo typeInfo;
-	auto c = Builders::buildClass(s, typeInfo).value();
-	REQUIRE(c.getName() == s.m_name);
+	auto c = Builders::buildClass(s, typeInfo);
+	REQUIRE(c.has_value());
 	REQUIRE(typeInfo.m_registerCommands.size() == 2);
 	auto& regs = typeInfo.m_registerCommands;
 	for (auto const& r : {R"(em::register_vector<int>("vector_int"))",
@@ -152,8 +152,8 @@ TEST_CASE("Class with vector in constructor gives the correct register command",
 	constructor.m_arguments.push_back({"myVar", arg});
 	s.m_public.m_functions.push_back(constructor);
 	EmbindProxy::TypeInfo typeInfo;
-	auto c = Builders::buildClass(s, typeInfo).value();
-	REQUIRE(c.getName() == s.m_name);
+	auto c = Builders::buildClass(s, typeInfo);
+	REQUIRE(c.has_value());
 	auto& regs = typeInfo.m_registerCommands;
 	REQUIRE(regs.size() == 1);
 	REQUIRE(regs.find(R"(em::register_vector<int>("vector_int"))") !=

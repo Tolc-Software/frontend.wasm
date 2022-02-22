@@ -30,7 +30,7 @@ function(get_emscripten)
   
   set(sdkCommand ./emsdk)
   if (${CMAKE_HOST_SYSTEM_NAME} STREQUAL Windows)
-	set(sdkCommand emsdk)
+	set(sdkCommand emsdk.bat)
   endif()
   
   # Installs the Emscripten compiler

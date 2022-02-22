@@ -12,6 +12,37 @@
 #include <string>
 #include <vector>
 
+namespace {
+// Platform independent path to jest "executable"
+std::string makePathToJestBin() {
+	using p = std::filesystem::path;
+	return (p("node_modules") / p("jest") / p("bin") / p("jest.js")).string();
+}
+
+std::string makeValidFileName(std::string s) {
+	std::replace(s.begin(), s.end(), ' ', '_');
+	std::replace(s.begin(), s.end(), ':', '_');
+	return s;
+}
+
+std::string
+joinExports(std::vector<TestUtil::EmbindStage::Code> const& exports) {
+	std::string content = "";
+	for (auto const& [language, code] : exports) {
+		content += fmt::format(R"(
+```{language}
+{code}
+```
+
+)",
+		                       fmt::arg("language", language),
+		                       fmt::arg("code", code));
+	}
+	return content;
+}
+
+}    // namespace
+
 namespace TestUtil {
 
 EmbindStage::EmbindStage(std::filesystem::path const& baseStage,
@@ -53,33 +84,18 @@ int EmbindStage::runEmbindTest(std::string const& cppCode,
 	return 1;
 }
 
-namespace {
-std::string makeValidFileName(std::string s) {
-	std::replace(s.begin(), s.end(), ' ', '_');
-	std::replace(s.begin(), s.end(), ':', '_');
-	return s;
-}
-}    // namespace
-
 void EmbindStage::exportAsExample(std::string const& name) {
 	std::filesystem::path fileName =
 	    TestStage::getExamplesPath() /
 	    fmt::format("{}.md", makeValidFileName(name));
-	std::string content = fmt::format(R"(
-## {} ##
+	std::string content =
+	    fmt::format(R"(
+## {exampleName} ##
 
+{exampleCode}
 )",
-	                                  name);
-	for (auto const& [language, code] : m_exports) {
-		content += fmt::format(R"(
-```{language}
-{code}
-```
-
-)",
-		                       fmt::arg("language", language),
-		                       fmt::arg("code", code));
-	}
+	                fmt::arg("exampleName", name),
+	                fmt::arg("exampleCode", joinExports(m_exports)));
 
 	std::ofstream example(fileName);
 	example << content;
@@ -117,7 +133,7 @@ int EmbindStage::runEmbindUnittest(std::string const& testBody) {
 
 	addJestUnitTest(testBody);
 
-	return m_stage.runCommand("./node_modules/jest/bin/jest.js");
+	return m_stage.runCommand("node " + makePathToJestBin());
 }
 
 void EmbindStage::addJestUnitTest(std::string const& body) {

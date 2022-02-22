@@ -39,5 +39,5 @@ set_target_properties(
   ${target_name}
   PROPERTIES
     LINK_FLAGS
-    "-s MODULARIZE=1 -s 'EXPORT_NAME=\"loadm\"' --pre-js ${CMAKE_CURRENT_LIST_DIR}/src/pre.js"
+    "-s MODULARIZE=1 -s EXPORT_NAME=\"loadm\" --pre-js ${CMAKE_CURRENT_LIST_DIR}/src/pre.js"
 )
