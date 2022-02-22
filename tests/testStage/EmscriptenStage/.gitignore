@@ -8,12 +8,11 @@
 # Except these
 # Files
 !.gitignore
-!configureAndBuild.bat
 !CMakeLists.txt
-!README.md
+!configureAndBuild.bat
+!defaultModule.test.js
 !package.json
 
 # Directories
 !cmake
 !src
-!EmscriptenStage
