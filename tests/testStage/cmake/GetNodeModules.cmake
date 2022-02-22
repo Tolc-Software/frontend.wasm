@@ -4,8 +4,7 @@ include_guard()
 function(get_node_modules)
   # Install
   execute_process(COMMAND npm install
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-    OUTPUT_FILE ${PROJECT_SOURCE_DIR}/node_modules)
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
   # node_modules
   file(COPY

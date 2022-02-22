@@ -3,6 +3,8 @@
 #include <string_view>
 #include <vector>
 
+namespace em = emscripten;
+
 class MyClass {
 public:
 	MyClass(int x, std::string y) : x(x), y(y) {}
