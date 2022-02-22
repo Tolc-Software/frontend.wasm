@@ -11,6 +11,7 @@
 !configureAndBuild.bat
 !CMakeLists.txt
 !README.md
+!package.json	
 
 # Directories
 !cmake

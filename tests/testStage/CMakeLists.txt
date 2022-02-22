@@ -13,7 +13,7 @@ include(cmake/GetEmscripten.cmake)
 include(cmake/GetNodeModules.cmake)
 
 if(NOT emsdk_SOURCE_DIR)
-  get_emscripten(VERSION 2.9.0)
+  get_emscripten(VERSION 3.1.3)
 endif()
 
 # Download and copy over to EmscriptenStage
@@ -29,5 +29,7 @@ include(cmake/TargetName.cmake)
 include(cmake/Sources.cmake)
 
 # Create the emscripten module
+# This is only for the local test files in this directory.
+# The EmscriptenStage uses the Emscripten Toolchain file instead
 add_emscripten_library(TARGET ${target_name} SOURCES ${sources} EMSDK_PATH
                        ${emsdk_SOURCE_DIR})
