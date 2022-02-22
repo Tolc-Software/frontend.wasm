@@ -20,7 +20,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       run: |
-        gh auth login --with-token "${GITHUB_TOKEN}"
+        gh auth login --with-token "$GITHUB_TOKEN"
         echo "Pushing to the latest tag"
         gh release create latest --title "Latest release from main" --notes "This release gets updated on each commit to main" || true
         gh release upload latest "README.md#ReadmeAndStuff.md" --clobber
