@@ -83,6 +83,7 @@ jobs:
         mv Frontend.wasm-Linux-main.tar.xz Frontend.wasm-Linux-${version}.tar.xz
 
         echo "Making sure the release ${version} is online"
+        test -f docs/ReleaseNotes/${version}.md
         gh release create "${version}" --title "${version}" --notes-file "docs/ReleaseNotes/${version}.md" || true
         gh release upload "${version}" Frontend.wasm-Linux-${version}.tar.xz || true
 

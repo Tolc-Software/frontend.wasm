@@ -12,6 +12,7 @@
 !configureAndBuild.bat
 !defaultModule.test.js
 !package.json
+!package-lock.json
 
 # Directories
 !cmake

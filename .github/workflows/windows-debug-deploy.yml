@@ -54,7 +54,7 @@ jobs:
       shell: cmd
       run: |
         call "%VCVARS%"
-        cmake -S. -Bbuild -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_C_COMPILER=clang-cl -DENABLE_PACKAGING=ON -DCMAKE_BUILD_TYPE=Debug -DCPACK_PACKAGE_FILE_NAME=frontend -G Ninja -DCPACK_PACKAGE_FILE_NAME=frontend.wasm
+        cmake -S. -Bbuild -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_C_COMPILER=clang-cl -DENABLE_PACKAGING=ON -DCMAKE_BUILD_TYPE=Debug -DCPACK_PACKAGE_FILE_NAME=frontend.wasm -G Ninja
 
     - name: Build
       working-directory: C:\Repo
@@ -90,6 +90,7 @@ jobs:
         mv Frontend.wasm-Windows-main-Debug.tar.xz Frontend.wasm-Windows-${version}-Debug.tar.xz
 
         echo "Making sure the release ${version} is online"
+        test -f docs/ReleaseNotes/${version}.md
         gh release create "${version}" --title "${version}" --notes-file "docs/ReleaseNotes/${version}.md" || true
         gh release upload "${version}" Frontend.wasm-Windows-${version}-Debug.tar.xz || true
 

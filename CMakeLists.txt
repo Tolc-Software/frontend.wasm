@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 project(
   Frontend.wasm
-  VERSION 0.2.0
+  VERSION 0.3.0
   LANGUAGES CXX)
 
 configure_file(docs/ReleaseNotes/version.in
@@ -28,7 +28,7 @@ include(${modules}/ConanHelpers.cmake)
 # Create the profile from variables known during configure
 setup_conan_profile(VARIABLE frontend_conan_profile)
 # This helps with packaging
-set(FRONTEND.WASM_CONAN_REQUIRES_PACKAGES spdlog/1.8.0 fmt/7.1.3)
+set(FRONTEND.WASM_CONAN_REQUIRES_PACKAGES spdlog/1.9.2 fmt/8.1.1)
 find_conan_packages(REQUIRES ${FRONTEND.WASM_CONAN_REQUIRES_PACKAGES} PROFILE
                     ${frontend_conan_profile})
 

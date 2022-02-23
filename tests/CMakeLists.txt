@@ -1,12 +1,7 @@
 include_guard()
 
 include(${modules}/GetParser.cmake)
-
-set(parser_asset_name "Parser-${CMAKE_SYSTEM_NAME}-main")
-if(${CMAKE_HOST_SYSTEM_NAME} STREQUAL Windows)
-  set(parser_asset_name "${parser_asset_name}-${CMAKE_BUILD_TYPE}")
-endif()
-get_parser(ASSET_NAME ${parser_asset_name}.tar.xz)
+get_parser(VERSION v0.2.0)
 
 # Set the include path for the system library in the variable
 # We are using the standard library shipped
@@ -55,11 +50,14 @@ configure_file(
   TestUtil/include/TestStage/paths.cpp.in
   ${CMAKE_CURRENT_LIST_DIR}/TestUtil/include/TestStage/paths.cpp @ONLY)
 
-
 # Everything put in TestUtil/include is available
-add_library(TestUtil TestUtil/include/TestUtil/embindStage.cpp TestUtil/include/TestUtil/parse.cpp TestUtil/include/TestStage/paths.cpp)
+add_library(
+  TestUtil
+  TestUtil/include/TestUtil/embindStage.cpp TestUtil/include/TestUtil/parse.cpp
+  TestUtil/include/TestStage/paths.cpp)
 target_include_directories(TestUtil PUBLIC TestUtil/include)
-target_link_libraries(TestUtil PRIVATE Tolc::Frontend.wasm Tolc::Parser Catch2::Catch2 Tolc::Stage)
+target_link_libraries(TestUtil PRIVATE Tolc::Frontend.wasm Tolc::Parser
+                                       Catch2::Catch2 Tolc::Stage)
 target_link_libraries(TestUtil PUBLIC IR::IR)
 find_package(fmt REQUIRED)
 
@@ -77,9 +75,9 @@ endif()
 
 # Before configuring the stage, we have to download node dependencies
 add_test(
-    NAME NpmInstall
-	WORKING_DIRECTORY ${test_stage}
-    COMMAND ${npm_exe} install)
+  NAME NpmInstall
+  WORKING_DIRECTORY ${test_stage}/EmscriptenStage
+  COMMAND ${npm_exe} install)
 set_tests_properties(NpmInstall PROPERTIES FIXTURES_SETUP PreTestStage)
 
 # Create a test fixture for downloading dependencies in the test stage
@@ -88,11 +86,11 @@ add_test(
   WORKING_DIRECTORY ${test_stage}
   COMMAND ${CMAKE_COMMAND} -S. -Bbuild -GNinja)
 set_tests_properties(ConfigureTestStage PROPERTIES FIXTURES_SETUP TestStage)
-set_tests_properties(ConfigureTestStage PROPERTIES FIXTURES_REQUIRED PreTestStage)
+set_tests_properties(ConfigureTestStage PROPERTIES FIXTURES_REQUIRED
+                                                   PreTestStage)
 
 foreach(
   test
-
   Builders/attributeBuilder.cpp
   Builders/classBuilder.cpp
   Builders/enumBuilder.cpp
@@ -133,9 +131,8 @@ foreach(
   # userDefined.cpp
   # valarrays.cpp
   # variants.cpp
-  vectors.cpp
-  )
-# Ex: EmbindProxy/moduleFile.cpp -> moduleFile
+  vectors.cpp)
+  # Ex: EmbindProxy/moduleFile.cpp -> moduleFile
   get_filename_component(testName ${test} NAME_WLE)
 
   create_catch2_test(

@@ -121,8 +121,10 @@ extractRegisterCommands(IR::Type const& type, EmbindProxy::TypeInfo& typeInfo) {
 	    container && noneOfIsConst(container->m_containedTypes)) {
 		if (auto s = getRegisterString(container->m_container)) {
 			auto typeString = Builders::buildTypeString(type, "_");
-			auto registerCmd = fmt::format(
-			    s.value(), Builders::getTemplateParameters(type), typeString);
+			auto registerCmd =
+			    fmt::format(fmt::runtime(s.value()),
+			                Builders::getTemplateParameters(type),
+			                typeString);
 
 			registerCmd += addElementsIfNecessary(
 			    *container, type.m_representation, typeString, typeInfo);

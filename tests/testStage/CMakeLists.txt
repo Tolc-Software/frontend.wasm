@@ -10,15 +10,10 @@ project(
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include(cmake/GetEmscripten.cmake)
-include(cmake/GetNodeModules.cmake)
 
 if(NOT emsdk_SOURCE_DIR)
   get_emscripten(VERSION 3.1.3)
 endif()
-
-# Download and copy over to EmscriptenStage
-# package.json and node_modules
-get_node_modules()
 
 # Get the variable 'target_name'
 # NOTE: This will be generated for each test

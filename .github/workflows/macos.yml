@@ -80,6 +80,7 @@ jobs:
         mv Frontend.wasm-Darwin-main.tar.xz Frontend.wasm-Darwin-${version}.tar.xz
 
         echo "Making sure the release ${version} is online"
+        test -f docs/ReleaseNotes/${version}.md
         gh release create "${version}" --title "${version}" --notes-file "docs/ReleaseNotes/${version}.md" || true
         gh release upload "${version}" "Frontend.wasm-Darwin-${version}.tar.xz" || true
 
