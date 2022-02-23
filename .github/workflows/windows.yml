@@ -65,7 +65,7 @@ jobs:
       run: |
         call "%VCVARS%"
         cd build
-        ctest --cores 4 --output-on-failure
+        ctest --output-on-failure -j4
 
     - name: Build the release tar.xz package
       if: github.ref == 'refs/heads/main'

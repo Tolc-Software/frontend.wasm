@@ -42,10 +42,14 @@ get_catch2(VERSION v2.13.8)
 # Create a platform independent way of getting the path to the test stage
 set(test_stage ${CMAKE_CURRENT_LIST_DIR}/testStage)
 set(examples_dir ${PROJECT_SOURCE_DIR}/docs/examples)
+set(npm_exe npm)
 if(${CMAKE_HOST_SYSTEM_NAME} STREQUAL Windows)
   # This is to normalize strings relative to how they are used in std::filesystem
   string(REPLACE "/" "\\\\" test_stage ${test_stage})
   string(REPLACE "/" "\\\\" examples_dir ${examples_dir})
+  # On windows, the actual command that will be executed is npm.cmd
+  # https://stackoverflow.com/questions/47224093/ctest-gives-not-run-and-bad-command-although-commands-work-directly
+  set(npm_exe npm.cmd)
 endif()
 configure_file(
   TestUtil/include/TestStage/paths.cpp.in
@@ -71,13 +75,20 @@ if(ENABLE_COVERAGE)
   add_code_coverage_all_targets()
 endif()
 
+# Before configuring the stage, we have to download node dependencies
+add_test(
+    NAME NpmInstall
+	WORKING_DIRECTORY ${test_stage}
+    COMMAND ${npm_exe} install)
+set_tests_properties(NpmInstall PROPERTIES FIXTURES_SETUP PreTestStage)
+
 # Create a test fixture for downloading dependencies in the test stage
-# In this case pybind11
 add_test(
   NAME ConfigureTestStage
   WORKING_DIRECTORY ${test_stage}
   COMMAND ${CMAKE_COMMAND} -S. -Bbuild -GNinja)
 set_tests_properties(ConfigureTestStage PROPERTIES FIXTURES_SETUP TestStage)
+set_tests_properties(ConfigureTestStage PROPERTIES FIXTURES_REQUIRED PreTestStage)
 
 foreach(
   test
