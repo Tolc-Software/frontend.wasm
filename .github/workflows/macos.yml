@@ -49,7 +49,7 @@ jobs:
 
     - name: Configure
       run: |
-        cmake -S. -Bbuild -G Ninja -DCMAKE_CXX_COMPILER="/usr/local/opt/llvm/bin/clang++" -DCMAKE_C_COMPILER="/usr/local/opt/llvm/bin/clang" -DCMAKE_BUILD_TYPE="Release" -DENABLE_TESTING=ON -DENABLE_PACKAGING=ON -DCPACK_PACKAGE_FILE_NAME=Frontend.wasm
+        cmake -S. -Bbuild -G Ninja -DCMAKE_CXX_COMPILER="/usr/local/opt/llvm/bin/clang++" -DCMAKE_C_COMPILER="/usr/local/opt/llvm/bin/clang" -DCMAKE_BUILD_TYPE="Release" -DENABLE_TESTING=ON -DENABLE_PACKAGING=ON -DCPACK_PACKAGE_FILE_NAME=Frontend.wasm-Darwin
 
     - name: Build
       run: cmake --build build -j4
@@ -68,19 +68,13 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       run: |
-        # Move to keep the directory on Github Actions free from filename clashes
-        mv Frontend.wasm.tar.xz Frontend.wasm-Darwin-main.tar.xz
-
         echo "Pushing to the latest tag"
         gh release create latest --title "Latest release from main" --notes "This release gets updated on each commit to main" || true
-        gh release upload latest Frontend.wasm-Darwin-main.tar.xz --clobber
+        gh release upload latest Frontend.wasm-Darwin.tar.xz --clobber
 
         version="$(cat docs/ReleaseNotes/version)"
-        # Move to keep the directory on Github Actions free from filename clashes
-        mv Frontend.wasm-Darwin-main.tar.xz Frontend.wasm-Darwin-${version}.tar.xz
-
         echo "Making sure the release ${version} is online"
         test -f docs/ReleaseNotes/${version}.md
         gh release create "${version}" --title "${version}" --notes-file "docs/ReleaseNotes/${version}.md" || true
-        gh release upload "${version}" "Frontend.wasm-Darwin-${version}.tar.xz" || true
+        gh release upload "${version}" Frontend.wasm-Darwin.tar.xz || true
 
