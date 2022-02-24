@@ -16,7 +16,7 @@ jobs:
     - name: Pull down to C disk
       shell: cmd
       run: |
-        git clone https://Tolc-Software:${{ secrets.ACCESS_TOKEN }}@github.com/Tolc-Software/frontend.py.git C:\Repo
+        git clone https://Tolc-Software:${{ secrets.ACCESS_TOKEN }}@github.com/Tolc-Software/frontend.wasm.git C:\Repo
 
     - uses: actions/setup-node@v2
       with:
