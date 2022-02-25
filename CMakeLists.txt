@@ -42,13 +42,13 @@ FetchContent_MakeAvailable(IRSpecification)
 
 add_library(
   Frontend.wasm
-  src/Builders/attributeBuilder.cpp
-  src/Builders/classBuilder.cpp
-  src/Builders/enumBuilder.cpp
-  src/Builders/functionBuilder.cpp
-  src/Builders/moduleBuilder.cpp
-  src/Builders/moduleFileBuilder.cpp
-  src/Builders/typeToStringBuilder.cpp
+  src/Embind/Builders/attributeBuilder.cpp
+  src/Embind/Builders/classBuilder.cpp
+  src/Embind/Builders/enumBuilder.cpp
+  src/Embind/Builders/functionBuilder.cpp
+  src/Embind/Builders/moduleBuilder.cpp
+  src/Embind/Builders/moduleFileBuilder.cpp
+  src/Embind/Builders/typeToStringBuilder.cpp
   src/Embind/Proxy/attribute.cpp
   src/Embind/Proxy/class.cpp
   src/Embind/Proxy/enum.cpp
@@ -58,10 +58,10 @@ add_library(
   src/Frontend/Wasm/frontend.cpp
   src/Embind/checkType.cpp
   src/Embind/createFunctions.cpp
-  src/Helpers/getOverloadedFunctions.cpp
-  src/Helpers/split.cpp
-  src/Helpers/string.cpp
-  src/Helpers/types.cpp)
+  src/Embind/getOverloadedFunctions.cpp
+  src/Embind/Helpers/split.cpp
+  src/Embind/Helpers/string.cpp
+  src/Embind/Helpers/types.cpp)
 
 add_warnings(TARGET Frontend.wasm)
 add_options(TARGET Frontend.wasm)

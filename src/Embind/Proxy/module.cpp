@@ -1,6 +1,6 @@
 #include "Embind/Proxy/module.hpp"
+#include "Embind/Helpers/split.hpp"
 #include "Embind/joinCalls.hpp"
-#include "Helpers/split.hpp"
 #include <algorithm>
 #include <fmt/format.h>
 #include <numeric>
@@ -94,8 +94,8 @@ std::string Module::getPreJS() const {
 }
 
 Module::Module(std::string const& name, std::string const& qualifiedName)
-    : m_name(name), m_path(Helpers::split(qualifiedName, "::")), m_namePrefix(),
-      m_functions(), m_enums(), m_attributes() {
+    : m_name(name), m_path(Embind::Helpers::split(qualifiedName, "::")),
+      m_namePrefix(), m_functions(), m_enums(), m_attributes() {
 	m_namePrefix = createPrefix(m_path);
 }
 

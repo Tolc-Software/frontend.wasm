@@ -91,15 +91,15 @@ set_tests_properties(ConfigureTestStage PROPERTIES FIXTURES_REQUIRED
 
 foreach(
   test
-  Builders/attributeBuilder.cpp
-  Builders/classBuilder.cpp
-  Builders/enumBuilder.cpp
-  Builders/functionBuilder.cpp
-  Builders/moduleFileBuilder.cpp
-  Builders/typeToStringBuilder.cpp
+  Embind/Builders/attributeBuilder.cpp
+  Embind/Builders/classBuilder.cpp
+  Embind/Builders/enumBuilder.cpp
+  Embind/Builders/functionBuilder.cpp
+  Embind/Builders/moduleFileBuilder.cpp
+  Embind/Builders/typeToStringBuilder.cpp
   Embind/checkType.cpp
-  Helpers/combine.cpp
-  Helpers/string.cpp
+  Embind/Helpers/combine.cpp
+  Embind/Helpers/string.cpp
   Embind/Proxy/attribute.cpp
   Embind/Proxy/class.cpp
   Embind/Proxy/enum.cpp

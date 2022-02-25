@@ -1,8 +1,8 @@
 #include "Embind/checkType.hpp"
-#include "Builders/typeToStringBuilder.hpp"
+#include "Embind/Builders/typeToStringBuilder.hpp"
+#include "Embind/Helpers/types.hpp"
 #include "Embind/Proxy/typeInfo.hpp"
 #include "Embind/createFunctions.hpp"
-#include "Helpers/types.hpp"
 #include <IR/ir.hpp>
 #include <fmt/format.h>
 #include <queue>
@@ -48,7 +48,7 @@ std::optional<std::string> getRegisterString(IR::ContainerType container) {
 		case IR::ContainerType::Variant:
 			spdlog::error(
 			    "Container type {} does not currently have a direct translation via embind. The translation might not work.",
-			    Helpers::toString(container));
+			    Embind::Helpers::toString(container));
 			break;
 
 		case IR::ContainerType::Allocator:
@@ -118,13 +118,13 @@ bool noneOfIsConst(std::vector<IR::Type> const& types) {
 std::optional<std::string>
 extractRegisterCommands(IR::Type const& type,
                         Embind::Proxy::TypeInfo& typeInfo) {
-	if (auto container = Helpers::getContainer(type);
+	if (auto container = Embind::Helpers::getContainer(type);
 	    container && noneOfIsConst(container->m_containedTypes)) {
 		if (auto s = getRegisterString(container->m_container)) {
-			auto typeString = Builders::buildTypeString(type, "_");
+			auto typeString = Embind::Builders::buildTypeString(type, "_");
 			auto registerCmd =
 			    fmt::format(fmt::runtime(s.value()),
-			                Builders::getTemplateParameters(type),
+			                Embind::Builders::getTemplateParameters(type),
 			                typeString);
 
 			registerCmd += addElementsIfNecessary(
@@ -143,7 +143,7 @@ bool isSharedPtr(IR::ContainerType c) {
 std::optional<std::string>
 getFirstUserDefinedRepresentation(std::vector<IR::Type> const& types) {
 	if (!types.empty()) {
-		if (auto userDefined = Helpers::getUserDefined(types[0])) {
+		if (auto userDefined = Embind::Helpers::getUserDefined(types[0])) {
 			return userDefined->m_representation;
 		}
 	}
@@ -151,7 +151,7 @@ getFirstUserDefinedRepresentation(std::vector<IR::Type> const& types) {
 }
 
 std::optional<std::string> extractShared(IR::Type const& type) {
-	if (auto container = Helpers::getContainer(type)) {
+	if (auto container = Embind::Helpers::getContainer(type)) {
 		if (isSharedPtr(container->m_container)) {
 			return getFirstUserDefinedRepresentation(
 			    container->m_containedTypes);
@@ -175,7 +175,7 @@ void checkType(IR::Type const& type, Embind::Proxy::TypeInfo& info) {
 			info.m_classesMarkedShared.insert(sharedClass.value());
 		}
 
-		if (auto container = Helpers::getContainer(current)) {
+		if (auto container = Embind::Helpers::getContainer(current)) {
 			for (auto const& containedType : container->m_containedTypes) {
 				typesToCheck.push(containedType);
 			}

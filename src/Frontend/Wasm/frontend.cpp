@@ -1,5 +1,5 @@
 #include "Frontend/Wasm/frontend.hpp"
-#include "Builders/moduleFileBuilder.hpp"
+#include "Embind/Builders/moduleFileBuilder.hpp"
 #include "Embind/Proxy/moduleFile.hpp"
 #include <IR/ir.hpp>
 #include <filesystem>
@@ -13,7 +13,7 @@ std::optional<std::vector<std::pair<std::filesystem::path, std::string>>>
 createModule(IR::Namespace const& rootNamespace,
              std::string const& moduleName) {
 	if (auto maybeModuleFile =
-	        Builders::buildModuleFile(rootNamespace, moduleName)) {
+	        Embind::Builders::buildModuleFile(rootNamespace, moduleName)) {
 		auto& moduleFile = maybeModuleFile.value();
 
 		return std::vector {

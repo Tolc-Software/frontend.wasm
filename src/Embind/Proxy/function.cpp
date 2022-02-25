@@ -1,5 +1,5 @@
 #include "Embind/Proxy/function.hpp"
-#include "Helpers/string.hpp"
+#include "Embind/Helpers/string.hpp"
 #include <algorithm>
 #include <fmt/format.h>
 #include <string>
@@ -115,12 +115,12 @@ std::string Function::getArgumentTypes() const {
 }
 
 std::string Function::getSignature() const {
-	return fmt::format(
-	    R"(({returnType}({namespace}*)({arguments})))",
-	    fmt::arg("returnType", m_returnType),
-	    fmt::arg("namespace",
-	             Helpers::removeSubString(m_fullyQualifiedName, m_name)),
-	    fmt::arg("arguments", getArgumentTypes()));
+	return fmt::format(R"(({returnType}({namespace}*)({arguments})))",
+	                   fmt::arg("returnType", m_returnType),
+	                   fmt::arg("namespace",
+	                            Embind::Helpers::removeSubString(
+	                                m_fullyQualifiedName, m_name)),
+	                   fmt::arg("arguments", getArgumentTypes()));
 }
 
 std::string Function::createName(std::string const& namePrefix) const {
