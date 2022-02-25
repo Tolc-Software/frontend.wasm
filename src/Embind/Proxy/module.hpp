@@ -1,15 +1,15 @@
 #pragma once
 
-#include "EmbindProxy/attribute.hpp"
-#include "EmbindProxy/class.hpp"
-#include "EmbindProxy/enum.hpp"
-#include "EmbindProxy/function.hpp"
-#include "EmbindProxy/typeInfo.hpp"
+#include "Embind/Proxy/attribute.hpp"
+#include "Embind/Proxy/class.hpp"
+#include "Embind/Proxy/enum.hpp"
+#include "Embind/Proxy/function.hpp"
+#include "Embind/Proxy/typeInfo.hpp"
 #include <deque>
 #include <string>
 #include <vector>
 
-namespace EmbindProxy {
+namespace Embind::Proxy {
 
 struct Module {
 	explicit Module(std::string const& name, std::string const& qualifiedName);
@@ -48,4 +48,4 @@ private:
 	std::vector<Enum> m_enums;
 	std::vector<Attribute> m_attributes;
 };
-}    // namespace EmbindProxy
+}    // namespace Embind::Proxy

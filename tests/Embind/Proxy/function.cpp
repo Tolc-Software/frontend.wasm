@@ -1,10 +1,10 @@
-#include "EmbindProxy/function.hpp"
+#include "Embind/Proxy/function.hpp"
 #include "TestUtil/string.hpp"
 #include <catch2/catch.hpp>
 #include <fmt/format.h>
 
 TEST_CASE("Global function and class functions are the same", "[function]") {
-	EmbindProxy::Function f("f", "MyNamespace::f");
+	Embind::Proxy::Function f("f", "MyNamespace::f");
 
 	auto globalFunction = f.getEmbind();
 	f.setAsClassFunction();
@@ -19,7 +19,7 @@ TEST_CASE("Global function and class functions are the same", "[function]") {
 
 TEST_CASE("Static class functions are defined with class_function",
           "[function]") {
-	EmbindProxy::Function f("f", "f");
+	Embind::Proxy::Function f("f", "f");
 
 	f.setAsClassFunction();
 	f.setAsStatic();
@@ -31,7 +31,7 @@ TEST_CASE("Static class functions are defined with class_function",
 }
 
 TEST_CASE("Overloads have select_overload passed", "[function]") {
-	EmbindProxy::Function f("f", "NS::f");
+	Embind::Proxy::Function f("f", "NS::f");
 
 	f.addArgument("int", "i");
 	f.setAsOverloaded();
@@ -45,7 +45,7 @@ TEST_CASE("Overloads have select_overload passed", "[function]") {
 }
 
 TEST_CASE("Void overloads is just called the function", "[function]") {
-	EmbindProxy::Function f("f", "NS::f");
+	Embind::Proxy::Function f("f", "NS::f");
 
 	f.setAsOverloaded();
 
@@ -56,7 +56,7 @@ TEST_CASE("Void overloads is just called the function", "[function]") {
 }
 
 TEST_CASE("Function with arguments does not affect signature", "[function]") {
-	EmbindProxy::Function f("f", "f");
+	Embind::Proxy::Function f("f", "f");
 	std::vector<std::string> args = {"i", "j", "k"};
 	for (auto const& arg : args) {
 		f.addArgument("int", arg);
@@ -72,7 +72,7 @@ TEST_CASE("Function with arguments does not affect signature", "[function]") {
 TEST_CASE(
     "PreJS sets the base name to the global name within the Module Object",
     "[function]") {
-	EmbindProxy::Function f("f", "MyNamespace::f");
+	Embind::Proxy::Function f("f", "MyNamespace::f");
 
 	std::vector<std::string> previousNames;
 	auto preJS = f.getPreJS("MyNamespace_", previousNames);

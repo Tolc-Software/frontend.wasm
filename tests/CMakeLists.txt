@@ -97,15 +97,15 @@ foreach(
   Builders/functionBuilder.cpp
   Builders/moduleFileBuilder.cpp
   Builders/typeToStringBuilder.cpp
-  Helpers/Embind/checkType.cpp
+  Embind/checkType.cpp
   Helpers/combine.cpp
   Helpers/string.cpp
-  EmbindProxy/attribute.cpp
-  EmbindProxy/class.cpp
-  EmbindProxy/enum.cpp
-  EmbindProxy/function.cpp
-  EmbindProxy/module.cpp
-  EmbindProxy/moduleFile.cpp
+  Embind/Proxy/attribute.cpp
+  Embind/Proxy/class.cpp
+  Embind/Proxy/enum.cpp
+  Embind/Proxy/function.cpp
+  Embind/Proxy/module.cpp
+  Embind/Proxy/moduleFile.cpp
   arrays.cpp
   classes.cpp
   # complex.cpp
@@ -132,7 +132,7 @@ foreach(
   # valarrays.cpp
   # variants.cpp
   vectors.cpp)
-  # Ex: EmbindProxy/moduleFile.cpp -> moduleFile
+  # Ex: Embind/Proxy/moduleFile.cpp -> moduleFile
   get_filename_component(testName ${test} NAME_WLE)
 
   create_catch2_test(

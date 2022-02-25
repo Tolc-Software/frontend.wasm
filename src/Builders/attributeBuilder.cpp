@@ -1,6 +1,6 @@
 #include "Builders/attributeBuilder.hpp"
-#include "EmbindProxy/typeInfo.hpp"
-#include "Helpers/Embind/checkType.hpp"
+#include "Embind/Proxy/typeInfo.hpp"
+#include "Embind/checkType.hpp"
 #include "Helpers/types.hpp"
 #include <IR/ir.hpp>
 #include <fmt/format.h>
@@ -9,10 +9,10 @@
 
 namespace Builders {
 
-EmbindProxy::Attribute buildAttribute(std::string const& parentNamespace,
-                                      IR::Variable const& v,
-                                      EmbindProxy::TypeInfo& typeInfo) {
-	Helpers::Embind::checkType(v.m_type, typeInfo);
+Embind::Proxy::Attribute buildAttribute(std::string const& parentNamespace,
+                                        IR::Variable const& v,
+                                        Embind::Proxy::TypeInfo& typeInfo) {
+	Embind::checkType(v.m_type, typeInfo);
 
 	std::string callName = v.m_name;
 	if (!parentNamespace.empty()) {
@@ -46,6 +46,6 @@ EmbindProxy::Attribute buildAttribute(std::string const& parentNamespace,
 		typeInfo.m_includes.insert("<emscripten/val.h>");
 	}
 
-	return EmbindProxy::Attribute(v.m_name, callName);
+	return Embind::Proxy::Attribute(v.m_name, callName);
 }
 }    // namespace Builders

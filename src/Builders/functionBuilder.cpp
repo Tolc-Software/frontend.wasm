@@ -1,17 +1,17 @@
 #include "Builders/functionBuilder.hpp"
-#include "EmbindProxy/function.hpp"
-#include "EmbindProxy/typeInfo.hpp"
-#include "Helpers/Embind/checkType.hpp"
+#include "Embind/Proxy/function.hpp"
+#include "Embind/Proxy/typeInfo.hpp"
+#include "Embind/checkType.hpp"
 #include "Helpers/types.hpp"
 #include <optional>
 #include <spdlog/spdlog.h>
 
 namespace Builders {
 
-std::optional<EmbindProxy::Function>
+std::optional<Embind::Proxy::Function>
 buildFunction(IR::Function const& cppFunction,
-              EmbindProxy::TypeInfo& typeInfo) {
-	EmbindProxy::Function jsFunction(
+              Embind::Proxy::TypeInfo& typeInfo) {
+	Embind::Proxy::Function jsFunction(
 	    Helpers::removeCppTemplate(cppFunction.m_name),
 	    cppFunction.m_representation);
 
@@ -20,7 +20,7 @@ buildFunction(IR::Function const& cppFunction,
 	for (auto const& arg : cppFunction.m_arguments) {
 		if (!Helpers::isContainerType(arg.m_type,
 		                              IR::ContainerType::UniquePtr)) {
-			Helpers::Embind::checkType(arg.m_type, typeInfo);
+			Embind::checkType(arg.m_type, typeInfo);
 
 			jsFunction.addArgument(arg.m_type.m_representation, arg.m_name);
 		} else {
@@ -31,7 +31,7 @@ buildFunction(IR::Function const& cppFunction,
 		}
 	}
 
-	Helpers::Embind::checkType(cppFunction.m_returnType, typeInfo);
+	Embind::checkType(cppFunction.m_returnType, typeInfo);
 	jsFunction.setReturnType(cppFunction.m_returnType.m_representation);
 
 	return jsFunction;

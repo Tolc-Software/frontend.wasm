@@ -1,8 +1,8 @@
-#include "EmbindProxy/class.hpp"
+#include "Embind/Proxy/class.hpp"
 #include <fmt/format.h>
 #include <string>
 
-namespace EmbindProxy {
+namespace Embind::Proxy {
 
 namespace {
 std::string getClassNamePrefix(std::string const& namespacePrefix,
@@ -146,4 +146,4 @@ std::string const& Class::getName() const {
 void Class::setAsManagedByShared() {
 	m_isManagedByShared = true;
 }
-}    // namespace EmbindProxy
+}    // namespace Embind::Proxy

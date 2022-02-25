@@ -3,8 +3,8 @@
 #include "Builders/classBuilder.hpp"
 #include "Builders/enumBuilder.hpp"
 #include "Builders/functionBuilder.hpp"
-#include "EmbindProxy/module.hpp"
-#include "EmbindProxy/typeInfo.hpp"
+#include "Embind/Proxy/module.hpp"
+#include "Embind/Proxy/typeInfo.hpp"
 #include "Helpers/combine.hpp"
 #include "Helpers/getOverloadedFunctions.hpp"
 #include "Helpers/split.hpp"
@@ -16,10 +16,9 @@
 
 namespace Builders {
 
-std::optional<EmbindProxy::Module>
-buildModule(IR::Namespace const& ns,
-            EmbindProxy::TypeInfo& typeInfo) {
-	EmbindProxy::Module builtModule(ns.m_name, ns.m_representation);
+std::optional<Embind::Proxy::Module>
+buildModule(IR::Namespace const& ns, Embind::Proxy::TypeInfo& typeInfo) {
+	Embind::Proxy::Module builtModule(ns.m_name, ns.m_representation);
 
 	auto overloadedFunctions = Helpers::getOverloadedFunctions(ns.m_functions);
 	for (auto const& function : ns.m_functions) {

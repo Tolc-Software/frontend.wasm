@@ -1,12 +1,12 @@
-#include "Helpers/Embind/createFunctions.hpp"
-#include "EmbindProxy/typeInfo.hpp"
+#include "Embind/createFunctions.hpp"
+#include "Embind/Proxy/typeInfo.hpp"
 #include <fmt/format.h>
 #include <string>
 
 namespace {
 std::string registerFunction(std::string functionName,
                              std::string const& fullFunction,
-                             EmbindProxy::TypeInfo& typeInfo) {
+                             Embind::Proxy::TypeInfo& typeInfo) {
 	// The getters may be in a namespace
 	if (!typeInfo.m_functionsNamespace.empty()) {
 		functionName = typeInfo.m_functionsNamespace + "::" + functionName;
@@ -19,12 +19,12 @@ std::string registerFunction(std::string functionName,
 }
 }
 
-namespace Helpers::Embind {
+namespace Embind {
 std::pair<std::string, std::string>
 createGetterSetter(std::string const& className,
                    std::string const& fullyQualifiedClassName,
                    std::string const& variableName,
-                   EmbindProxy::TypeInfo& typeInfo) {
+                   Embind::Proxy::TypeInfo& typeInfo) {
 	std::string getter = fmt::format(R"({className}_get_{variable})",
 	                                 fmt::arg("variable", variableName),
 	                                 fmt::arg("className", className));
@@ -60,7 +60,7 @@ createGetterSetter(std::string const& typeString,
                    std::string const& representation,
                    std::string const& elementType,
                    int index,
-                   EmbindProxy::TypeInfo& typeInfo) {
+                   Embind::Proxy::TypeInfo& typeInfo) {
 	std::string getter = fmt::format("{}_get_{}", typeString, index);
 	std::string getterFunction =
 	    fmt::format(R"(
@@ -85,4 +85,4 @@ void {setter}({representation}& t, {elementType} e) {{
 	return {registerFunction(getter, getterFunction, typeInfo),
 	        registerFunction(setter, setterFunction, typeInfo)};
 }
-}    // namespace Helpers::Embind
+}    // namespace Embind

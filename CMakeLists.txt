@@ -49,15 +49,15 @@ add_library(
   src/Builders/moduleBuilder.cpp
   src/Builders/moduleFileBuilder.cpp
   src/Builders/typeToStringBuilder.cpp
-  src/EmbindProxy/attribute.cpp
-  src/EmbindProxy/class.cpp
-  src/EmbindProxy/enum.cpp
-  src/EmbindProxy/function.cpp
-  src/EmbindProxy/module.cpp
-  src/EmbindProxy/moduleFile.cpp
+  src/Embind/Proxy/attribute.cpp
+  src/Embind/Proxy/class.cpp
+  src/Embind/Proxy/enum.cpp
+  src/Embind/Proxy/function.cpp
+  src/Embind/Proxy/module.cpp
+  src/Embind/Proxy/moduleFile.cpp
   src/Frontend/Wasm/frontend.cpp
-  src/Helpers/Embind/checkType.cpp
-  src/Helpers/Embind/createFunctions.cpp
+  src/Embind/checkType.cpp
+  src/Embind/createFunctions.cpp
   src/Helpers/getOverloadedFunctions.cpp
   src/Helpers/split.cpp
   src/Helpers/string.cpp

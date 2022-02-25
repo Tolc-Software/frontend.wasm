@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-namespace EmbindProxy {
+namespace Embind::Proxy {
 class Function {
 public:
 	Function(std::string const& name, std::string const& fullyQualifiedName);
@@ -73,4 +73,4 @@ private:
 	bool m_isStatic;
 	bool m_isClassFunction;
 };
-}    // namespace EmbindProxy
+}    // namespace Embind::Proxy

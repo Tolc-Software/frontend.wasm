@@ -1,5 +1,5 @@
 #include "Builders/moduleFileBuilder.hpp"
-#include "EmbindProxy/module.hpp"
+#include "Embind/Proxy/module.hpp"
 #include "TestUtil/string.hpp"
 #include "TestUtil/types.hpp"
 #include <IR/ir.hpp>

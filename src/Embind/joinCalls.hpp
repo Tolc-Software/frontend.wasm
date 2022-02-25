@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-namespace Helpers::Embind {
+namespace Embind {
 
 template <typename EmbindObject>
 std::string joinEmbind(std::vector<EmbindObject> const& objects) {
@@ -56,4 +56,4 @@ std::string joinGlobalPreJS(std::string const& prefix,
 	return out;
 }
 
-}    // namespace Helpers::Embind
+}    // namespace Embind

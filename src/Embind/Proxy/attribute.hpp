@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-namespace EmbindProxy {
+namespace Embind::Proxy {
 /**
 * An attribute is a global value
 */
@@ -28,4 +28,4 @@ private:
 
 	std::string createName(std::string const& namePrefix) const;
 };
-}    // namespace EmbindProxy
+}    // namespace Embind::Proxy

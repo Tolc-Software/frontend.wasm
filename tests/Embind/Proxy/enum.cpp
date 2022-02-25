@@ -1,4 +1,4 @@
-#include "EmbindProxy/enum.hpp"
+#include "Embind/Proxy/enum.hpp"
 #include "TestUtil/string.hpp"
 #include <catch2/catch.hpp>
 #include <fmt/format.h>
@@ -9,7 +9,7 @@ TEST_CASE("Enums", "[enum]") {
 	std::string name = "MyEnum";
 	std::string fullyQualifiedName = moduleName + "::" + name;
 
-	EmbindProxy::Enum e(name, fullyQualifiedName);
+	Embind::Proxy::Enum e(name, fullyQualifiedName);
 	std::string value = "MyValue";
 	e.addValue(value);
 
@@ -38,7 +38,7 @@ TEST_CASE("PreJS enum", "[enum]") {
 	std::string name = "MyEnum";
 	std::string fullyQualifiedName = moduleName + "::" + name;
 
-	EmbindProxy::Enum e(name, fullyQualifiedName);
+	Embind::Proxy::Enum e(name, fullyQualifiedName);
 	std::string value = "MyValue";
 	e.addValue(value);
 

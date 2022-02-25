@@ -1,12 +1,12 @@
 #pragma once
 
-#include "EmbindProxy/enum.hpp"
-#include "EmbindProxy/function.hpp"
+#include "Embind/Proxy/enum.hpp"
+#include "Embind/Proxy/function.hpp"
 #include <optional>
 #include <string>
 #include <vector>
 
-namespace EmbindProxy {
+namespace Embind::Proxy {
 
 class Class {
 public:
@@ -62,4 +62,4 @@ private:
 
 	std::string createName(std::string const& namePrefix) const;
 };
-}    // namespace EmbindProxy
+}    // namespace Embind::Proxy

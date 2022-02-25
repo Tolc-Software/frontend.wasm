@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-namespace EmbindProxy {
+namespace Embind::Proxy {
 class Enum {
 public:
 	Enum(std::string const& name, std::string const& fullyQualifiedName);
@@ -40,4 +40,4 @@ private:
 	std::string m_fullyQualifiedName;
 	std::vector<std::string> m_values;
 };
-}    // namespace EmbindProxy
+}    // namespace Embind::Proxy

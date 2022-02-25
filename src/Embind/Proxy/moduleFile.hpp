@@ -1,11 +1,11 @@
 #pragma once
 
-#include "EmbindProxy/module.hpp"
+#include "Embind/Proxy/module.hpp"
 #include <filesystem>
 #include <string>
 #include <vector>
 
-namespace EmbindProxy {
+namespace Embind::Proxy {
 
 class ModuleFile {
 public:
@@ -19,7 +19,7 @@ public:
 	void addModule(Module const& m);
 
 	// Copies the type info into this classes
-	void setTypeInfo(EmbindProxy::TypeInfo const& info);
+	void setTypeInfo(Embind::Proxy::TypeInfo const& info);
 
 	std::filesystem::path getCppFilepath() const;
 
@@ -39,6 +39,6 @@ private:
 
 	// Contains global information about types in the module
 	// E.g. if there is a type that forces some pybind include
-	EmbindProxy::TypeInfo m_typeInfo;
+	Embind::Proxy::TypeInfo m_typeInfo;
 };
-}    // namespace EmbindProxy
+}    // namespace Embind::Proxy

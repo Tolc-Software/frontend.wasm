@@ -1,10 +1,10 @@
-#include "EmbindProxy/function.hpp"
+#include "Embind/Proxy/function.hpp"
 #include "Helpers/string.hpp"
 #include <algorithm>
 #include <fmt/format.h>
 #include <string>
 
-namespace EmbindProxy {
+namespace Embind::Proxy {
 
 namespace {
 
@@ -129,4 +129,4 @@ std::string Function::createName(std::string const& namePrefix) const {
 	    fmt::arg("namePrefix", namePrefix),
 	    fmt::arg("name", m_isOverloaded ? createOverloadedName() : m_name));
 }
-}    // namespace EmbindProxy
+}    // namespace Embind::Proxy

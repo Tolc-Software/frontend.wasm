@@ -15,7 +15,7 @@ TEST_CASE("Can build simple attributes", "[attributeBuilder]") {
 	std::string moduleName = "Module";
 	auto fullyQualifiedName = moduleName + "::" + variableName;
 
-	EmbindProxy::TypeInfo typeInfo;
+	Embind::Proxy::TypeInfo typeInfo;
 	auto proxyAttribute = Builders::buildAttribute(moduleName, v, typeInfo);
 	auto embind = proxyAttribute.getEmbind();
 	CAPTURE(embind);
@@ -43,7 +43,7 @@ TEST_CASE("String attributes", "[attributeBuilder]") {
 
 		std::string moduleName = "Module";
 
-		EmbindProxy::TypeInfo typeInfo;
+		Embind::Proxy::TypeInfo typeInfo;
 		auto proxyAttribute = Builders::buildAttribute(moduleName, v, typeInfo);
 		auto embind = proxyAttribute.getEmbind();
 		CAPTURE(embind);

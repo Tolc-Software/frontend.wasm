@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Builders/functionBuilder.hpp"
-#include "EmbindProxy/module.hpp"
-#include "EmbindProxy/typeInfo.hpp"
+#include "Embind/Proxy/module.hpp"
+#include "Embind/Proxy/typeInfo.hpp"
 #include <IR/ir.hpp>
 #include <optional>
 
@@ -14,7 +14,6 @@ namespace Builders {
 *       but adds the children of ns as submodules
 * Fails if any functions takes unique_ptr as an argument
 */
-std::optional<EmbindProxy::Module>
-buildModule(IR::Namespace const& ns,
-            EmbindProxy::TypeInfo& typeInfo);
+std::optional<Embind::Proxy::Module>
+buildModule(IR::Namespace const& ns, Embind::Proxy::TypeInfo& typeInfo);
 }    // namespace Builders

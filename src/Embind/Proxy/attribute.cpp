@@ -1,9 +1,9 @@
-#include "EmbindProxy/attribute.hpp"
+#include "Embind/Proxy/attribute.hpp"
 #include <fmt/format.h>
 #include <string>
 #include <vector>
 
-namespace EmbindProxy {
+namespace Embind::Proxy {
 
 Attribute::Attribute(std::string const& name,
                      std::string const& fullyQualifiedName)
@@ -33,4 +33,4 @@ std::string Attribute::createName(std::string const& namePrefix) const {
 	return namePrefix + m_name;
 }
 
-}    // namespace EmbindProxy
+}    // namespace Embind::Proxy

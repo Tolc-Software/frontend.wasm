@@ -1,8 +1,8 @@
-#include "EmbindProxy/moduleFile.hpp"
+#include "Embind/Proxy/moduleFile.hpp"
 #include <fmt/format.h>
 #include <string>
 
-namespace EmbindProxy {
+namespace Embind::Proxy {
 
 namespace {
 std::string joinRegisterCommands(std::set<std::string> const& commands) {
@@ -64,7 +64,7 @@ std::filesystem::path ModuleFile::getPreJSFilepath() const {
 	return "pre.js";
 }
 
-void ModuleFile::setTypeInfo(EmbindProxy::TypeInfo const& info) {
+void ModuleFile::setTypeInfo(Embind::Proxy::TypeInfo const& info) {
 	m_typeInfo = info;
 }
 
@@ -109,4 +109,4 @@ var Module = {{
 	return out;
 }
 
-}    // namespace EmbindProxy
+}    // namespace Embind::Proxy

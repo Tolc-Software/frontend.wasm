@@ -1,6 +1,6 @@
-#include "EmbindProxy/moduleFile.hpp"
-#include "EmbindProxy/function.hpp"
-#include "EmbindProxy/module.hpp"
+#include "Embind/Proxy/moduleFile.hpp"
+#include "Embind/Proxy/function.hpp"
+#include "Embind/Proxy/module.hpp"
 #include "TestUtil/string.hpp"
 #include <catch2/catch.hpp>
 #include <fmt/format.h>
@@ -8,8 +8,8 @@
 TEST_CASE("ModuleFile includes embind and default start of bindings",
           "[moduleFile]") {
 	std::string moduleName = "myModule";
-	EmbindProxy::Module m(moduleName, moduleName);
-	EmbindProxy::ModuleFile mf(m, moduleName);
+	Embind::Proxy::Module m(moduleName, moduleName);
+	Embind::Proxy::ModuleFile mf(m, moduleName);
 
 	auto embindCode = mf.getEmbind();
 	CAPTURE(embindCode);
@@ -24,8 +24,8 @@ TEST_CASE("ModuleFile includes embind and default start of bindings",
 
 TEST_CASE("ModuleFile includes the default preJS", "[moduleFile]") {
 	std::string moduleName = "myModule";
-	EmbindProxy::Module m(moduleName, moduleName);
-	EmbindProxy::ModuleFile mf(m, moduleName);
+	Embind::Proxy::Module m(moduleName, moduleName);
+	Embind::Proxy::ModuleFile mf(m, moduleName);
 
 	auto preJSCode = mf.getPreJS();
 	CAPTURE(preJSCode);
@@ -40,10 +40,10 @@ TEST_CASE("ModuleFile includes the default preJS", "[moduleFile]") {
 
 // TEST_CASE("ModuleFile can take a module", "[moduleFile]") {
 // 	std::string moduleName = "myModule";
-// 	EmbindProxy::Module m(moduleName);
-// 	EmbindProxy::Function f("f", "f");
+// 	Embind::Proxy::Module m(moduleName);
+// 	Embind::Proxy::Function f("f", "f");
 // 	m.addFunction(f);
-// 	EmbindProxy::ModuleFile mf(m, moduleName);
+// 	Embind::Proxy::ModuleFile mf(m, moduleName);
 
 // 	auto embindCode = mf.getEmbind();
 // 	CAPTURE(embindCode);

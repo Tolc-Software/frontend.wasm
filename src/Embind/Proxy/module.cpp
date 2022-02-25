@@ -1,15 +1,15 @@
-#include "EmbindProxy/module.hpp"
-#include "Helpers/Embind/joinCalls.hpp"
+#include "Embind/Proxy/module.hpp"
+#include "Embind/joinCalls.hpp"
 #include "Helpers/split.hpp"
 #include <algorithm>
 #include <fmt/format.h>
 #include <numeric>
 #include <string>
 
-namespace EmbindProxy {
+namespace Embind::Proxy {
 
 std::string Module::getEmbind() const {
-	using namespace Helpers::Embind;
+	using namespace Embind;
 	return fmt::format(
 	    R"(
 {functions}
@@ -59,8 +59,8 @@ std::string Module::getPreJS() const {
 	std::vector<std::string> namesToDelete;
 
 	// Move things into classes that are not supported in Embind
-	std::string preJS = Helpers::Embind::joinGlobalPreJS(
-	    m_namePrefix, m_classes, namesToDelete);
+	std::string preJS =
+	    Embind::joinGlobalPreJS(m_namePrefix, m_classes, namesToDelete);
 
 	if (m_path.empty()) {
 		// The rest are renaming things into their namespace
@@ -68,7 +68,7 @@ std::string Module::getPreJS() const {
 		return preJS + "\n" + joinDeletions(namesToDelete);
 	}
 
-	using namespace Helpers::Embind;
+	using namespace Embind;
 	preJS += fmt::format(
 	    R"(
 {moduleDeclaration} {{
@@ -119,4 +119,4 @@ std::string const& Module::getPrefix() const {
 	return m_namePrefix;
 }
 
-}    // namespace EmbindProxy
+}    // namespace Embind::Proxy

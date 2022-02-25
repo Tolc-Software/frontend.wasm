@@ -1,8 +1,8 @@
-#include "EmbindProxy/enum.hpp"
+#include "Embind/Proxy/enum.hpp"
 #include <fmt/format.h>
 #include <string>
 
-namespace EmbindProxy {
+namespace Embind::Proxy {
 
 Enum::Enum(std::string const& name, std::string const& fullyQualifiedName)
     : m_name(name), m_fullyQualifiedName(fullyQualifiedName), m_values({}) {};
@@ -54,4 +54,4 @@ std::string Enum::getName() const {
 	return m_name;
 }
 
-}    // namespace EmbindProxy
+}    // namespace Embind::Proxy

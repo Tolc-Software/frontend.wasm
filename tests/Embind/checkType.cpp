@@ -1,6 +1,6 @@
-#include "Helpers/Embind/checkType.hpp"
+#include "Embind/checkType.hpp"
 #include "Builders/typeToStringBuilder.hpp"
-#include "EmbindProxy/typeInfo.hpp"
+#include "Embind/Proxy/typeInfo.hpp"
 #include "TestUtil/string.hpp"
 #include <IR/ir.hpp>
 #include <TestUtil/parse.hpp>
@@ -9,8 +9,8 @@
 
 TEST_CASE("Construct register_vector", "[checkType]") {
 	auto c = TestUtil::getVector();
-	EmbindProxy::TypeInfo typeInfo;
-	Helpers::Embind::checkType(c, typeInfo);
+	Embind::Proxy::TypeInfo typeInfo;
+	Embind::checkType(c, typeInfo);
 	REQUIRE(typeInfo.m_registerCommands.size() == 1);
 	for (auto const& command : typeInfo.m_registerCommands) {
 		CAPTURE(command);
@@ -20,8 +20,8 @@ TEST_CASE("Construct register_vector", "[checkType]") {
 
 TEST_CASE("Construct register_map", "[checkType]") {
 	auto c = TestUtil::getMap();
-	EmbindProxy::TypeInfo typeInfo;
-	Helpers::Embind::checkType(c, typeInfo);
+	Embind::Proxy::TypeInfo typeInfo;
+	Embind::checkType(c, typeInfo);
 	REQUIRE(typeInfo.m_registerCommands.size() == 1);
 	for (auto const& command : typeInfo.m_registerCommands) {
 		CAPTURE(command);
@@ -31,8 +31,8 @@ TEST_CASE("Construct register_map", "[checkType]") {
 
 TEST_CASE("Construct value_array", "[checkType]") {
 	auto c = TestUtil::getArray();
-	EmbindProxy::TypeInfo typeInfo;
-	Helpers::Embind::checkType(c, typeInfo);
+	Embind::Proxy::TypeInfo typeInfo;
+	Embind::checkType(c, typeInfo);
 	REQUIRE(typeInfo.m_registerCommands.size() == 1);
 	for (auto const& command : typeInfo.m_registerCommands) {
 		CAPTURE(command);
@@ -47,8 +47,8 @@ TEST_CASE("Construct value_array", "[checkType]") {
 
 TEST_CASE("Construct value_array for pair", "[checkType]") {
 	auto c = TestUtil::getPair();
-	EmbindProxy::TypeInfo typeInfo;
-	Helpers::Embind::checkType(c, typeInfo);
+	Embind::Proxy::TypeInfo typeInfo;
+	Embind::checkType(c, typeInfo);
 	REQUIRE(typeInfo.m_registerCommands.size() == 1);
 	for (auto const& command : typeInfo.m_registerCommands) {
 		CAPTURE(command);
@@ -64,8 +64,8 @@ TEST_CASE("Construct value_array for pair", "[checkType]") {
 
 TEST_CASE("Construct value_array for tuple", "[checkType]") {
 	auto c = TestUtil::getTuple();
-	EmbindProxy::TypeInfo typeInfo;
-	Helpers::Embind::checkType(c, typeInfo);
+	Embind::Proxy::TypeInfo typeInfo;
+	Embind::checkType(c, typeInfo);
 	REQUIRE(typeInfo.m_registerCommands.size() == 1);
 	for (auto const& command : typeInfo.m_registerCommands) {
 		CAPTURE(command);

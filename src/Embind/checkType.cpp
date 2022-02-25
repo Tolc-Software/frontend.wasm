@@ -1,7 +1,7 @@
-#include "Helpers/Embind/checkType.hpp"
+#include "Embind/checkType.hpp"
 #include "Builders/typeToStringBuilder.hpp"
-#include "EmbindProxy/typeInfo.hpp"
-#include "Helpers/Embind/createFunctions.hpp"
+#include "Embind/Proxy/typeInfo.hpp"
+#include "Embind/createFunctions.hpp"
 #include "Helpers/types.hpp"
 #include <IR/ir.hpp>
 #include <fmt/format.h>
@@ -9,7 +9,7 @@
 #include <spdlog/spdlog.h>
 #include <string>
 
-namespace Helpers::Embind {
+namespace Embind {
 
 std::optional<std::string> getRegisterString(IR::ContainerType container) {
 	// See https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html
@@ -69,7 +69,7 @@ std::optional<std::string> getRegisterString(IR::ContainerType container) {
 std::string addElementsIfNecessary(IR::Type::Container const& c,
                                    std::string const& representation,
                                    std::string const& typeString,
-                                   EmbindProxy::TypeInfo& typeInfo) {
+                                   Embind::Proxy::TypeInfo& typeInfo) {
 	std::string elements;
 	if (c.m_container == IR::ContainerType::Array) {
 		for (int i = 0;
@@ -88,11 +88,11 @@ std::string addElementsIfNecessary(IR::Type::Container const& c,
 		int index = 0;
 		for (auto const& element : c.m_containedTypes) {
 			auto [getterName, setterName] =
-			    Helpers::Embind::createGetterSetter(typeString,
-			                                        representation,
-			                                        element.m_representation,
-			                                        index,
-			                                        typeInfo);
+			    Embind::createGetterSetter(typeString,
+			                               representation,
+			                               element.m_representation,
+			                               index,
+			                               typeInfo);
 			// Record the element
 			elements +=
 			    fmt::format("\t\t.element(&{getterName}, &{setterName})\n",
@@ -116,7 +116,8 @@ bool noneOfIsConst(std::vector<IR::Type> const& types) {
 * E.g. vector conversion requires inclusion of <pybind11/stl.h>
 */
 std::optional<std::string>
-extractRegisterCommands(IR::Type const& type, EmbindProxy::TypeInfo& typeInfo) {
+extractRegisterCommands(IR::Type const& type,
+                        Embind::Proxy::TypeInfo& typeInfo) {
 	if (auto container = Helpers::getContainer(type);
 	    container && noneOfIsConst(container->m_containedTypes)) {
 		if (auto s = getRegisterString(container->m_container)) {
@@ -159,7 +160,7 @@ std::optional<std::string> extractShared(IR::Type const& type) {
 	return std::nullopt;
 }
 
-void checkType(IR::Type const& type, EmbindProxy::TypeInfo& info) {
+void checkType(IR::Type const& type, Embind::Proxy::TypeInfo& info) {
 	std::queue<std::reference_wrapper<IR::Type const>> typesToCheck;
 	typesToCheck.push(type);
 
@@ -183,4 +184,4 @@ void checkType(IR::Type const& type, EmbindProxy::TypeInfo& info) {
 	}
 }
 
-}    // namespace Helpers::Embind
+}    // namespace Embind

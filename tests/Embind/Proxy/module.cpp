@@ -1,16 +1,16 @@
-#include "EmbindProxy/module.hpp"
+#include "Embind/Proxy/module.hpp"
 #include "TestUtil/string.hpp"
 #include <catch2/catch.hpp>
 #include <fmt/format.h>
 
 TEST_CASE("Modules defines their functions", "[module]") {
 	std::string moduleName = "myModule";
-	EmbindProxy::Module m(moduleName, moduleName);
+	Embind::Proxy::Module m(moduleName, moduleName);
 
 	std::vector<std::string> functions = {"f", "calculate", "foo"};
 	for (auto const& function : functions) {
 		m.addFunction(
-		    EmbindProxy::Function(function, moduleName + "::" + function));
+		    Embind::Proxy::Function(function, moduleName + "::" + function));
 	}
 
 	auto embindCode = m.getEmbind();
@@ -29,12 +29,12 @@ TEST_CASE("Modules defines their functions", "[module]") {
 
 TEST_CASE("PreJS includes function", "[module]") {
 	std::string moduleName = "myModule";
-	EmbindProxy::Module m(moduleName, moduleName);
+	Embind::Proxy::Module m(moduleName, moduleName);
 
 	std::vector<std::string> functions = {"f", "calculate", "foo"};
 	for (auto const& function : functions) {
 		m.addFunction(
-		    EmbindProxy::Function(function, moduleName + "::" + function));
+		    Embind::Proxy::Function(function, moduleName + "::" + function));
 	}
 
 	auto preJS = m.getPreJS();
@@ -53,7 +53,7 @@ TEST_CASE("PreJS includes function", "[module]") {
 // TEST_CASE("Module variable name", "[module]") {
 // 	std::string moduleName = "myTestModule";
 // 	std::string variableName = moduleName + "__ns";
-// 	EmbindProxy::Module m(variableName);
+// 	Embind::Proxy::Module m(variableName);
 
 // 	using TestUtil::contains;
 // 	REQUIRE(m.getPrefix() == "myTestModule__ns");
@@ -61,11 +61,11 @@ TEST_CASE("PreJS includes function", "[module]") {
 
 // TEST_CASE("Modules defines their classes", "[module]") {
 // 	std::string moduleName = "myTestModule";
-// 	EmbindProxy::Module m(moduleName);
+// 	Embind::Proxy::Module m(moduleName);
 
 // 	std::vector<std::string> classes = {"Cl", "MyClass", "OtherClass"};
 // 	for (auto const& cls : classes) {
-// 		EmbindProxy::Class c(cls, cls);
+// 		Embind::Proxy::Class c(cls, cls);
 // 		m.addClass(c);
 // 	}
 

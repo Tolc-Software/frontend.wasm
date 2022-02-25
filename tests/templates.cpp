@@ -35,24 +35,22 @@ template class MyClass<int>;
 template class MyClass<std::map<char, std::vector<int>>>;
 )";
 
-	auto pythonTestCode = fmt::format(R"(
-hi = {moduleName}.getSomething("hi")
-self.assertEqual(hi, "hi")
+	auto jsTestCode = R"(
+hi = m.getSomething("hi")
+expect(hi).toBe("hi");
 
-five = {moduleName}.getSomething(5)
-self.assertEqual(five, 5)
+five = m.getSomething(5)
+expect(five).toBe(5);
 
-l = {moduleName}.getSomething(["hi"])
-self.assertEqual(l, ["hi"])
+l = m.getSomething(["hi"])
+expect(l).toBe(["hi"]);
 
-my_class_int = {moduleName}.MyClass_int()
-self.assertEqual(my_class_int.myFun(25), 25)
+my_class_int = m.MyClass_int()
+expect(my_class_int.myFun(25)).toBe(25);
 
-my_class_map = {moduleName}.MyClass_map_char_vector_int()
-self.assertEqual(my_class_map.myFun()",
-	                                  fmt::arg("moduleName", moduleName)) +
-	                      R"({'h': [1]}), {'h': [1]}))";
+my_class_map = m.MyClass_map_char_vector_int()
+expect(my_class_map.myFun({h: [1]}).toStrictEqual({h: [1]})))";
 
-	auto errorCode = stage.runEmbindTest(cppCode, pythonTestCode, moduleName);
+	auto errorCode = stage.runEmbindTest(cppCode, jsTestCode, moduleName);
 	REQUIRE(errorCode == 0);
 }

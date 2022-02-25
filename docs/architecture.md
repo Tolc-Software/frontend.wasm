@@ -2,7 +2,7 @@
 
 ### Builders are smart, they are building dumb objects ###
 
-You should see a strong connection between the `Builders` and the `EmbindProxy` objects they are building. You should consider the objects as data aggregations, with builders making decisions on how they are stored the best. **The `EmbindProxy` classes should not make decisions.**
+You should see a strong connection between the `Builders` and the `Embind::Proxy` objects they are building. You should consider the objects as data aggregations, with builders making decisions on how they are stored the best. **The `Embind::Proxy` classes should not make decisions.**
 
 ## Good to know ##
 

@@ -1,11 +1,11 @@
-#include "EmbindProxy/class.hpp"
+#include "Embind/Proxy/class.hpp"
 #include "TestUtil/string.hpp"
 #include <catch2/catch.hpp>
 #include <fmt/format.h>
 
 TEST_CASE("Empty class", "[class]") {
 	std::string className = "myClass";
-	EmbindProxy::Class c(className, className);
+	Embind::Proxy::Class c(className, className);
 	auto embindCode = c.getEmbind();
 	CAPTURE(embindCode);
 
@@ -18,11 +18,11 @@ TEST_CASE("Empty class", "[class]") {
 
 TEST_CASE("Class with functions", "[class]") {
 	std::string className = "myOtherClass";
-	EmbindProxy::Class c(className, className);
+	Embind::Proxy::Class c(className, className);
 
 	std::vector<std::string> functions = {"f", "calculate", "foo"};
 	for (auto const& function : functions) {
-		auto f = EmbindProxy::Function(function, function);
+		auto f = Embind::Proxy::Function(function, function);
 		f.setAsClassFunction();
 		c.addFunction(f);
 	}
@@ -49,10 +49,10 @@ TEST_CASE("Class with functions", "[class]") {
 
 TEST_CASE("Class with constructor", "[class]") {
 	std::string className = "myFreshClass";
-	EmbindProxy::Class c(className, className);
+	Embind::Proxy::Class c(className, className);
 
 	std::vector<std::string> arguments = {"const std::string&", "int"};
-	auto constructor = EmbindProxy::Function(className, className);
+	auto constructor = Embind::Proxy::Function(className, className);
 	for (auto const& argument : arguments) {
 		constructor.addArgument(argument);
 	}
@@ -71,7 +71,7 @@ TEST_CASE("Class with constructor", "[class]") {
 
 TEST_CASE("Class with member variables", "[class]") {
 	std::string className = "SuperbClass";
-	EmbindProxy::Class c(className, className);
+	Embind::Proxy::Class c(className, className);
 
 	std::vector<std::string> constVariables = {"myInt", "var", "yes"};
 	for (auto const& variable : constVariables) {
@@ -126,7 +126,7 @@ TEST_CASE("Class with member variables", "[class]") {
 
 TEST_CASE("Static variable", "[class]") {
 	std::string className = "myClass";
-	EmbindProxy::Class c(className, className);
+	Embind::Proxy::Class c(className, className);
 	c.addMemberVariable("v", "v", std::nullopt, true);
 	auto embindCode = c.getEmbind();
 	CAPTURE(embindCode);
@@ -140,7 +140,7 @@ TEST_CASE("Static variable", "[class]") {
 TEST_CASE("PreJS", "[class]") {
 	std::string ns = "Stuff";
 	std::string className = "myClass";
-	EmbindProxy::Class c(className, ns + "::" + className);
+	Embind::Proxy::Class c(className, ns + "::" + className);
 	std::vector<std::string> namesToDelete;
 	auto preJS = c.getPreJS(ns + "_", namesToDelete);
 	CAPTURE(preJS);
@@ -155,14 +155,14 @@ TEST_CASE("PreJS", "[class]") {
 TEST_CASE("GlobalPreJS", "[class]") {
 	std::string ns = "Stuff";
 	std::string className = "myClass";
-	EmbindProxy::Class c(className, ns + "::" + className);
+	Embind::Proxy::Class c(className, ns + "::" + className);
 	std::vector<std::string> namesToDelete;
 	auto noEnumsPrejs = c.getGlobalPreJS(ns + "_", namesToDelete);
 	REQUIRE(noEnumsPrejs.empty());
 
 	std::string enumName = "MyEnum";
 	std::string fullyQualifiedName = className + "::" + enumName;
-	EmbindProxy::Enum e(enumName, fullyQualifiedName);
+	Embind::Proxy::Enum e(enumName, fullyQualifiedName);
 	e.addValue("Hi");
 	c.addEnum(e);
 	auto preJS = c.getGlobalPreJS(ns + "_", namesToDelete);
@@ -181,11 +181,11 @@ TEST_CASE("GlobalPreJS", "[class]") {
 
 TEST_CASE("Class with enum", "[class]") {
 	std::string className = "myFreshClass";
-	EmbindProxy::Class c(className, className);
+	Embind::Proxy::Class c(className, className);
 
 	std::string enumName = "MyEnum";
 	std::string fullyQualifiedName = className + "::" + enumName;
-	EmbindProxy::Enum e(enumName, fullyQualifiedName);
+	Embind::Proxy::Enum e(enumName, fullyQualifiedName);
 	std::string valueName = "Hi";
 	e.addValue(valueName);
 	c.addEnum(e);

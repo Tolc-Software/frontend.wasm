@@ -1,15 +1,15 @@
 #pragma once
 
-#include "EmbindProxy/attribute.hpp"
-#include "EmbindProxy/typeInfo.hpp"
+#include "Embind/Proxy/attribute.hpp"
+#include "Embind/Proxy/typeInfo.hpp"
 #include <IR/ir.hpp>
 
 namespace Builders {
 
 /**
-* Transforms a IR::Variable to a EmbindProxy::Attribute
+* Transforms a IR::Variable to a Embind::Proxy::Attribute
 */
-EmbindProxy::Attribute buildAttribute(std::string const& parentNamespace,
-                                      IR::Variable const& v,
-                                      EmbindProxy::TypeInfo& typeInfo);
+Embind::Proxy::Attribute buildAttribute(std::string const& parentNamespace,
+                                        IR::Variable const& v,
+                                        Embind::Proxy::TypeInfo& typeInfo);
 }    // namespace Builders

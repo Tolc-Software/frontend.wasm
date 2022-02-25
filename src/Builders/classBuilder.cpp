@@ -2,9 +2,9 @@
 #include "Builders/enumBuilder.hpp"
 #include "Builders/functionBuilder.hpp"
 #include "Builders/typeToStringBuilder.hpp"
-#include "EmbindProxy/typeInfo.hpp"
-#include "Helpers/Embind/checkType.hpp"
-#include "Helpers/Embind/createFunctions.hpp"
+#include "Embind/Proxy/typeInfo.hpp"
+#include "Embind/checkType.hpp"
+#include "Embind/createFunctions.hpp"
 #include "Helpers/combine.hpp"
 #include "Helpers/getOverloadedFunctions.hpp"
 #include "Helpers/types.hpp"
@@ -17,9 +17,9 @@
 
 namespace Builders {
 
-std::optional<EmbindProxy::Class> buildClass(IR::Struct const& cppClass,
-                                             EmbindProxy::TypeInfo& typeInfo) {
-	EmbindProxy::Class jsClass(
+std::optional<Embind::Proxy::Class>
+buildClass(IR::Struct const& cppClass, Embind::Proxy::TypeInfo& typeInfo) {
+	Embind::Proxy::Class jsClass(
 	    Helpers::removeCppTemplate(cppClass.m_name) +
 	        Builders::getSeparatedTypeString(cppClass.m_templateArguments, "_"),
 	    cppClass.m_representation);
@@ -68,7 +68,7 @@ std::optional<EmbindProxy::Class> buildClass(IR::Struct const& cppClass,
 	}
 
 	for (auto const& variable : cppClass.m_public.m_memberVariables) {
-		Helpers::Embind::checkType(variable.m_type, typeInfo);
+		Embind::checkType(variable.m_type, typeInfo);
 		std::string getter = "";
 		std::optional<std::string> setter = std::nullopt;
 		if (variable.m_type.m_isConst) {
@@ -80,10 +80,10 @@ std::optional<EmbindProxy::Class> buildClass(IR::Struct const& cppClass,
 		} else {
 			// Not const => Need to create setters and getters
 			std::tie(getter, setter) =
-			    Helpers::Embind::createGetterSetter(jsClass.getName(),
-			                                        cppClass.m_representation,
-			                                        variable.m_name,
-			                                        typeInfo);
+			    Embind::createGetterSetter(jsClass.getName(),
+			                               cppClass.m_representation,
+			                               variable.m_name,
+			                               typeInfo);
 		}
 		jsClass.addMemberVariable(
 		    variable.m_name, getter, setter, variable.m_type.m_isStatic);
@@ -92,7 +92,7 @@ std::optional<EmbindProxy::Class> buildClass(IR::Struct const& cppClass,
 	// Add default constructor
 	if (cppClass.m_hasImplicitDefaultConstructor) {
 		auto constructor =
-		    EmbindProxy::Function(jsClass.getName(), jsClass.getName());
+		    Embind::Proxy::Function(jsClass.getName(), jsClass.getName());
 		constructor.setAsConstructor();
 		jsClass.addConstructor(constructor);
 	}

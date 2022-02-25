@@ -1,6 +1,6 @@
 #include "Frontend/Wasm/frontend.hpp"
 #include "Builders/moduleFileBuilder.hpp"
-#include "EmbindProxy/moduleFile.hpp"
+#include "Embind/Proxy/moduleFile.hpp"
 #include <IR/ir.hpp>
 #include <filesystem>
 #include <optional>

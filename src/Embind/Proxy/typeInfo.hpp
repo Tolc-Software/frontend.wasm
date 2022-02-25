@@ -3,7 +3,7 @@
 #include <set>
 #include <string>
 
-namespace EmbindProxy {
+namespace Embind::Proxy {
 
 struct TypeInfo {
 	// E.g. Use of std::vector<std::string> requires
@@ -35,4 +35,4 @@ struct TypeInfo {
 	std::string m_functionsNamespace = "Tolc_";
 };
 
-}    // namespace EmbindProxy
+}    // namespace Embind::Proxy

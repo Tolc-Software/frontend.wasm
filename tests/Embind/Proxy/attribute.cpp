@@ -1,4 +1,4 @@
-#include "EmbindProxy/attribute.hpp"
+#include "Embind/Proxy/attribute.hpp"
 #include "TestUtil/string.hpp"
 #include <catch2/catch.hpp>
 #include <fmt/format.h>
@@ -6,7 +6,7 @@
 TEST_CASE("Simple attribute", "[attribute]") {
 	std::string fqName = "Stuff::i";
 	std::string name = "i";
-	EmbindProxy::Attribute a(name, fqName);
+	Embind::Proxy::Attribute a(name, fqName);
 	auto pybindCode = a.getEmbind();
 	CAPTURE(pybindCode);
 

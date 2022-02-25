@@ -1,7 +1,7 @@
 #include "Builders/moduleFileBuilder.hpp"
 #include "Builders/moduleBuilder.hpp"
-#include "EmbindProxy/moduleFile.hpp"
-#include "EmbindProxy/typeInfo.hpp"
+#include "Embind/Proxy/moduleFile.hpp"
+#include "Embind/Proxy/typeInfo.hpp"
 #include "Helpers/combine.hpp"
 #include <IR/ir.hpp>
 #include <optional>
@@ -12,14 +12,14 @@
 namespace {
 struct ModulePair {
 	IR::Namespace const& m_namespace;
-	EmbindProxy::Module m_module;
+	Embind::Proxy::Module m_module;
 };
 
 // Builds the submodules corresponding to the sub namespaces of currentNamespace
 // Adds each built submodule to namespaces
 // Returns false on failure
 bool tryBuildSubModules(IR::Namespace const& currentNamespace,
-                        EmbindProxy::TypeInfo& typeInfo,
+                        Embind::Proxy::TypeInfo& typeInfo,
                         std::queue<ModulePair>& namespaces) {
 	for (auto const& subNamespace : currentNamespace.m_namespaces) {
 		if (auto m = Builders::buildModule(subNamespace, typeInfo)) {
@@ -35,14 +35,14 @@ bool tryBuildSubModules(IR::Namespace const& currentNamespace,
 
 namespace Builders {
 
-std::optional<EmbindProxy::ModuleFile>
+std::optional<Embind::Proxy::ModuleFile>
 buildModuleFile(IR::Namespace const& rootNamespace,
                 std::string const& rootModuleName) {
-	EmbindProxy::TypeInfo typeInfo;
+	Embind::Proxy::TypeInfo typeInfo;
 
 	if (auto maybeRootModule = Builders::buildModule(rootNamespace, typeInfo)) {
 		auto rootModule = maybeRootModule.value();
-		EmbindProxy::ModuleFile moduleFile(rootModule, rootModuleName);
+		Embind::Proxy::ModuleFile moduleFile(rootModule, rootModuleName);
 
 		std::queue<ModulePair> namespaces;
 		if (!tryBuildSubModules(rootNamespace, typeInfo, namespaces)) {

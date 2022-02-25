@@ -3,8 +3,8 @@
 
 namespace Builders {
 
-EmbindProxy::Enum buildEnum(IR::Enum const& e) {
-	EmbindProxy::Enum proxyEnum(e.m_name, e.m_representation);
+Embind::Proxy::Enum buildEnum(IR::Enum const& e) {
+	Embind::Proxy::Enum proxyEnum(e.m_name, e.m_representation);
 
 	for (auto const& value : e.m_values) {
 		proxyEnum.addValue(value);

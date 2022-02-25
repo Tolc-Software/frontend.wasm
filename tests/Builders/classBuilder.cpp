@@ -1,5 +1,5 @@
 #include "Builders/classBuilder.hpp"
-#include "EmbindProxy/class.hpp"
+#include "Embind/Proxy/class.hpp"
 #include "TestUtil/string.hpp"
 #include "TestUtil/types.hpp"
 #include <IR/ir.hpp>
@@ -23,7 +23,7 @@ TEST_CASE("Class with vector in member function gives the correct register",
 	auto s = TestUtil::getStruct("SomeClass");
 	s.m_public.m_functions.push_back(constructor);
 
-	EmbindProxy::TypeInfo typeInfo;
+	Embind::Proxy::TypeInfo typeInfo;
 	auto c = Builders::buildClass(s, typeInfo);
 	REQUIRE(c.has_value());
 	REQUIRE(typeInfo.m_registerCommands.size() == 2);
@@ -42,7 +42,7 @@ TEST_CASE("Class with a constructor", "[classBuilder]") {
 	auto s = TestUtil::getStruct("SomeClass");
 	s.m_public.m_constructors.push_back(constructor);
 
-	EmbindProxy::TypeInfo typeInfo;
+	Embind::Proxy::TypeInfo typeInfo;
 	auto myStruct = Builders::buildClass(s, typeInfo).value();
 	auto embind = myStruct.getEmbind();
 	CAPTURE(embind);
@@ -65,7 +65,7 @@ TEST_CASE("Class with static function", "[classBuilder]") {
 
 	s.m_public.m_functions.push_back(f);
 
-	EmbindProxy::TypeInfo typeInfo;
+	Embind::Proxy::TypeInfo typeInfo;
 	auto myStruct = Builders::buildClass(s, typeInfo).value();
 	auto embind = myStruct.getEmbind();
 	CAPTURE(embind);
@@ -82,7 +82,7 @@ TEST_CASE("Templated class", "[classBuilder]") {
 	IR::Type t = TestUtil::getType();
 	s.m_templateArguments.push_back(t);
 
-	EmbindProxy::TypeInfo typeInfo;
+	Embind::Proxy::TypeInfo typeInfo;
 	auto myStruct = Builders::buildClass(s, typeInfo).value();
 	auto embind = myStruct.getEmbind();
 	auto expectedContains =
@@ -97,7 +97,7 @@ TEST_CASE("Empty class gets default constructor", "[classBuilder]") {
 	IR::Struct s = TestUtil::getStruct("MyStruct");
 	s.m_hasImplicitDefaultConstructor = true;
 
-	EmbindProxy::TypeInfo typeInfo;
+	Embind::Proxy::TypeInfo typeInfo;
 	auto myStruct = Builders::buildClass(s, typeInfo).value();
 	auto embind = myStruct.getEmbind();
 	CAPTURE(embind);
@@ -130,7 +130,7 @@ TEST_CASE("Class with functions", "[classBuilder]") {
 		s.m_public.m_functions.push_back(f);
 	}
 
-	EmbindProxy::TypeInfo typeInfo;
+	Embind::Proxy::TypeInfo typeInfo;
 	auto myStruct = Builders::buildClass(s, typeInfo).value();
 	auto embind = myStruct.getEmbind();
 	CAPTURE(embind);
@@ -151,7 +151,7 @@ TEST_CASE("Class with vector in constructor gives the correct register command",
 	IR::Type arg = TestUtil::getVector();
 	constructor.m_arguments.push_back({"myVar", arg});
 	s.m_public.m_functions.push_back(constructor);
-	EmbindProxy::TypeInfo typeInfo;
+	Embind::Proxy::TypeInfo typeInfo;
 	auto c = Builders::buildClass(s, typeInfo);
 	REQUIRE(c.has_value());
 	auto& regs = typeInfo.m_registerCommands;
@@ -176,7 +176,7 @@ TEST_CASE("Class with member variables", "[classBuilder]") {
 		s.m_public.m_memberVariables.push_back(v);
 	}
 
-	EmbindProxy::TypeInfo typeInfo;
+	Embind::Proxy::TypeInfo typeInfo;
 	auto myStruct = Builders::buildClass(s, typeInfo).value();
 	auto embind = myStruct.getEmbind();
 	CAPTURE(embind);
@@ -219,7 +219,7 @@ TEST_CASE("Class with member variables", "[classBuilder]") {
 // 	                                 fmt::arg("className", s.m_name));
 // 	s.m_hasImplicitDefaultConstructor = true;
 
-// 	EmbindProxy::TypeInfo typeInfo;
+// 	Embind::Proxy::TypeInfo typeInfo;
 // 	auto myStruct = Builders::buildClass(s, typeInfo).value();
 // 	auto embind = myStruct.getEmbind();
 // 	CAPTURE(embind);
@@ -243,7 +243,7 @@ TEST_CASE("Class with member variables", "[classBuilder]") {
 // 	e.m_values.push_back("Hi");
 // 	s.m_public.m_enums.push_back(e);
 
-// 	EmbindProxy::TypeInfo typeInfo;
+// 	Embind::Proxy::TypeInfo typeInfo;
 // 	auto myStruct = Builders::buildClass(s, typeInfo).value();
 // 	auto embind = myStruct.getEmbind();
 // 	auto expectedContains = fmt::format(
