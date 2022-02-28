@@ -67,11 +67,11 @@ Note that any restriction this poses only applies to the public interface of you
 | std::variant                    | ???                                                               |
 | std::vector                     | Vector Object***                                                  |
 
-\* Converted via the [`register_map`](https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html#built-in-type-conversions) function (behaves like a `Object` in `javascript`).
+\* Converted via the [`register_map`](https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html#built-in-type-conversions) function (behaves like an `Object` in `javascript`).
 
 \*\* Note that arguments of type `unique_ptr<T>` are not supported. For more info see [here](https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html#unique-ptr).
 
-\*\*\* Converted via the [`register_vector`](https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html#built-in-type-conversions) function (behaves like a `Object` in `javascript`).
+\*\*\* Converted via the [`register_vector`](https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html#built-in-type-conversions) function (behaves like an `Object` in `javascript`).
 
 
 | C++ builtin type           | WebAssembly translation                                          |
