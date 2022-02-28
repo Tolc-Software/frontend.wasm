@@ -27,16 +27,16 @@ function(get_emscripten)
   if(NOT emscripten_entry_POPULATED)
     FetchContent_Populate(emsdk_entry)
   endif()
-  
+
   set(sdkCommand ./emsdk)
   if (${CMAKE_HOST_SYSTEM_NAME} STREQUAL Windows)
-	set(sdkCommand emsdk.bat)
+    set(sdkCommand emsdk.bat)
   endif()
-  
+
   # Installs the Emscripten compiler
   execute_process(COMMAND ${sdkCommand} install ${emsdk_version}
     WORKING_DIRECTORY ${emsdk_entry_SOURCE_DIR})
-  
+
   # Writes the .emscripten file
   execute_process(COMMAND ${sdkCommand} activate ${emsdk_version}
     WORKING_DIRECTORY ${emsdk_entry_SOURCE_DIR})
