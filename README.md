@@ -1,8 +1,10 @@
+![Ubuntu](https://github.com/Tolc-Software/frontend.wasm/workflows/Ubuntu/badge.svg) ![MacOS](https://github.com/Tolc-Software/frontend.wasm/workflows/MacOS/badge.svg) ![Windows](https://github.com/Tolc-Software/frontend.wasm/actions/workflows/windows.yml/badge.svg) ![Windows-debug-deploy](https://github.com/Tolc-Software/frontend.wasm/actions/workflows/windows-debug-deploy.yml/badge.svg)
+
 # frontend.wasm #
 
-**NOTE:** This is a work in progress and will be added to `Tolc` as soon as possible.
-
 `frontend.wasm` is a library that takes an AST defined by [`IR::IR`](https://github.com/Tolc-Software/IntermediateRepresentation) and writes [`embind`](https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html) code. The idea is to be able to use the C++ code that corresponds to the AST from the web via the generated `embind`.
+
+`frontend.wasm` is a part of the [`Tolc`](https://github.com/Tolc-Software/tolc) project and is used to support creating `WebAssembly` bindings.
 
 ## Building ##
 
