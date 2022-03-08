@@ -22,12 +22,6 @@ std::string sayHello(std::string to) {
 
 std::string safety() { return "Safe!"; }
 
-class overloadedFunctions {
-public:
-
-
-};
-
 class Overload {
 public:
 	// Overloaded constructor
