@@ -20,7 +20,7 @@ TEST_CASE("Contains the correct boilerplate", "[moduleFileBuilder]") {
 	CAPTURE(path);
 	CAPTURE(embind);
 
-	REQUIRE(path == "MyModule.cpp");
+	REQUIRE(path == "MyModule_wasm.cpp");
 
 	for (auto const& expectedContains : {"#include <emscripten/bind.h>",
 	                                     "namespace em = emscripten;",

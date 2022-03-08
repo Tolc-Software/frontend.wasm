@@ -52,7 +52,7 @@ void ModuleFile::addModule(Module const& m) {
 }
 
 std::filesystem::path ModuleFile::getCppFilepath() const {
-	return m_libraryName + ".cpp";
+	return m_libraryName + "_wasm.cpp";
 }
 
 std::filesystem::path ModuleFile::getPreJSFilepath() const {
