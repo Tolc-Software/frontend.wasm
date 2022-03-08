@@ -20,19 +20,14 @@ std::string joinExtraFunctions(std::set<std::string> const& functions,
 		return "";
 	}
 
-	std::string out;
-
-	for (auto const& f : functions) {
-		out += fmt::format("\t{}\n", f);
-	}
-
 	// Add the namespace
-	out = fmt::format(R"(
+	std::string out = fmt::format(R"(
 namespace {} {{
 {}
-}})",
-	                  ns,
-	                  out);
+}}
+)",
+	                              ns,
+	                              fmt::join(functions, ""));
 
 	return out;
 }
@@ -74,11 +69,8 @@ std::string ModuleFile::getEmbind() const {
 #include <emscripten/bind.h>
 
 namespace em = emscripten;
-
 {joinedFunctions}
-
 EMSCRIPTEN_BINDINGS({libraryName}) {{
-
 {registerCommands}
 )",
 	    fmt::arg("joinedFunctions",
@@ -101,7 +93,7 @@ std::string ModuleFile::getPreJS() const {
 	    fmt::format(R"(
 var Module = {{
 	postRun: [() => {{
-		{modules}
+{modules}
 	}}],
 }};)",
 	                fmt::arg("modules", joinPreJSModules(m_modules)));

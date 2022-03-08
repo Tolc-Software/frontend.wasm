@@ -87,9 +87,7 @@ Class::getGlobalPreJS(std::string const& namePrefix,
 		// Since this class will then be moved to it's correct namespace
 		// The renamed enum will follow
 		preJS += fmt::format(
-		    R"(
-Module['{globalName}']['{enumName}'] = Module['{globalEnumName}'];
-)",
+		    "\t\tModule['{globalName}']['{enumName}'] = Module['{globalEnumName}'];\n",
 		    fmt::arg("globalName", createName(namePrefix)),
 		    fmt::arg("enumName", e.getName()),
 		    fmt::arg("globalEnumName", namesToDelete.back()));
@@ -104,9 +102,7 @@ std::string Class::getPreJS(std::string const& namePrefix,
 
 	// Renaming the class
 	// Expects to be injected where necessary
-	return fmt::format(R"(
-{baseName}: Module['{globalName}'],
-)",
+	return fmt::format("\t\t\t{baseName}: Module['{globalName}'],\n",
 	                   fmt::arg("baseName", m_name),
 	                   fmt::arg("globalName", namesToDelete.back()));
 }

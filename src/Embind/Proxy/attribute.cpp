@@ -22,9 +22,7 @@ std::string Attribute::getPreJS(std::string const& namePrefix,
 
 	// Renaming the function
 	// Expects to be injected where necessary
-	return fmt::format(R"(
-{baseName}: Module['{globalName}'],
-)",
+	return fmt::format("\t\t\t{baseName}: Module['{globalName}'],\n",
 	                   fmt::arg("baseName", m_name),
 	                   fmt::arg("globalName", namesToDelete.back()));
 }

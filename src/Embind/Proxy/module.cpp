@@ -11,12 +11,7 @@ namespace Embind::Proxy {
 std::string Module::getEmbind() const {
 	using namespace Embind;
 	return fmt::format(
-	    R"(
-{functions}
-{classes}
-{enums}
-{attributes}
-)",
+	    "{functions}{classes}{enums}{attributes}",
 	    fmt::arg("functions", joinEmbind(m_namePrefix, m_functions)),
 	    fmt::arg("classes", joinEmbind(m_namePrefix, m_classes)),
 	    fmt::arg("enums", joinEmbind(m_namePrefix, m_enums)),
@@ -48,7 +43,7 @@ std::string getModuleDeclaration(std::deque<std::string> const& path) {
 std::string joinDeletions(std::vector<std::string> const& deletions) {
 	std::string joined;
 	for (auto const& d : deletions) {
-		joined += fmt::format("delete Module['{}'];\n", d);
+		joined += fmt::format("\t\tdelete Module['{}'];\n", d);
 	}
 	return joined;
 }
@@ -71,13 +66,8 @@ std::string Module::getPreJS() const {
 	using namespace Embind;
 	preJS += fmt::format(
 	    R"(
-{moduleDeclaration} {{
-{functions}
-{enums}
-{attributes}
-{classes}
-}};
-
+		{moduleDeclaration} {{
+{functions}{enums}{attributes}{classes}		}};
 )",
 	    fmt::arg("moduleDeclaration", getModuleDeclaration(m_path)),
 	    fmt::arg("functions",
