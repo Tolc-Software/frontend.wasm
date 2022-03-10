@@ -35,9 +35,9 @@ target_link_libraries(${target_name} PRIVATE embind)
 # Export Promise as 'loadm' for module 'm'
 # -s MODULARIZE=1 sets it as a promise based load
 # Note that this is necessary for preJS to work properly
-set_target_properties(
-  ${target_name}
-  PROPERTIES
+set_property(
+  TARGET ${target_name}
+  PROPERTY
     LINK_FLAGS
-    "-s MODULARIZE=1 -s EXPORT_NAME=\"loadm\" --pre-js ${CMAKE_CURRENT_LIST_DIR}/src/pre.js"
+    "-s MODULARIZE=1 -s EXPORT_NAME=\"loadm\" --pre-js ${CMAKE_CURRENT_LIST_DIR}/src/pre.js "
 )

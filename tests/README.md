@@ -31,7 +31,7 @@ When the `stage` runs its destructor, the `stage` directory is removed. This can
 
 ### EmbindStage ###
 
-The `TestUtil` library provides `EmbindStage` which extends a normal `stage`, and adds some convenient abstractions to test `embind11` built modules. If you don't have a reason to dig, you should probably use a `EmbindStage`.
+The `TestUtil` library provides `EmbindStage` which extends a normal `stage`, and adds some convenient abstractions to test `embind` built modules. If you don't have a reason to dig, you should probably use a `EmbindStage`.
 
 ## Architecture ##
 
