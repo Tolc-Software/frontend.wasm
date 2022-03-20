@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 project(
   Frontend.wasm
-  VERSION 0.4.4
+  VERSION 0.4.5
   LANGUAGES CXX)
 
 configure_file(docs/ReleaseNotes/version.in
@@ -36,7 +36,7 @@ include(FetchContent)
 FetchContent_Declare(
   IRSpecification
   GIT_REPOSITORY https://github.com/Tolc-Software/IntermediateRepresentation.git
-  GIT_TAG v0.11.0)
+  GIT_TAG v0.12.0)
 
 FetchContent_MakeAvailable(IRSpecification)
 
