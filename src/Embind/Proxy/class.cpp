@@ -10,13 +10,22 @@ std::string getClassNamePrefix(std::string const& namespacePrefix,
 	return namespacePrefix.empty() ? className + '_' :
                                      namespacePrefix + className + '_';
 }
+
+std::string getInherited(std::vector<std::string> const& inherited) {
+	std::string out;
+	for (auto const& i : inherited) {
+		out += fmt::format(", em::base<{}>", i);
+	}
+	return out;
+}
 }    // namespace
 
 std::string Class::getEmbind(std::string const& namePrefix) const {
-	std::string out =
-	    fmt::format("\tem::class_<{fullyQualifiedName}>(\"{name}\")\n",
-	                fmt::arg("fullyQualifiedName", m_fullyQualifiedName),
-	                fmt::arg("name", createName(namePrefix)));
+	std::string out = fmt::format(
+	    "\tem::class_<{fullyQualifiedName}{inherited}>(\"{name}\")\n",
+	    fmt::arg("fullyQualifiedName", m_fullyQualifiedName),
+	    fmt::arg("inherited", getInherited(m_inherited)),
+	    fmt::arg("name", createName(namePrefix)));
 
 	if (m_isManagedByShared) {
 		out += fmt::format(
@@ -25,9 +34,12 @@ std::string Class::getEmbind(std::string const& namePrefix) const {
 		    fmt::arg("name", createName(namePrefix)));
 	}
 
-	for (auto const& init : m_constructors) {
-		out += fmt::format("\t\t.{constructorEmbind}",
-		                   fmt::arg("constructorEmbind", init.getEmbind()));
+	// Pure classes cannot be instantiated
+	if (!m_isPure) {
+		for (auto const& init : m_constructors) {
+			out += fmt::format("\t\t.{constructorEmbind}",
+			                   fmt::arg("constructorEmbind", init.getEmbind()));
+		}
 	}
 
 	for (auto const& function : m_functions) {
@@ -50,6 +62,13 @@ std::string Class::getEmbind(std::string const& namePrefix) const {
 		    fmt::arg("getter", variable.m_getter),
 		    fmt::arg("setter", setter),
 		    fmt::arg("variableName", variable.m_name));
+	}
+
+	for (auto const& trampoline : m_trampolineClasses) {
+		out += fmt::format(
+		    "\t\t.allow_subclass<{fullyQualifiedName}>(\"{name}\")\n",
+		    fmt::arg("fullyQualifiedName", trampoline.m_fullyQualifiedName),
+		    fmt::arg("name", trampoline.m_name));
 	}
 
 	// Remove the last newline
@@ -112,9 +131,10 @@ std::string Class::createName(std::string const& namePrefix) const {
 }
 
 Class::Class(std::string const& name, std::string const& fullyQualifiedName)
-    : m_name(name), m_fullyQualifiedName(fullyQualifiedName), m_constructors(),
-      m_functions(), m_memberVariables(), m_enums(),
-      m_isManagedByShared(false) {}
+    : m_name(name), m_fullyQualifiedName(fullyQualifiedName),
+      m_trampolineClasses(), m_inherited(), m_constructors(), m_functions(),
+      m_memberVariables(), m_enums(), m_isManagedByShared(false),
+      m_isPure(false) {}
 
 void Class::addEnum(Enum const& e) {
 	m_enums.push_back(e);
@@ -142,4 +162,18 @@ std::string const& Class::getName() const {
 void Class::setAsManagedByShared() {
 	m_isManagedByShared = true;
 }
+
+void Class::addTrampolineClass(std::string const& className,
+                               std::string const& fullyQualifiedName) {
+	m_trampolineClasses.push_back({className, fullyQualifiedName});
+}
+
+void Class::setAsPure() {
+	m_isPure = true;
+}
+
+void Class::addInherited(std::string const& baseClass) {
+	m_inherited.push_back(baseClass);
+}
+
 }    // namespace Embind::Proxy

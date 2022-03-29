@@ -86,7 +86,7 @@ expect(m.MyNamespace.i).toBe(5);
 expect(m.MyNamespace_i).toBe(undefined);
 
 // Ok to nest Enums within classes
-var withEnum = new m.WithEnum();
+const withEnum = new m.WithEnum();
 expect(withEnum.i).toBe(m.WithEnum.Instrument.Flute);
 withEnum.delete();
 

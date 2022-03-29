@@ -14,9 +14,9 @@ std::string joinRegisterCommands(std::set<std::string> const& commands) {
 	return out;
 }
 
-std::string joinExtraFunctions(std::set<std::string> const& functions,
-                               std::string const& ns) {
-	if (functions.empty()) {
+std::string joinExtraFunctions(Embind::Proxy::TypeInfo const& typeInfo) {
+	if (typeInfo.m_extraFunctions.empty() &&
+	    typeInfo.m_trampolineClasses.empty()) {
 		return "";
 	}
 
@@ -24,10 +24,12 @@ std::string joinExtraFunctions(std::set<std::string> const& functions,
 	std::string out = fmt::format(R"(
 namespace {} {{
 {}
+{}
 }}
 )",
-	                              ns,
-	                              fmt::join(functions, ""));
+	                              typeInfo.m_functionsNamespace,
+	                              fmt::join(typeInfo.m_extraFunctions, ""),
+	                              fmt::join(typeInfo.m_trampolineClasses, ""));
 
 	return out;
 }
@@ -73,9 +75,7 @@ namespace em = emscripten;
 EMSCRIPTEN_BINDINGS({libraryName}) {{
 {registerCommands}
 )",
-	    fmt::arg("joinedFunctions",
-	             joinExtraFunctions(m_typeInfo.m_extraFunctions,
-	                                m_typeInfo.m_functionsNamespace)),
+	    fmt::arg("joinedFunctions", joinExtraFunctions(m_typeInfo)),
 	    fmt::arg("libraryName", m_libraryName),
 	    fmt::arg("registerCommands",
 	             joinRegisterCommands(m_typeInfo.m_registerCommands)));

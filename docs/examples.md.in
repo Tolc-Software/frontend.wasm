@@ -5,7 +5,7 @@ Each example is taken from the test suite for `Tolc` and, given that you use the
 To use `WebAssembly` from `javascript`, one has to load it in asynchronously. When using `Tolc` this is done with a [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) on the `javascript` side. Each library named `MyLib` exports a `Promise` called `loadMyLib`, in every test the name is simply `m` for brevity. All tests use [`jest`](https://jestjs.io/), and the `javascript` test boiler plate is omitted:
 
 ```javascript
-var loadm = require('./build/m');
+const loadm = require('./build/m');
 
 test('Tolc Test', () => {
 	loadm().then(m => {

@@ -27,6 +27,13 @@ struct TypeInfo {
 	//     }
 	std::set<std::string> m_extraFunctions;
 
+	// If a class has virtual functions they need to have a 'trampoline' class defined.
+	// This allows python classes to override the C++ classes.
+	// Also allows binding of purely virtual classes
+	// This is the full definition of that trampoline class.
+	// https://emscripten.org/docs/porting/connecting_cpp_and_javascript/embind.html#advanced-class-concepts
+	std::set<std::string> m_trampolineClasses;
+
 	// Do we need to include anything extra?
 	// Example entries: {<string>, "MyStuff.hpp"}
 	std::set<std::string> m_includes;

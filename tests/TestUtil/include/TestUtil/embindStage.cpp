@@ -138,7 +138,7 @@ int EmbindStage::runEmbindUnittest(std::string const& testBody) {
 
 void EmbindStage::addJestUnitTest(std::string const& body) {
 	std::string test = fmt::format(R"(
-var loadm = require('./build/defaultModule');
+const loadm = require('./build/defaultModule');
 
 test('Tolc Test', () => {{
 	loadm().then(m => {{

@@ -35,10 +35,13 @@ std::string Function::getEmbind(std::string const& namePrefix) const {
 		// Results in
 		// class_function("myFunction", select_overload<void()>(&MyNS::myFunction))
 		f = fmt::format(
-		    R"({functionPrefix}function("{name}", {qualifiedName}){ending})",
+		    R"({functionPrefix}function("{name}", {qualifiedName}{allowPointers}{virtual}){ending})",
 		    fmt::arg("functionPrefix",
 		             getFunctionPrefix(m_isClassFunction, m_isStatic)),
 		    fmt::arg("name", createName(namePrefix)),
+		    fmt::arg("allowPointers",
+		             m_allowPointers ? ", em::allow_raw_pointers()" : ""),
+		    fmt::arg("virtual", m_polymorphic),
 		    fmt::arg("ending", m_isClassFunction ? "\n" : ";\n"),
 		    fmt::arg("qualifiedName",
 		             m_isOverloaded ?
@@ -71,11 +74,52 @@ std::string Function::createOverloadedName() const {
 	return joinedArgs.empty() ? m_name : m_name + '_' + joinedArgs;
 }
 
+std::string Function::getArgumentNames() const {
+	// Get the typenames of the arguments
+	std::vector<std::string> names;
+	std::transform(m_arguments.begin(),
+	               m_arguments.end(),
+	               std::back_inserter(names),
+	               [=](auto const& argument) { return argument.name; });
+	return fmt::format("{}", fmt::join(names, ", "));
+}
+
+std::string Function::getArgumentTypes(bool withArgumentNames) const {
+	// Get the typenames of the arguments
+	std::vector<std::string> typeNames;
+	std::transform(m_arguments.begin(),
+	               m_arguments.end(),
+	               std::back_inserter(typeNames),
+	               [=](auto const& argument) {
+		               return withArgumentNames ?
+		                          argument.typeName + " " + argument.name :
+                                  argument.typeName;
+	               });
+	return fmt::format("{}", fmt::join(typeNames, ", "));
+}
+
+std::string Function::getSignature() const {
+	return fmt::format(R"(({returnType}({namespace}*)({arguments})))",
+	                   fmt::arg("returnType", m_returnType),
+	                   fmt::arg("namespace",
+	                            Embind::Helpers::removeSubString(
+	                                m_fullyQualifiedName, m_name)),
+	                   fmt::arg("arguments", getArgumentTypes()));
+}
+
+std::string Function::createName(std::string const& namePrefix) const {
+	return fmt::format(
+	    R"({namePrefix}{name})",
+	    fmt::arg("namePrefix", namePrefix),
+	    fmt::arg("name", m_isOverloaded ? createOverloadedName() : m_name));
+}
+
 Function::Function(std::string const& name,
                    std::string const& fullyQualifiedName)
     : m_name(name), m_fullyQualifiedName(fullyQualifiedName),
-      m_returnType("void"), m_arguments({}), m_isConstructor(false),
-      m_isOverloaded(false), m_isStatic(false), m_isClassFunction(false) {}
+      m_returnType("void"), m_arguments({}), m_polymorphic(""),
+      m_isConstructor(false), m_isOverloaded(false), m_isStatic(false),
+      m_isClassFunction(false), m_allowPointers(false) {}
 
 void Function::addArgument(std::string const& typeName,
                            std::string const& name) {
@@ -102,29 +146,31 @@ void Function::setAsOverloaded() {
 	m_isOverloaded = true;
 };
 
-std::string Function::getArgumentTypes() const {
-	// Get the typenames of the arguments
-	std::vector<std::string> typeNames;
-	std::transform(m_arguments.begin(),
-	               m_arguments.end(),
-	               std::back_inserter(typeNames),
-	               [](auto const& argument) { return argument.typeName; });
-	return fmt::format("{}", fmt::join(typeNames, ", "));
+std::string Function::getReturnType() const {
+	return m_returnType;
 }
 
-std::string Function::getSignature() const {
-	return fmt::format(R"(({returnType}({namespace}*)({arguments})))",
-	                   fmt::arg("returnType", m_returnType),
-	                   fmt::arg("namespace",
-	                            Embind::Helpers::removeSubString(
-	                                m_fullyQualifiedName, m_name)),
-	                   fmt::arg("arguments", getArgumentTypes()));
+std::string Function::getName() const {
+	return m_name;
 }
 
-std::string Function::createName(std::string const& namePrefix) const {
-	return fmt::format(
-	    R"({namePrefix}{name})",
-	    fmt::arg("namePrefix", namePrefix),
-	    fmt::arg("name", m_isOverloaded ? createOverloadedName() : m_name));
+void Function::setAsPureVirtual() {
+	m_polymorphic = ", em::pure_virtual()";
 }
+
+void Function::allowPointers() {
+	m_allowPointers = true;
+}
+
+void Function::setAsVirtual(std::string const& base) {
+	m_polymorphic = fmt::format(
+	    R"_tolc_delimiter(, optional_override([]({base}& self, {arguments}) {{
+			return self.{base}::{functionName}({argumentsNames});
+		}}))_tolc_delimiter",
+	    fmt::arg("base", base),
+	    fmt::arg("arguments", getArgumentTypes(true)),
+	    fmt::arg("functionName", m_name),
+	    fmt::arg("argumentNames", getArgumentNames()));
+}
+
 }    // namespace Embind::Proxy
