@@ -21,7 +21,7 @@ std::map<int, std::string> getData() {
 )";
 
 	auto jsTestCode = R"(
-var data = m.getData();
+const data = m.getData();
 
 expect(data.size()).toBe(1);
 

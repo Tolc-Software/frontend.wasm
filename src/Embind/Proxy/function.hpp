@@ -41,9 +41,22 @@ public:
 	// should call setReturnType("std::string")
 	void setReturnType(std::string const& typeName);
 
+	// Get the C++ name
+	std::string getName() const;
+
+	std::string getArgumentTypes(bool withArgumentNames = false) const;
+
+	std::string getArgumentNames() const;
+
+	std::string getReturnType() const;
+
+	void setAsPureVirtual();
+	void setAsVirtual(std::string const& base);
+
+	void allowPointers();
+
 private:
 	std::string getSignature() const;
-	std::string getArgumentTypes() const;
 
 	// => {m_name}_{argType0}_{argType1}
 	// If there are no argument types, then just {m_name}
@@ -68,9 +81,11 @@ private:
 	std::string m_returnType;
 	std::vector<Argument> m_arguments;
 
+	std::string m_polymorphic;
 	bool m_isConstructor;
 	bool m_isOverloaded;
 	bool m_isStatic;
 	bool m_isClassFunction;
+	bool m_allowPointers;
 };
 }    // namespace Embind::Proxy

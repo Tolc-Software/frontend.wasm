@@ -1,7 +1,7 @@
 include_guard()
 
 include(${modules}/GetParser.cmake)
-get_parser(VERSION v0.3.0)
+get_parser(VERSION v0.4.1)
 
 # Set the include path for the system library in the variable
 # We are using the standard library shipped
@@ -117,6 +117,7 @@ foreach(
   globalVariables.cpp
   # lists.cpp
   maps.cpp
+  inheritence.cpp
   namespaceRenaming.cpp
   namespaces.cpp
   # optionals.cpp
@@ -131,7 +132,8 @@ foreach(
   # userDefined.cpp
   # valarrays.cpp
   # variants.cpp
-  vectors.cpp)
+  vectors.cpp
+  virtualInheritence.cpp)
   # Ex: Embind/Proxy/moduleFile.cpp -> moduleFile
   get_filename_component(testName ${test} NAME_WLE)
 

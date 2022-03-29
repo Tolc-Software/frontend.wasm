@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 project(
   Frontend.wasm
-  VERSION 0.4.5
+  VERSION 0.5.0
   LANGUAGES CXX)
 
 configure_file(docs/ReleaseNotes/version.in
@@ -36,7 +36,7 @@ include(FetchContent)
 FetchContent_Declare(
   IRSpecification
   GIT_REPOSITORY https://github.com/Tolc-Software/IntermediateRepresentation.git
-  GIT_TAG v0.12.0)
+  GIT_TAG v0.14.0)
 
 FetchContent_MakeAvailable(IRSpecification)
 
@@ -61,6 +61,7 @@ add_library(
   src/Embind/getOverloadedFunctions.cpp
   src/Embind/Helpers/split.cpp
   src/Embind/Helpers/string.cpp
+  src/Embind/Helpers/trampolineClass.cpp
   src/Embind/Helpers/types.cpp)
 
 add_warnings(TARGET Frontend.wasm)

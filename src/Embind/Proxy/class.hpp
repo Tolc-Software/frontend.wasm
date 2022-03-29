@@ -39,6 +39,13 @@ public:
 	std::string getGlobalPreJS(std::string const& namePrefix,
 	                           std::vector<std::string>& namesToDelete) const;
 
+	void addTrampolineClass(std::string const& className,
+	                        std::string const& fullyQualifiedName);
+
+	void setAsPure();
+
+	void addInherited(std::string const& baseClass);
+
 private:
 	struct MemberVariable {
 		// User defined name of the member variable
@@ -49,9 +56,17 @@ private:
 		bool m_isStatic;
 	};
 
+	struct Trampoline {
+		std::string m_name;
+		std::string m_fullyQualifiedName;
+	};
+
 	// User defined name of the class
 	std::string m_name;
 	std::string m_fullyQualifiedName;
+
+	std::vector<Trampoline> m_trampolineClasses;
+	std::vector<std::string> m_inherited;
 
 	std::vector<Function> m_constructors;
 	std::vector<Function> m_functions;
@@ -59,6 +74,7 @@ private:
 	std::vector<Enum> m_enums;
 
 	bool m_isManagedByShared;
+	bool m_isPure;
 
 	std::string createName(std::string const& namePrefix) const;
 };

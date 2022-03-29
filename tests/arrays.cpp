@@ -24,14 +24,14 @@ std::array<int, 2> getData2() {
 )";
 
 	auto jsTestCode = R"(
-var data3 = m.getData3();
+const data3 = m.getData3();
 
 // It's just a normal JS array
 expect(data3.length).toBe(3);
 
 expect(data3).toStrictEqual([0, 1, 2]);
 
-var data2 = m.getData2();
+const data2 = m.getData2();
 expect(data2.length).toBe(2);
 
 expect(data2).toStrictEqual([0, 1]);

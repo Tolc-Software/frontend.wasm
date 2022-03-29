@@ -3,6 +3,7 @@
 #include "Embind/Builders/functionBuilder.hpp"
 #include "Embind/Builders/typeToStringBuilder.hpp"
 #include "Embind/Helpers/combine.hpp"
+#include "Embind/Helpers/trampolineClass.hpp"
 #include "Embind/Helpers/types.hpp"
 #include "Embind/Proxy/typeInfo.hpp"
 #include "Embind/checkType.hpp"
@@ -17,6 +18,33 @@
 
 namespace Embind::Builders {
 
+namespace {
+
+struct TrampolineFunctions {
+	std::vector<Embind::Proxy::Function> virtualFunctions;
+};
+
+bool addIfVirtual(IR::Polymorphic polymorphic,
+                  std::string const& baseClass,
+                  Embind::Proxy::Function& emFunction,
+                  TrampolineFunctions& trampoline) {
+	using IR::Polymorphic;
+	switch (polymorphic) {
+		case Polymorphic::PureVirtual:
+			trampoline.virtualFunctions.push_back(emFunction);
+			emFunction.setAsPureVirtual();
+			return true;
+			break;
+		case Polymorphic::Virtual:
+			trampoline.virtualFunctions.push_back(emFunction);
+			emFunction.setAsVirtual(baseClass);
+			break;
+		case Polymorphic::NA: break;
+	}
+	return false;
+}
+}
+
 std::optional<Embind::Proxy::Class>
 buildClass(IR::Struct const& cppClass, Embind::Proxy::TypeInfo& typeInfo) {
 	Embind::Proxy::Class jsClass(
@@ -24,6 +52,8 @@ buildClass(IR::Struct const& cppClass, Embind::Proxy::TypeInfo& typeInfo) {
 	        Embind::Builders::getSeparatedTypeString(
 	            cppClass.m_templateArguments, "_"),
 	    cppClass.m_representation);
+
+	TrampolineFunctions trampoline;
 
 	auto overloadedFunctions =
 	    Embind::getOverloadedFunctions(cppClass.m_public.m_functions);
@@ -41,6 +71,14 @@ buildClass(IR::Struct const& cppClass, Embind::Proxy::TypeInfo& typeInfo) {
 			if (overloadedFunctions.find(function.m_representation) !=
 			    overloadedFunctions.end()) {
 				jsFunction.setAsOverloaded();
+			}
+
+			auto pureVirtual = addIfVirtual(function.m_polymorphic,
+			                                cppClass.m_representation,
+			                                jsFunction,
+			                                trampoline);
+			if (pureVirtual) {
+				jsClass.setAsPure();
 			}
 
 			jsClass.addFunction(jsFunction);
@@ -98,8 +136,24 @@ buildClass(IR::Struct const& cppClass, Embind::Proxy::TypeInfo& typeInfo) {
 		jsClass.addConstructor(constructor);
 	}
 
+	for (auto const& inherited : cppClass.m_public.m_inherited) {
+		jsClass.addInherited(inherited);
+	}
+
 	for (auto const& e : cppClass.m_public.m_enums) {
 		jsClass.addEnum(buildEnum(e));
+	}
+
+	if (!trampoline.virtualFunctions.empty()) {
+		// There are virtual functions
+		auto [name, cls] =
+		    Embind::Helpers::getTrampolineClass(cppClass.m_name,
+		                                        cppClass.m_representation,
+		                                        trampoline.virtualFunctions);
+
+		typeInfo.m_trampolineClasses.insert(cls);
+		jsClass.addTrampolineClass(name,
+		                           typeInfo.m_functionsNamespace + "::" + name);
 	}
 
 	if (typeInfo.m_classesMarkedShared.contains(cppClass.m_representation)) {

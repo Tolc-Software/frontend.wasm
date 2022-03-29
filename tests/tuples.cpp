@@ -37,7 +37,7 @@ public:
 
 // Tuple converts from javascript array
 const myArray = ["Hello World", 42];
-var myClass = new m.MyClass(myArray);
+const myClass = new m.MyClass(myArray);
 expect(myClass.getTuple()).toStrictEqual(myArray);
 
 // The array still need to match the underlying std::tuple structure
@@ -51,7 +51,7 @@ try {
 myClass.delete();
 
 // Can handle different Number types
-var withFunction = new m.WithFunction();
+const withFunction = new m.WithFunction();
 expect(withFunction.sum([1, 2, 3.3, 2.0])).toBeCloseTo(8.3, 5);
 
 withFunction.delete();

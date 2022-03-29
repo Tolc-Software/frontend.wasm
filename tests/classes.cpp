@@ -79,14 +79,14 @@ expect(m.WithConstructor.getStatic()).toBe(55);
 // Static variable
 expect(m.WithConstructor.i).toBe(5);
 
-var withConstructor = new m.WithConstructor("Hello");
+const withConstructor = new m.WithConstructor("Hello");
 expect(withConstructor.getS()).toBe("Hello");
 
 // Classes need to be deleted manually
 withConstructor.delete();
 
 // Const properties are read-only
-var withMembers = new m.WithMembers();
+const withMembers = new m.WithMembers();
 expect(withMembers.i).toBe(5);
 try {
 	withMembers.i = 10;
@@ -98,12 +98,12 @@ expect(withMembers.s).toBe("hello");
 withMembers.delete();
 
 // Public functions are available
-var withFunction = new m.WithFunction();
+const withFunction = new m.WithFunction();
 expect(withFunction.add(5, 10)).toBe(15);
 withFunction.delete();
 
 // Cannot access private functions
-var withPrivateFunction = new m.WithPrivateFunction();
+const withPrivateFunction = new m.WithPrivateFunction();
 try {
 	withPrivateFunction.multiply(5, 10);
 	expect(true).toBe(false);
@@ -113,12 +113,12 @@ try {
 withPrivateFunction.delete();
 
 // Classes can be found under their namespace
-var nested = new m.MyNamespace.Nested();
+const nested = new m.MyNamespace.Nested();
 expect(nested.i).toBe(42);
 nested.delete();
 
 // Ok to nest Enums within classes
-var withEnum = new m.WithEnum();
+const withEnum = new m.WithEnum();
 expect(withEnum.i).toBe(m.WithEnum.Instrument.Flute);
 withEnum.delete();
 )";

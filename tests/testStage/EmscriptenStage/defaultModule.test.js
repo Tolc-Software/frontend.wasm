@@ -1,4 +1,4 @@
-var m = require('./defaultModule');
+const m = require('./defaultModule');
 
 test('Default test', () => {
 	m.onRuntimeInitialized = function() {

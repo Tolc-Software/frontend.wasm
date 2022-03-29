@@ -18,11 +18,11 @@ std::vector<int> getData() {
 )";
 
 	auto jsTestCode = R"(
-var data = m.getData();
+const data = m.getData();
 
 expect(data.size()).toBe(3);
 
-for (var i = 0; i < data.size(); i++) {
+for (let i = 0; i < data.size(); i++) {
     expect(data.get(i)).toBe(i);
 }
 
