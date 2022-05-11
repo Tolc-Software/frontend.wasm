@@ -179,6 +179,9 @@ TEST_CASE("Class with member variables", "[classBuilder]") {
 	for (auto const& var : variables) {
 		IR::Variable v;
 		v.m_name = var.name;
+		v.m_isStatic = false;
+		v.m_documentation = "";
+		v.m_id = 0;
 		v.m_type = TestUtil::getType();
 		v.m_type.m_representation = var.type;
 		v.m_type.m_isConst = var.isConst;
