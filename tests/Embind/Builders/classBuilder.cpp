@@ -17,7 +17,10 @@ struct Var {
 TEST_CASE("Class with vector in member function gives the correct register",
           "[classBuilder]") {
 	auto constructor = TestUtil::getFunction("SomeClass");
-	constructor.m_arguments.push_back({"myVar", "", TestUtil::getVector()});
+	IR::Argument arg;
+	arg.m_name = "myVar";
+	arg.m_type = TestUtil::getVector();
+	constructor.m_arguments.push_back(arg);
 	constructor.m_returnType = TestUtil::getMap();
 
 	auto s = TestUtil::getStruct("SomeClass");
@@ -37,7 +40,10 @@ TEST_CASE("Class with vector in member function gives the correct register",
 
 TEST_CASE("Class with a constructor", "[classBuilder]") {
 	auto constructor = TestUtil::getFunction("SomeClass");
-	constructor.m_arguments.push_back({"myVar", "", TestUtil::getVector()});
+	IR::Argument arg;
+	arg.m_name = "myVar";
+	arg.m_type = TestUtil::getVector();
+	constructor.m_arguments.emplace_back(arg);
 
 	auto s = TestUtil::getStruct("SomeClass");
 	s.m_public.m_constructors.push_back(constructor);
@@ -117,7 +123,7 @@ TEST_CASE("Class with functions", "[classBuilder]") {
 	for (auto const& [function, type] : functions) {
 		IR::Function f = TestUtil::getFunction(function);
 
-		IR::Variable v;
+		IR::Argument v;
 		v.m_name = "myVar";
 
 		IR::Type arg;
@@ -148,8 +154,11 @@ TEST_CASE("Class with vector in constructor gives the correct register command",
           "[classBuilder]") {
 	IR::Struct s = TestUtil::getStruct("MyStruct");
 	IR::Function constructor = TestUtil::getFunction("MyStruct");
-	IR::Type arg = TestUtil::getVector();
-	constructor.m_arguments.push_back({"myVar", "", arg});
+	IR::Type v = TestUtil::getVector();
+	IR::Argument arg;
+	arg.m_name = "myVar";
+	arg.m_type = v;
+	constructor.m_arguments.push_back(arg);
 	s.m_public.m_functions.push_back(constructor);
 	Embind::Proxy::TypeInfo typeInfo;
 	auto c = Embind::Builders::buildClass(s, typeInfo);

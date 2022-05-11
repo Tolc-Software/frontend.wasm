@@ -165,7 +165,7 @@ void Function::allowPointers() {
 void Function::setAsVirtual(std::string const& base) {
 	m_polymorphic = fmt::format(
 	    R"_tolc_delimiter(, optional_override([]({base}& self, {arguments}) {{
-			return self.{base}::{functionName}({argumentsNames});
+			return self.{base}::{functionName}({argumentNames});
 		}}))_tolc_delimiter",
 	    fmt::arg("base", base),
 	    fmt::arg("arguments", getArgumentTypes(true)),

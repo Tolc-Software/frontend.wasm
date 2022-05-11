@@ -125,7 +125,7 @@ buildClass(IR::Struct const& cppClass, Embind::Proxy::TypeInfo& typeInfo) {
 			                               typeInfo);
 		}
 		jsClass.addMemberVariable(
-		    variable.m_name, getter, setter, variable.m_type.m_isStatic);
+		    variable.m_name, getter, setter, variable.m_isStatic);
 	}
 
 	// Add default constructor
